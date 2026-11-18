@@ -1,6 +1,7 @@
 // Stage 16: retain in-memory photos when normalizing a step for Excel output.
 // normalizeStepShape() intentionally drops media when hydrating JSON drafts;
 // it must not be applied destructively to a live step immediately before export.
+function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('Не удалось прочитать фото'));r.readAsDataURL(blob)})}
 function normalizeExcelStepKeepingPhoto(source){
   const step=normalizeStepShape(source);
   step.imageData=typeof source.imageData==='string'?source.imageData:null;
