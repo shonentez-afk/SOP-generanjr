@@ -22,7 +22,13 @@
 ## Результаты UX/UI аудита
 Подробный аудит Stage 13: `docs/UX_UI_AUDIT_STAGE13_RU.md`. Найден P0 с потерей фото при XLSX→черновик→восстановление, несколько P1/P2. Приложение не изменено, требуется пакет исправлений с регрессией.
 
-## Текущая версия
+## Исправленная версия для ПК — Stage 14
+
+`releases/stage14-desktop-ux-data-integrity.html` — текущий единственный HTML. Исправлена потеря импортированных фото, расширены переносимые JSON-копии с изображениями, оформление Tailwind встроено локально, устранены ошибки фоторедактора/публикации/TWI и улучшена доступность. **Телефон не рассматриваем:** мобильная горизонтальная прокрутка не исправлялась. Настройки ИИ и Yandex Cloud-прокси не изменены.
+
+Сборка: `python tools/build_stage14.py --verify-release`. Полный отчёт: `docs/RELEASE_STAGE14_RU.md`.
+
+## Предыдущая версия
 
 Stage 13: `releases/stage13-layered-photo-editor.html` — неразрушающее редактирование фото и сохранение разметки по версиям документа. Код: `src/modules/photos/stage13-photo-section.js` и `src/patches/stage13-integrations.json`. Сборка: `python tools/build_stage13.py --verify-release`. См. `docs/RELEASE_STAGE13_RU.md`. Настройки ИИ и прокси сохранены.
 

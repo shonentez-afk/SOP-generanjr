@@ -1,0 +1,26 @@
+name: Stage 14 Desktop UX and data integrity
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild Stage14 from source patches
+        run: python tools/build_stage14.py --verify-release
+      - name: Run all regression contract tests
+        run: python -m unittest discover -s tests -v
+      - name: Syntax-check all inline application scripts
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('releases/stage14-desktop-ux-data-integrity.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script[^>]*>([\s\S]*?)</script>',s,re.I)
+          Path('/tmp/sop-stage14.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/sop-stage14.js
