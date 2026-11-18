@@ -1,0 +1,14 @@
+{
+  "styles": [
+    "src/styles/inline-01.html",
+    "src/styles/inline-02.html",
+    "src/styles/inline-03.html",
+    "src/styles/inline-04.html",
+    "src/styles/inline-05.html"
+  ],
+  "scripts": [
+    "src/legacy/inline-script-01.html",
+    "src/legacy/inline-script-02.html",
+    "src/legacy/inline-script-03.html"
+  ]
+}
