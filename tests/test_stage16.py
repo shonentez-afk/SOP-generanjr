@@ -36,6 +36,13 @@ class Stage16PhotoRegressionTests(unittest.TestCase):
         self.assertNotIn("wb.addImage({buffer:s.imageBuffer",self.html)
         self.assertNotIn("catch(e){console.warn('image',e,s.id)}",self.html)
 
+    def test_excel_image_anchors_are_standards_compliant(self):
+        self.assertIn("function sopExcelImageRange(ws,tl,widthPx,heightPx)",self.html)
+        self.assertIn("ws.addImage(id,sopExcelImageRange(ws,{col:c1-1+0.05,row:r-1+0.05},150,95))",self.html)
+        self.assertIn("ws.addImage(logoId,sopExcelImageRange",self.html)
+        self.assertIn("ws.addImage(icId,sopExcelImageRange",self.html)
+        self.assertNotIn("ws.addImage(id,{tl:{col:c1-1+0.05,row:r-1+0.05},ext:",self.html)
+
     def test_photo_editor_upload_zone_does_not_steal_clicks(self):
         self.assertIn("if(e.target.closest('button,input'))return;inp.click()",self.html)
         self.assertIn("e.preventDefault();e.stopPropagation();",self.html)
