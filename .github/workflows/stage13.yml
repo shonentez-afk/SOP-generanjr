@@ -1,0 +1,28 @@
+name: Stage 13 layered photo editor
+on:
+  push:
+  pull_request:
+jobs:
+  stage13:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source/release consistency
+        run: python tools/build_stage13.py --verify-release
+      - name: Check photo module JavaScript
+        run: node --check src/modules/photos/stage13-photo-section.js
+      - name: Validate HTML JavaScript
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('releases/stage13-layered-photo-editor.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script[^>]*>([\s\S]*?)</script>',s,re.I)
+          Path('/tmp/sop-stage13.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/sop-stage13.js
+      - name: Run regressions
+        run: python -m unittest discover -s tests -v
