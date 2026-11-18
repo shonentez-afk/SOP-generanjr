@@ -3400,6 +3400,23 @@ function normalizeExcelStepKeepingPhoto(source){
   step.hasPhoto=!!(source.hasPhoto||step.imageData||step.imageBuffer);
   return step;
 }
+// ExcelJS 4.4 serializes an unsupported editAs attribute on oneCellAnchor.
+// Use standards-valid twoCellAnchor (editAs=oneCell) while preserving pixel
+// dimensions and original top-left placement in the SOP template.
+function sopExcelImageRange(ws,tl,widthPx,heightPx){
+  const startCol=Math.floor(tl.col),startRow=Math.floor(tl.row);
+  const col=ws.getColumn(startCol+1),row=ws.getRow(startRow+1);
+  const startColOff=Math.floor((tl.col-startCol)*(col.isCustomWidth?col.width*10000:640000));
+  const startRowOff=Math.floor((tl.row-startRow)*(row.height?row.height*10000:180000));
+  const colEmu=i=>Math.max(90000,Math.round(((ws.getColumn(i+1).width||8.43)*7+5)*9525));
+  const rowEmu=i=>Math.max(90000,Math.round((ws.getRow(i+1).height||15)*12700));
+  let endCol=startCol,endRow=startRow;
+  let endColOff=startColOff+Math.round(widthPx*9525);
+  let endRowOff=startRowOff+Math.round(heightPx*9525);
+  while(endColOff>=colEmu(endCol)&&endCol<1000){endColOff-=colEmu(endCol);endCol++}
+  while(endRowOff>=rowEmu(endRow)&&endRow<10000){endRowOff-=rowEmu(endRow);endRow++}
+  return {tl,br:{nativeCol:endCol,nativeColOff:endColOff,nativeRow:endRow,nativeRowOff:endRowOff},editAs:'oneCell'};
+}
 function excelPhotoMimeFromBytes(bytes){
   if(bytes.length>=3&&bytes[0]===255&&bytes[1]===216&&bytes[2]===255)return 'jpeg';
   if(bytes.length>=8&&bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71&&bytes[4]===13&&bytes[5]===10)return 'png';
@@ -3516,9 +3533,10 @@ async function generateExcel(){
       }
     }
     ws.getRow(1).height=9;
+    ws.getRow(2).height=32;
     try{
       const logoId=wb.addImage({base64:makeLogo().split(',')[1],extension:'png'});
-      ws.addImage(logoId,{tl:{col:1.05,row:1.08},ext:{width:110,height:22}});
+      ws.addImage(logoId,sopExcelImageRange(ws,{col:1.05,row:1.08},110,22));
     }catch(e){console.warn('logo',e)}
 
     // === ОРИГИНАЛЬНАЯ ШАПКА СОП: сохраняем геометрию исходного шаблона ===
@@ -3566,13 +3584,14 @@ async function generateExcel(){
     M(14,2,14,5,(hasIcons?'\n':'')+m.safety,{font:{size:9},alignment:T});
     M(14,6,14,10,m.tools,{font:{size:10},alignment:C});
     M(14,11,14,12,m.material,{font:{size:10},alignment:C});
+    ws.getRow(14).height=clamp((textLines(m.safety,40)+(hasIcons?1:0))*13+34,hasIcons?58:40,130);
     if(hasIcons){
       status.textContent='Загрузка пиктограмм ISO 7010...';
       try{
         const strip=await buildIconStripPng(state.safetyIconIds,24);
         if(strip){
           const icId=wb.addImage({base64:strip.dataUrl.split(',')[1],extension:'png'});
-          ws.addImage(icId,{tl:{col:1.15,row:13.08},ext:{width:strip.width,height:strip.height}});
+          ws.addImage(icId,sopExcelImageRange(ws,{col:1.15,row:13.08},strip.width,strip.height));
           if(strip.loaded<strip.total)toast(`Загрузилось ${strip.loaded} из ${strip.total} пиктограмм ISO 7010`,'info');
         } else toast('Не удалось загрузить пиктограммы ISO 7010 — файл создан без них','info');
       }catch(e){console.warn('icons',e);toast('Не удалось загрузить пиктограммы ISO 7010','info')}
@@ -3591,13 +3610,14 @@ async function generateExcel(){
       const g=state.steps.slice(i,i+3);
       M(r,2,r,2,'Визуализация',{fill:GRAY,font:{size:8,color:{argb:GRAYTXT}},alignment:{textRotation:90,horizontal:'center',vertical:'middle'}});
       let hasImg=false;
+      ws.getRow(r).height=g.some(st=>st?._excelPhoto)?120:30;
       for(let k=0;k<3;k++){
         const [c1,c2]=vSpans[k],s=g[k];
         M(r,c1,r,c2,'',{alignment:C});
         if(s?._excelPhoto){
           hasImg=true;
           const id=wb.addImage({base64:s._excelPhoto.base64,extension:s._excelPhoto.extension});
-          ws.addImage(id,{tl:{col:c1-1+0.05,row:r-1+0.05},ext:{width:150,height:95}});
+          ws.addImage(id,sopExcelImageRange(ws,{col:c1-1+0.05,row:r-1+0.05},150,95));
           embeddedStepPhotos++;
         }
       }
