@@ -69,6 +69,35 @@ def build():
         "    status.innerHTML='<span class=\"text-green-600 font-medium\">✓ Файл успешно сгенерирован! (3 листа: СОП, ФРВ, Чек-лист; фотографий: '+embeddedStepPhotos+')</span>';",
         "Display number of embedded photos")
 
+    # ExcelJS 4.4 emits invalid oneCellAnchor editAs attributes; browsers
+    # and openpyxl may drop all drawings despite ZIP media being present.
+    # Two-cell anchors are accepted by Excel and openpyxl, and preserve the
+    # same pixel extents using sopExcelImageRange().
+    html=replace_once(html,
+        "    ws.getRow(1).height=9;",
+        "    ws.getRow(1).height=9;\n    ws.getRow(2).height=32;",
+        "Fix logo row size before defining image anchor")
+    html=replace_once(html,
+        "      ws.addImage(logoId,{tl:{col:1.05,row:1.08},ext:{width:110,height:22}});",
+        "      ws.addImage(logoId,sopExcelImageRange(ws,{col:1.05,row:1.08},110,22));",
+        "Use standards-compliant logo anchor")
+    html=replace_once(html,
+        "    M(14,11,14,12,m.material,{font:{size:10},alignment:C});\n    if(hasIcons){",
+        "    M(14,11,14,12,m.material,{font:{size:10},alignment:C});\n    ws.getRow(14).height=clamp((textLines(m.safety,40)+(hasIcons?1:0))*13+34,hasIcons?58:40,130);\n    if(hasIcons){",
+        "Compute safety row height before image anchor")
+    html=replace_once(html,
+        "          ws.addImage(icId,{tl:{col:1.15,row:13.08},ext:{width:strip.width,height:strip.height}});",
+        "          ws.addImage(icId,sopExcelImageRange(ws,{col:1.15,row:13.08},strip.width,strip.height));",
+        "Use standards-compliant safety-sign anchor")
+    html=replace_once(html,
+        "      let hasImg=false;\n      for(let k=0;k<3;k++){",
+        "      let hasImg=false;\n      ws.getRow(r).height=g.some(st=>st?._excelPhoto)?120:30;\n      for(let k=0;k<3;k++){",
+        "Set photo row height before calculating its end anchor")
+    html=replace_once(html,
+        "          ws.addImage(id,{tl:{col:c1-1+0.05,row:r-1+0.05},ext:{width:150,height:95}});",
+        "          ws.addImage(id,sopExcelImageRange(ws,{col:c1-1+0.05,row:r-1+0.05},150,95));",
+        "Use standards-compliant step photo anchor")
+
     # Prevent upload dialog from being called again on an input click bubbling
     # through its own parent drop zone.
     html=replace_once(html,
