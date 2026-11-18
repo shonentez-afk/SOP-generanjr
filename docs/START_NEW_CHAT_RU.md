@@ -1,5 +1,13 @@
 # START_NEW_CHAT_RU — передача проекта новому чату
 
+## Stage 17 — исправлен ответ ИИ-наставника при ошибке JSON (2026-11-18)
+- Актуальный HTML: `releases/stage17-mentor-json-recovery.html` (продолжение Stage 16).
+- Ошибка `Unterminated fractional number in JSON` при «Отправить наставнику»: безопасный разбор, один повтор при повреждённом JSON, сохранение аргумента, системная ошибка вместо ложной реплики наставника, неизменность замечания при сбое.
+- Исходник: `src/modules/ai/stage17-mentor-dispute-recovery.js`; сборщик `tools/build_stage17.py --verify-release`; тесты `tests/test_stage17.py`, CI `.github/workflows/stage17.yml`.
+- Настройки ИИ, прокси, модели, промпты, ФРВ/TWI, фото, Excel и мобильную версию не менять. Ручная реальная проверка ответа Yandex Cloud-прокси остаётся открытой.
+- Подробности: `docs/RELEASE_STAGE17_RU.md`.
+
+
 ## Текущая версия Stage 15 — полностью встроенные пиктограммы ISO 7010 (2026-11-18)
 - Файл: `releases/stage15-local-iso7010-icons.html`; сборка `tools/build_stage15.py`; проверка `python tools/build_stage15.py --verify-release`.
 - 60 знаков M/W/P теперь входят прямо в единый HTML через семь JSON-пакетов SVG `src/assets/safety/iso7010-part01..07.json`; загрузка в интерфейсе и PNG-подготовка для XLSX полностью без HTTP.
