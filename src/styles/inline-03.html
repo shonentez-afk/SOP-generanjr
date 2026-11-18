@@ -1,0 +1,190 @@
+<style id="tn-design-layer">
+
+/* =========================================================
+   ТЕХНОНИКОЛЬ / TN-inspired UI layer
+   Только визуальный слой. Логика, id, обработчики и XLSX не меняются.
+   ========================================================= */
+:root{
+  --tn-red:#e30613;
+  --tn-red-dark:#b8000b;
+  --tn-ink:#18212f;
+  --tn-muted:#687385;
+  --tn-line:#dfe4ea;
+  --tn-bg:#f5f6f8;
+  --tn-blue:#0b5cff;
+  --tn-green:#169b62;
+  --tn-shadow:0 8px 28px rgba(20,31,48,.07);
+}
+html{background:var(--tn-bg)}
+body{
+  background:var(--tn-bg)!important;
+  color:var(--tn-ink);
+  padding-top:22px!important;
+}
+body:before{
+  content:"";
+  position:fixed;left:0;right:0;top:0;height:4px;
+  background:var(--tn-red);z-index:9999;
+}
+body > .max-w-7xl{max-width:1440px!important}
+body > .max-w-7xl > header{
+  margin-bottom:18px!important;
+  padding:18px 22px 20px;
+  background:#fff;
+  border:1px solid var(--tn-line);
+  border-radius:16px;
+  box-shadow:var(--tn-shadow);
+  position:relative;
+  overflow:hidden;
+}
+body > .max-w-7xl > header:after{
+  content:"";
+  position:absolute;left:0;bottom:0;width:128px;height:4px;
+  background:var(--tn-red);
+}
+body > .max-w-7xl > header h1{
+  color:var(--tn-ink)!important;
+  letter-spacing:-.025em;
+}
+body > .max-w-7xl > header h1:before{
+  content:"ТЕХНОНИКОЛЬ";
+  display:block;
+  margin-bottom:3px;
+  color:var(--tn-red);
+  font-size:10px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.16em;
+}
+body > .max-w-7xl > header p{color:var(--tn-muted)!important}
+#aiConnectivityBadge{border:1px solid var(--tn-line);background:#f8fafc!important;color:#4b5563!important}
+#aiTestBtn{border:1px solid #d7e2f7;background:#f4f7ff!important;color:#174ea6!important}
+
+/* Верхняя навигация — ближе к корпоративному порталу, без изменения data-tab. */
+body > .max-w-7xl > .flex.gap-1.bg-slate-100{
+  width:100%!important;
+  padding:5px!important;
+  gap:3px!important;
+  background:#fff!important;
+  border:1px solid var(--tn-line);
+  border-radius:12px!important;
+  box-shadow:0 4px 16px rgba(20,31,48,.05);
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+body > .max-w-7xl > .flex.gap-1.bg-slate-100 .tab-btn{
+  flex:0 0 auto;
+  border-radius:8px!important;
+  color:#596579!important;
+  padding:10px 14px!important;
+  font-size:13px!important;
+  white-space:nowrap;
+}
+body > .max-w-7xl > .flex.gap-1.bg-slate-100 .tab-btn:hover{
+  background:#f5f6f8!important;
+  color:var(--tn-ink)!important;
+}
+body > .max-w-7xl > .flex.gap-1.bg-slate-100 .tab-btn.active{
+  background:#fff!important;
+  color:var(--tn-red)!important;
+  box-shadow:none!important;
+  font-weight:750!important;
+  position:relative;
+}
+body > .max-w-7xl > .flex.gap-1.bg-slate-100 .tab-btn.active:after{
+  content:"";position:absolute;left:12px;right:12px;bottom:2px;height:2px;
+  background:var(--tn-red);border-radius:2px;
+}
+
+/* Карточки конструктора */
+.tab-content section.bg-white,
+.tab-content section.bg-slate-50{
+  border-color:var(--tn-line)!important;
+  border-radius:14px!important;
+  box-shadow:0 5px 20px rgba(20,31,48,.045)!important;
+}
+.tab-content section.bg-white:hover{box-shadow:0 7px 24px rgba(20,31,48,.06)!important}
+.tab-content h2,.tab-content h3{color:var(--tn-ink)!important}
+.tab-content label{color:#5c6879!important}
+input,textarea,select{
+  border-color:#d7dde5!important;
+  border-radius:8px!important;
+  background:#fff;
+  color:var(--tn-ink);
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--tn-red)!important;
+  box-shadow:0 0 0 3px rgba(227,6,19,.09)!important;
+}
+
+/* Кнопки: корпоративный красный для основных действий, смысловые цвета сохраняются. */
+.btn-primary{
+  background:linear-gradient(135deg,var(--tn-red),var(--tn-red-dark))!important;
+  border:1px solid var(--tn-red)!important;
+  box-shadow:0 4px 12px rgba(227,6,19,.16);
+}
+.btn-primary:hover:not(:disabled){box-shadow:0 9px 20px rgba(227,6,19,.22)!important}
+.btn-success{box-shadow:0 4px 12px rgba(22,155,98,.14)}
+.btn-review{background:linear-gradient(135deg,#8b1730,#6f1025)!important}
+.btn-ghost{
+  background:#fff!important;
+  border-color:#d6dce5!important;
+  color:#283548!important;
+}
+.btn-ghost:hover:not(:disabled){background:#f7f8fa!important;border-color:#c5ccd6!important}
+
+/* Библиотека СОП */
+#tab-documents .chip{
+  background:#eef7f2;color:#13784b;border:1px solid #cbe9d9;
+}
+#tab-documents .bg-slate-50{
+  background:#f7f8fa!important;
+}
+#tab-documents .btn-primary{min-height:40px}
+#tab-documents section:has(#docFolderStatus){
+  background:#fff!important;
+  border-top:3px solid #eaf0f7!important;
+}
+#tab-documents section:has(#docFolderStatus) > div:first-child{
+  align-items:flex-start;
+}
+#tab-documents section:has(#docFolderStatus) h3{
+  font-size:17px;
+  letter-spacing:-.01em;
+}
+#tab-documents section:has(#docFolderStatus) > div:first-child p{
+  max-width:850px;
+  line-height:1.5;
+}
+#tab-documents #docFolderStatus{
+  font-size:11px;
+  padding:5px 10px;
+}
+#tab-documents #docNetworkSyncInfo > div{
+  background:#f8fbff;
+  border:1px solid #e3ebf6;
+  border-radius:10px;
+  padding:10px 12px;
+}
+#tab-documents #docCurrentInfo,
+#tab-documents #docVersionTree{
+  background:#fff;
+}
+
+/* Мягкие разделители и метрики */
+.small-note{color:#718096!important}
+.metric-card{border-color:#e0e5eb!important;border-radius:12px!important}
+.drop-zone{border-radius:12px!important}
+.step-card{border-left-color:var(--tn-red)!important;border-radius:10px}
+.step-card.highlight-ring{box-shadow:0 0 0 3px #7c3aed,0 0 0 7px rgba(124,58,237,.12)!important}
+
+/* Мобильный режим */
+@media(max-width:768px){
+  body{padding:10px!important;padding-top:14px!important}
+  body > .max-w-7xl > header{padding:16px}
+  body > .max-w-7xl > header h1{font-size:24px!important}
+  body > .max-w-7xl > .flex.gap-1.bg-slate-100{margin-bottom:14px!important}
+  .tab-content section.bg-white,.tab-content section.bg-slate-50{padding:16px!important}
+}
+
+</style>
