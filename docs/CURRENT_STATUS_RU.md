@@ -2,6 +2,15 @@
 
 Обновлено: 2026-11-18.
 
+## Stage 12 (2026-11-18) — новый функциональный пакет
+
+- Добавлена только встроенная ExcelJS 4.4.0 и расширенный редактор фотографии (стрелки, цифры, подписи, выноски, значки, выравнивание).
+- Версия: `releases/stage12-local-exceljs-photo-studio.html`; исходники: `src/vendor/` и `src/modules/photos/illustration-studio.js`.
+- Сборка: `python tools/build_stage12.py --verify-release`. Проверки: `tests/test_stage12.py`, `.github/workflows/stage12.yml`.
+- AI-прокси, модели, вызовы, промпты и остальная логика сохранены без изменений.
+- Выполнена проверка в Chromium: ExcelJS XLSX write/read офлайн, создание разметки и сохранение JPEG в объекте шага. Полный файл `file://` и долговременная IndexedDB пока не проверены в штатном пользовательском окружении.
+- Подробно: `docs/RELEASE_STAGE12_RU.md`.
+
 ## Подтверждено
 - Репозиторий GitHub `shonentez-afk/SOP-generanjr` доступен на запись, `main` инициализирован.
 - В `releases/stage11-photo-editor.html` сохранён исходный HTML Stage 11 с ранее добавленным фоторедактором.
