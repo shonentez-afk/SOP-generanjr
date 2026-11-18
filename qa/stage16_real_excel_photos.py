@@ -79,7 +79,27 @@ def main():
         )
         page.locator("button[data-edit-photo]").first.wait_for(state="visible",timeout=20000)
         page.locator("button[data-edit-photo]").first.click()
-        page.locator("#illustrationEditorOverlay").wait_for(state="visible",timeout=15000)
+        page.wait_for_timeout(200)
+        diag=page.evaluate("""async () => ({
+          isReadOnly:document.body.classList.contains('document-readonly'),
+          docStatus:state.documentManager?.status,
+          photoData:!!state.steps[0]?.imageData,
+          photoBytes:state.steps[0]?.imageBuffer?.byteLength,
+          hasPhoto:state.steps[0]?.hasPhoto,
+          idbRecord:!!(await idbGetPhoto(state.steps[0].id))?.blob,
+          overlay:!!document.getElementById('illustrationEditorOverlay'),
+          buttonDisabled:document.querySelector('[data-edit-photo]')?.disabled,
+          toasts:document.getElementById('toastContainer')?.innerText||''
+        })""")
+        print("PHOTO_EDITOR_DIAGNOSTIC",json.dumps({"state":diag,"errors":errors},ensure_ascii=False),flush=True)
+        try:
+            page.locator("#illustrationEditorOverlay").wait_for(state="visible",timeout=5000)
+        except Exception:
+            if args.screenshot:
+                dest=Path(args.screenshot)
+                dest.parent.mkdir(parents=True,exist_ok=True)
+                page.screenshot(path=str(dest),full_page=True)
+            raise
         page.locator("[data-ill-mode='rect']").click()
         canvas=page.locator("#illCanvas")
         canvas.scroll_into_view_if_needed()
