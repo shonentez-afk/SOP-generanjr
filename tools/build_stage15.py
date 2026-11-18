@@ -62,7 +62,11 @@ def build() -> str:
     html_marker = "<script>\n'use strict';"
     if html.count(html_marker) != 1:
         raise AssertionError("Main app script boundary changed")
-    html = html.replace(html_marker, '<script type="application/json" id="sop-local-iso-icons">' + payload + "</script>\n" + html_marker, 1)
+    mit = (ROOT / "src/assets/safety/LICENSE_UPSTREAM_MIT.txt").read_text(encoding="utf-8").strip()
+    if "Copyright (c) 2024 Karl Norling" not in mit or "-->" in mit:
+        raise AssertionError("Upstream license absent or invalid")
+    attribution = "<!--\nISO 7010 local vector image bundle. Upstream: karlnorling/iso-safety-signs.\n" + mit + "\nOriginal icon authors/licensing: see docs/ISO7010_ASSETS_RU.md and Commons individual file pages.\n-->\n"
+    html = html.replace(html_marker, '<script type="application/json" id="sop-local-iso-icons">' + payload + "</script>\n" + attribution + html_marker, 1)
 
     base_text = BASE.read_text(encoding="utf-8")
     ai_begin = "const AI_PROXY_BASE="
