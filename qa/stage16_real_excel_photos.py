@@ -49,7 +49,13 @@ def assert_excel_photos(path,expected_photo_sha):
         xml=b"".join(archive.read(name) for name in drawing_files)
         if xml.count(b"<xdr:pic>")<3:
             raise AssertionError("XLSX drawing does not anchor all 3 illustrations")
-        return {"media":list(photos),"matchingStepPhoto":photo_hits[0],"drawingPics":xml.count(b"<xdr:pic>")}
+        from openpyxl import load_workbook
+        wb=load_workbook(path,read_only=False)
+        if wb.sheetnames[:3]!=['СОП','ФРВ','Чек-лист оценки СОП']:
+            raise AssertionError("Workbook sheet names/regression unexpected: "+repr(wb.sheetnames))
+        if len(wb['СОП']._images)<3:
+            raise AssertionError("openpyxl cannot see all three anchored pictures")
+        return {"media":list(photos),"matchingStepPhoto":photo_hits[0],"drawingPics":xml.count(b"<xdr:pic>"),"openpyxlImages":len(wb['СОП']._images)}
 
 def main():
     parser=argparse.ArgumentParser()
@@ -85,6 +91,12 @@ def main():
         page.mouse.move(x+90,y+60,steps=6)
         page.mouse.up()
         page.locator("#illSave").click()
+        page.locator("#illustrationEditorOverlay").wait_for(state="detached",timeout=15000)
+        # Repeat the actual button click after saving and prove the markup
+        # editor can reopen an existing layered illustration.
+        page.locator("button[data-edit-photo]").first.click()
+        page.locator("#illustrationEditorOverlay").wait_for(state="visible",timeout=15000)
+        page.locator("#illCancel").click()
         page.locator("#illustrationEditorOverlay").wait_for(state="detached",timeout=15000)
         image=page.evaluate("""() => {
             if(!state.steps[0].photoEdited || !state.steps[0].photoAnnotations.length)
