@@ -10,6 +10,23 @@ function normalizeExcelStepKeepingPhoto(source){
   step.hasPhoto=!!(source.hasPhoto||step.imageData||step.imageBuffer);
   return step;
 }
+// ExcelJS 4.4 serializes an unsupported editAs attribute on oneCellAnchor.
+// Use standards-valid twoCellAnchor (editAs=oneCell) while preserving pixel
+// dimensions and original top-left placement in the SOP template.
+function sopExcelImageRange(ws,tl,widthPx,heightPx){
+  const startCol=Math.floor(tl.col),startRow=Math.floor(tl.row);
+  const col=ws.getColumn(startCol+1),row=ws.getRow(startRow+1);
+  const startColOff=Math.floor((tl.col-startCol)*(col.isCustomWidth?col.width*10000:640000));
+  const startRowOff=Math.floor((tl.row-startRow)*(row.height?row.height*10000:180000));
+  const colEmu=i=>Math.max(90000,Math.round(((ws.getColumn(i+1).width||8.43)*7+5)*9525));
+  const rowEmu=i=>Math.max(90000,Math.round((ws.getRow(i+1).height||15)*12700));
+  let endCol=startCol,endRow=startRow;
+  let endColOff=startColOff+Math.round(widthPx*9525);
+  let endRowOff=startRowOff+Math.round(heightPx*9525);
+  while(endColOff>=colEmu(endCol)&&endCol<1000){endColOff-=colEmu(endCol);endCol++}
+  while(endRowOff>=rowEmu(endRow)&&endRow<10000){endRowOff-=rowEmu(endRow);endRow++}
+  return {tl,br:{nativeCol:endCol,nativeColOff:endColOff,nativeRow:endRow,nativeRowOff:endRowOff},editAs:'oneCell'};
+}
 function excelPhotoMimeFromBytes(bytes){
   if(bytes.length>=3&&bytes[0]===255&&bytes[1]===216&&bytes[2]===255)return 'jpeg';
   if(bytes.length>=8&&bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71&&bytes[4]===13&&bytes[5]===10)return 'png';
