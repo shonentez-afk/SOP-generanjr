@@ -6,7 +6,7 @@ async function docGatherPortablePhotos(snapshot,documentId,{preferActive=false}=
     if(!st.hasPhoto)continue;
     let rec=preferActive?await idbGetPhoto(st.id):null;
     if(!rec?.blob && documentId)rec=await idbGetPhoto(docPortablePhotoKey(documentId,st.id));
-    if(!rec?.blob)rec=await idbGetPhoto(st.id);
+    if(!rec?.blob && (!documentId||preferActive||String(state.documentManager?.currentId||'')===String(documentId)))rec=await idbGetPhoto(st.id);
     if(!rec?.blob)throw new Error(`Нет исходной фотографии для шага ${st.id}. Экспорт без изображения отменён.`);
     assets[String(st.id)]={
       original:await blobToDataUrl(rec.blob),
