@@ -1,0 +1,61 @@
+name: Stage 16 SOP Excel Photos and Photo Editor
+
+on:
+  push:
+    branches:
+      - main
+      - fix/stage16-sop-photos-excel-export-20261118
+    paths:
+      - 'src/modules/excel/stage16-step-photo-export.js'
+      - 'tools/build_stage16.py'
+      - 'releases/stage16-excel-photos-and-editor-fixed.html'
+      - 'qa/stage16_real_excel_photos.py'
+      - 'tests/test_stage16.py'
+      - '.github/workflows/stage16.yml'
+  pull_request:
+    paths:
+      - 'src/modules/excel/stage16-step-photo-export.js'
+      - 'tools/build_stage16.py'
+      - 'releases/stage16-excel-photos-and-editor-fixed.html'
+      - 'qa/stage16_real_excel_photos.py'
+      - 'tests/test_stage16.py'
+      - '.github/workflows/stage16.yml'
+
+jobs:
+  stage16:
+    name: Excel pictures, editor clicks and regressions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify standalone HTML matches modules
+        run: python tools/build_stage16.py --verify-release
+      - name: Run unit regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify all inline JS syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          text=Path('releases/stage16-excel-photos-and-editor-fixed.html').read_text(encoding='utf-8')
+          matches=re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>',text)
+          js=[x for x in matches if "'use strict';" in x]
+          assert len(js)==1, f"Found {len(js)} app scripts"
+          Path('/tmp/stage16-app.js').write_text(js[0],encoding='utf-8')
+          PY
+          node --check /tmp/stage16-app.js
+      - name: Install real browser QA dependencies
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: Real file-mode Chrome XLSX/photo-editor end-to-end
+        run: python qa/stage16_real_excel_photos.py --screenshot /tmp/stage16-editor-and-export.png
+      - name: Upload screenshot when failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage16-photo-editor-ui-screenshot
+          path: /tmp/stage16-editor-and-export.png
+          if-no-files-found: ignore
