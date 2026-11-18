@@ -1,0 +1,13 @@
+# Never commit real SOPs, private images, credentials, or local browser data
+.env
+.env.*
+!.env.example
+*.log
+node_modules/
+__pycache__/
+*.pyc
+local-data/
+private/
+secrets/
+*.key
+*.pem
