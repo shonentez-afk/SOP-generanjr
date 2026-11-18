@@ -1,0 +1,63 @@
+name: Stage 15 Embedded ISO 7010 Icons
+
+on:
+  push:
+    branches:
+      - main
+      - feature/stage15-embedded-iso7010-icons-20261118
+    paths:
+      - 'src/assets/safety/**'
+      - 'src/modules/safety/**'
+      - 'tools/build_stage15.py'
+      - 'releases/stage15-local-iso7010-icons.html'
+      - 'tests/test_stage15.py'
+      - 'qa/stage15_real_offline_icons.py'
+      - '.github/workflows/stage15.yml'
+  pull_request:
+    paths:
+      - 'src/assets/safety/**'
+      - 'src/modules/safety/**'
+      - 'tools/build_stage15.py'
+      - 'releases/stage15-local-iso7010-icons.html'
+      - 'tests/test_stage15.py'
+      - 'qa/stage15_real_offline_icons.py'
+      - '.github/workflows/stage15.yml'
+
+jobs:
+  stage15:
+    name: Build, regression and real offline Chromium
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify reproducible standalone HTML
+        run: python tools/build_stage15.py --verify-release
+      - name: Run all unit and contract regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify inline JS syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html=Path('releases/stage15-local-iso7010-icons.html').read_text(encoding='utf-8')
+          js=re.findall(r'<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>', html)
+          blocks=[x for x in js if "'use strict';" in x]
+          assert len(blocks)==1, f"Expected one app script; got {len(blocks)}"
+          Path('/tmp/sop-stage15-app.js').write_text(blocks[0],encoding='utf-8')
+          PY
+          node --check /tmp/sop-stage15-app.js
+      - name: Install Playwright
+        run: python -m pip install 'playwright>=1.50,<2'
+      - name: Real Chrome file offline test
+        run: python qa/stage15_real_offline_icons.py --screenshot /tmp/stage15-pictograms.png
+      - name: Upload screenshot on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage15-icon-validation-screenshot
+          path: /tmp/stage15-pictograms.png
+          if-no-files-found: ignore
