@@ -1,5 +1,14 @@
 # START_NEW_CHAT_RU — передача проекта новому чату
 
+## Текущая версия Stage 15 — полностью встроенные пиктограммы ISO 7010 (2026-11-18)
+- Файл: `releases/stage15-local-iso7010-icons.html`; сборка `tools/build_stage15.py`; проверка `python tools/build_stage15.py --verify-release`.
+- 60 знаков M/W/P теперь входят прямо в единый HTML через семь JSON-пакетов SVG `src/assets/safety/iso7010-part01..07.json`; загрузка в интерфейсе и PNG-подготовка для XLSX полностью без HTTP.
+- Обязательная проверка: `tests/test_stage15.py`, `qa/stage15_real_offline_icons.py`, `.github/workflows/stage15.yml` (реальный Chrome `file://`, без сети); документ `docs/RELEASE_STAGE15_RU.md`.
+- Stage 14 сохраняется как предыдущая версия и не менялся. ИИ/Yandex-прокси/модели, ExcelJS, логика ФРВ/TWI/документов и мобильный интерфейс не затронуты.
+- Открытые задачи прежние: реальная ручная Windows/IndexedDB/сетевая приёмка; не считать браузерный офлайн-тест всех значков полной приёмкой хранилища документов.
+
+
+
 Дата исходной фиксации: 2026-11-18.
 Репозиторий: https://github.com/shonentez-afk/SOP-generanjr
 
