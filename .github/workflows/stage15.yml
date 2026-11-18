@@ -44,7 +44,7 @@ jobs:
           import re
           from pathlib import Path
           html=Path('releases/stage15-local-iso7010-icons.html').read_text(encoding='utf-8')
-          js=re.findall(r'<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>', html)
+          js=re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>', html)
           blocks=[x for x in js if "'use strict';" in x]
           assert len(blocks)==1, f"Expected one app script; got {len(blocks)}"
           Path('/tmp/sop-stage15-app.js').write_text(blocks[0],encoding='utf-8')
