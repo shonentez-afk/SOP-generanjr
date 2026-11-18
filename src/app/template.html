@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏭 Конструктор СОП — Технониколь</title>
+<!-- SOP_SCRIPT_01 -->
+<!-- SOP_SCRIPT_02 -->
+<!-- SOP_STYLE_01 -->
+
+<!-- SOP_STYLE_02 -->
+<!-- SOP_STYLE_03 -->
+
+<!-- SOP_STYLE_04 -->
+<!-- SOP_STYLE_05 -->
+</head>
+<body class="p-4 md:p-8">
+<div id="draftBanner" class="hidden max-w-7xl mx-auto mb-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 text-sm"><span class="text-amber-800">Найден несохранённый черновик (<span id="draftBannerTime"></span>). Восстановить?</span><div class="flex gap-2 flex-shrink-0"><button id="draftRestoreBtn" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-semibold">Восстановить</button><button id="draftDismissBtn" class="px-3 py-1.5 rounded-lg border border-amber-300 text-amber-700 text-xs font-semibold">Начать заново</button></div></div>
+<div class="max-w-7xl mx-auto">
+<header class="mb-6"><div class="flex items-center justify-between flex-wrap gap-4"><div class="flex items-center gap-3"><div class="text-4xl">🏭</div><div><h1 class="text-2xl md:text-3xl font-bold text-slate-800">Конструктор СОП — Технониколь</h1><p class="text-slate-500 text-sm mt-0.5">Стандартная операционная — технологическая карта + ФРВ</p></div></div><div class="flex items-center gap-2 text-xs"><span id="aiConnectivityBadge" class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600">AI: не проверен</span><button id="aiTestBtn" class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-medium">Проверить AI</button></div></div></header>
+<div class="flex gap-1 bg-slate-100 p-1 rounded-xl mb-6 w-fit"><button class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium" data-tab="editor">📝 Редактор</button><button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600" data-tab="frv">⏱ ФРВ</button><button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600" data-tab="preview">👁 Предпросмотр</button><button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600" data-tab="checklist">✅ Чек-лист</button><button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600" data-tab="frvstudy">📊 Анализ ФРВ</button><button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600" data-tab="twi">🎓 TWI</button><button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-slate-600" data-tab="documents">📚 Библиотека СОП</button></div>
+<div id="documentLockBanner" class="document-lock-banner hidden">
+<div><div id="documentLockTitle" class="lock-title">🔒 Опубликованный документ защищён от редактирования</div><div id="documentLockText" class="lock-text">Версия зафиксирована. Для внесения изменений создайте новую версию.</div></div>
+<button id="documentLockNewVersionBtn" type="button" class="btn-review text-white px-3 py-2 rounded-lg text-xs font-semibold">＋ Новая версия</button>
+</div>
+<div id="tab-editor" class="tab-content">
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><h2 class="text-lg font-semibold text-slate-800 mb-4">1. Метаданные СОП</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Филиал / организация</label><input id="meta-branch" type="text" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder='Филиал ООО "Завод Техно" г. Юрга'></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">Дата</label><input id="meta-date" type="date" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">Подразделение</label><input id="meta-department" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="ОГЭ"></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">Рабочее место</label><input id="meta-workplace" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Мастерская ОГЭ"></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">Исполнитель</label><input id="meta-executor" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Электромонтер по ремонту оборудования 6 разряда"></div>
+<div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Название операции</label><input id="meta-operation" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold" placeholder="Поверка электроинструмента"></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">№ СОП / версия</label><input id="meta-sop-number" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="15.144.2026. Версия 1"></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">Время СОП (авто = Σ действий)</label><input id="meta-total-time" readonly class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50" placeholder="авто"></div>
+<div class="lg:col-span-3"><label class="block text-xs font-medium text-slate-600 mb-1">Описание процесса (что фактически делается)</label><textarea id="meta-description" rows="4" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Опишите по шагам, что фактически делает работник. Чем подробнее — тем точнее черновик."></textarea><div class="flex gap-2 items-center mt-2 flex-wrap"><button id="generateSopBtn" class="btn-primary text-white px-3 py-2 rounded-lg text-xs font-semibold">✨ Сгенерировать СОП по описанию</button><button id="reviewSopBtn" class="btn-review px-3 py-2 rounded-lg text-xs font-semibold">🔍 Проверить весь СОП</button><select id="modelSelector" class="px-2 py-2 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 bg-white"></select><span class="small-note">Конструктор работает как локальный файл. Для функций ИИ требуется подключение к сети; черновики, фотографии и Excel обрабатываются на компьютере.</span></div><div id="openQuestionsContainer" class="hidden mt-3 border border-amber-200 bg-amber-50 rounded-xl p-3"><div class="flex items-center justify-between gap-2 mb-2"><div class="text-sm font-semibold text-amber-900">⚠ Нужно уточнить перед утверждением СОП</div><span id="openQuestionsCount" class="chip">0</span></div><div id="openQuestionsList" class="text-sm text-amber-900 space-y-1"></div></div></div>
+<div id="sopReviewContainer" class="hidden lg:col-span-3 mt-4 border-2 border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-pink-50"><div class="flex items-center justify-between mb-3"><h3 class="text-lg font-semibold text-purple-900">🔍 Результаты проверки СОП</h3><button id="closeReviewBtn" class="text-purple-600 text-xl">×</button></div><div id="sopReviewSummary" class="mb-3 p-3 bg-white rounded border border-purple-200"></div><div id="sopReviewIssues" class="space-y-2 max-h-[60vh] overflow-y-auto pr-2"></div></div>
+<div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Требования к безопасности</label><textarea id="meta-safety" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Использовать СИЗ..."></textarea></div>
+<div class="md:col-span-2 lg:col-span-3"><div class="border border-slate-200 rounded-lg p-3 bg-slate-50"><div class="flex items-center justify-between mb-2"><span class="text-xs font-medium text-slate-600">Пиктограммы ISO 7010 (по каждому СОП свои)</span><span class="text-[11px] text-slate-400">выбрано: <span id="iconCountBadge">0</span></span></div><p class="text-[11px] text-slate-400 mb-2">Пиктограммы берутся из Wikimedia при предпросмотре/экспорте; при отсутствии сети Excel создастся без картинок.</p><div id="iconPicker"></div></div></div>
+<div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Инструмент, оснастка, приспособления</label><textarea id="meta-tools" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Мегаомметр, удлинитель"></textarea></div>
+<div><label class="block text-xs font-medium text-slate-600 mb-1">Материал</label><input id="meta-material" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Электроинструмент, бирки, журнал поверки"></div></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100"><div><label class="block text-xs font-medium text-slate-600 mb-1">УТВЕРЖДАЮ (должность)</label><input id="meta-approver-post" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder='Директор филиала ООО "Завод ТЕХНО" г. Юрга'></div><div><label class="block text-xs font-medium text-slate-600 mb-1">УТВЕРЖДАЮ (ФИО)</label><input id="meta-approver-name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Ермакова Н.П."></div></div>
+<div class="mt-4"><label class="block text-xs font-medium text-slate-600 mb-1">СОГЛАСОВАНО (до 3 подписантов)</label><div id="agreedContainer"></div></div><div class="mt-4"><label class="block text-xs font-medium text-slate-600 mb-1">Ответственная рабочая группа / Наблюдали</label><div id="respContainer"></div></div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><div class="flex items-center justify-between mb-4 flex-wrap gap-2"><div class="flex items-center gap-3"><h2 class="text-lg font-semibold text-slate-800">2. Шаги процедуры</h2><span id="stepsCounter" class="chip">0 шагов</span></div><div class="flex gap-2"><button id="loadDemoBtn" class="btn-ghost px-3 py-2 rounded-lg text-sm font-medium text-slate-600 border border-slate-200">📋 Демо</button><button id="importSopBtn" class="btn-ghost px-3 py-2 rounded-lg text-sm font-medium text-slate-600 border border-slate-200">📂 Импорт XLSX</button><input type="file" id="importSopInput" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden"><button id="addStepBtn" class="btn-primary text-white px-4 py-2 rounded-lg text-sm font-semibold">+ Шаг</button></div></div><div id="stepsContainer" class="space-y-4"></div></section>
+<section class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-sm border border-green-200 p-6 mb-4"><button id="generateBtn" class="btn-success text-white px-6 py-3 rounded-xl font-semibold">📥 Скачать СОП (.xlsx) — 3 листа: СОП, ФРВ, Чек-лист</button><div id="generateStatus" class="mt-3 text-sm hidden"></div></section>
+</div>
+<div id="tab-frv" class="tab-content hidden"><section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><h2 class="text-lg font-semibold text-slate-800 mb-4">⏱ ФРВ — шапка бланка</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Наблюдал (если пусто — рабочая группа)</label><textarea id="frv-observers" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="ФИО по одному в строке"></textarea></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Качество:</label><input id="frv-quality" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Прочие условия:</label><input id="frv-other" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-slate-600 mb-1">Назначение ФРВ/хронометража:</label><input id="frv-purpose" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" value="зафиксировать текущее исполнение операции"></div></div></section><section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><h2 class="text-lg font-semibold text-slate-800 mb-1">⏱ ФРВ — таблица наблюдений</h2><p class="text-xs text-slate-500 mb-3">Время хранения внутри приложения — секунды. В Excel длительности представлены как время/секунды с формулами.</p><div id="frvRowsContainer" class="overflow-x-auto"></div></section><section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><h2 class="text-lg font-semibold text-slate-800 mb-4">🎯 Целевые показатели</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div><label class="block text-xs font-medium text-slate-600 mb-1">Цель: Вр. операции, сек</label><input id="frv-t-op" type="number" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Цель: ВДЦ, сек</label><input id="frv-t-vdc" type="number" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Цель: М2, сек</label><input id="frv-t-m2" type="number" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Цель: М1, сек</label><input id="frv-t-m1" type="number" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Цель: Перемещения, м</label><input id="frv-t-move" type="number" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Цель: Площадь, м²</label><input id="frv-t-area" type="number" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Вход. запасы (от-до), шт</label><input id="frv-t-in" class="w-full px-3 py-2 border rounded-lg text-sm"></div><div><label class="block text-xs font-medium text-slate-600 mb-1">Исход. запасы (от-до), шт</label><input id="frv-t-out" class="w-full px-3 py-2 border rounded-lg text-sm"></div></div></section></div>
+<div id="tab-frvstudy" class="tab-content hidden">
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div><h2 class="text-lg font-semibold text-slate-800">📊 Анализ ФРВ</h2><p class="text-sm text-slate-500 mt-1">Фактические наблюдения → анализ ценности и потерь → улучшение → повторный замер → кандидат в стандарт.</p></div>
+    <div class="flex gap-2 flex-wrap">
+      <button id="frvStudyBuildBtn" class="btn-primary text-white px-3 py-2 rounded-lg text-xs font-semibold">🤖 Построить ФРВ из описания</button>
+      <button id="frvStudyAnalyzeBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">🔎 Анализировать ФРВ</button>
+      <button id="frvStudyValidateBtn" class="btn-success text-white px-3 py-2 rounded-lg text-xs font-semibold">✓ Проверить ФРВ</button>
+      
+    </div>
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <h3 class="font-semibold text-slate-800 mb-3">1. Паспорт исследования</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+    <input id="frvs-studyId" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ID исследования">
+    <input id="frvs-processId" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ID процесса">
+    <input id="frvs-operationId" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ID операции">
+    <select id="frvs-status" class="w-full px-3 py-2 border rounded-lg text-sm"><option value="Draft">Черновик</option><option value="Observed">Наблюдение</option><option value="Analyzed">Анализ</option><option value="Improvement">Улучшение</option><option value="Re-measured">Повторный замер</option><option value="Validated">Проверено</option><option value="Approved">Утверждено</option><option value="Standard">Стандарт</option></select>
+    <input id="frvs-operator" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Исполнитель / оператор">
+    <input id="frvs-observer" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Наблюдатель">
+    <input id="frvs-workplace" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Рабочее место">
+    <input id="frvs-takt" type="number" min="0" step="0.1" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Время такта, сек">
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-semibold text-slate-800">2. Наблюдения ФРВ</h3><p class="text-xs text-slate-500">Для каждой строки вводится только фактическая длительность в секундах. Время суток здесь не требуется: для хронометража важна продолжительность действия.</p></div><button id="frvStudyAddCycleBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">＋ Добавить цикл</button></div>
+  <div id="frvStudyCycles"></div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><h3 class="font-semibold text-slate-800 mb-3">3. Анализ времени, ценности и потерь</h3><div id="frvStudyDashboard" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-4"></div><div id="frvStudyAnalysis" class="space-y-2"></div></section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><h3 class="font-semibold text-slate-800 mb-3">4. Улучшения и кандидат в стандарт</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><textarea id="frvs-improvement" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Мероприятия по устранению потерь и улучшению процесса"></textarea><textarea id="frvs-standard" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Кандидат в стандарт: последовательность, время, условия выполнения"></textarea></div><div class="mt-3 flex gap-2 flex-wrap"><button id="frvStudyMakeSokBtn" class="btn-primary text-white px-3 py-2 rounded-lg text-xs font-semibold">📋 Сформировать СОК-кандидат</button><button id="frvStudySendSopBtn" class="btn-success text-white px-3 py-2 rounded-lg text-xs font-semibold">↗ Передать подтверждённые шаги в СОП</button></div><div id="frvStudyValidation" class="mt-3"></div></section>
+
+</div>
+<div id="tab-preview" class="tab-content hidden"><section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4"><div class="flex items-center justify-between mb-4"><h2 class="text-lg font-semibold text-slate-800">👁 Предпросмотр СОП</h2><button id="refreshPreviewBtn" class="btn-ghost px-3 py-2 rounded-lg text-sm border border-slate-200">🔄</button></div><div id="previewContainer" class="overflow-x-auto bg-slate-100 p-4 rounded-xl"></div></section><section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"><h2 class="text-lg font-semibold text-slate-800 mb-4">⏱ Предпросмотр ФРВ</h2><div id="frvPreviewContainer" class="overflow-x-auto bg-slate-100 p-4 rounded-xl"></div></section></div>
+<div id="tab-checklist" class="tab-content hidden"><section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"><h2 class="text-lg font-semibold text-slate-800 mb-4">✅ Чек-лист оценки СОП</h2><div class="overflow-x-auto"><table class="w-full text-sm" id="checklistTable"></table></div></section></div>
+<div id="tab-twi" class="tab-content hidden">
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <div class="flex items-center justify-between gap-3 flex-wrap mb-2">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-800">🎓 TWI Job Instruction — план обучения</h2>
+      <p class="text-xs text-slate-500 mt-1">Отдельный учебный блок. Не изменяет СОП и не участвует в текущем Excel. Основа JI: подготовить работника → представить работу → пробное выполнение → сопровождение.</p>
+    </div>
+    <div class="flex gap-2">
+      <button id="generateTwiBtn" class="btn-review text-white px-3 py-2 rounded-lg text-xs font-semibold">✨ Сформировать план TWI</button>
+      <button id="clearTwiBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">Очистить</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-slate-100">
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Инструктор / наставник</label><input id="twi-trainer" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ФИО"></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Обучаемый</label><input id="twi-trainee" type="text" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ФИО"></div>
+
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <h3 class="font-semibold text-slate-800 mb-3">1. Подготовить работника (Prepare the Person)</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Цель обучения</label><textarea id="twi-purpose" rows="2" placeholder="Что работник должен уметь выполнить безопасно и правильно после обучения" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Что работник уже знает / умеет</label><textarea id="twi-known" rows="2" placeholder="Опыт, предыдущий инструктаж, знакомое оборудование" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Что подготовить до начала</label><textarea id="twi-prep" rows="3" placeholder="Рабочее место, инструмент, СИЗ, материалы, документация, безопасное состояние оборудования" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Как поставить задачу и заинтересовать</label><textarea id="twi-interest" rows="3" placeholder="Коротко объяснить цель, результат и значение операции для работника" class="w-full px-3 py-2 border rounded-lg text-sm"></textarea></div>
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <h3 class="font-semibold text-slate-800 mb-1">2. Представить работу (Present the Operation)</h3>
+  <p class="text-xs text-slate-500 mb-3">Работа представляется по одному Important Step за раз, с акцентом на Key Points и Reasons Why.</p>
+  <div class="twi-grid-2 grid gap-4">
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Показ работы целиком</label><textarea id="twi-round1" rows="5" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Кратко показать всю операцию в нормальном темпе, без подробного разбора"></textarea></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Разбор каждого Important Step</label><textarea id="twi-round2" rows="5" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Для каждого шага: сказать название → показать действие → назвать Key Point → объяснить Reason Why"></textarea></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Проверка понимания</label><textarea id="twi-round3" rows="5" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Попросить работника самому назвать важный момент и объяснить, почему он важен, после каждого разобранного шага"></textarea></div>
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <h3 class="font-semibold text-slate-800 mb-3">3. Пробное выполнение (Try Out Performance)</h3>
+  <div class="twi-grid-2 grid gap-4">
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Самостоятельное выполнение</label><textarea id="twi-tryout" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Работник выполняет операцию сам от начала до конца или по выбранному участку СОП"></textarea></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Объяснение при выполнении</label><textarea id="twi-explain" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Работник сам объясняет Important Steps, Key Points и Reasons Why по мере выполнения"></textarea></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Что проверяет инструктор</label><textarea id="twi-check" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Наблюдает безопасность, последовательность, Key Points, качество и конечный результат"></textarea></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Как исправлять ошибки</label><textarea id="twi-correct" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Немедленно остановить опасное действие; показать правильный приём; дать работнику повторить до правильного выполнения"></textarea></div>
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <h3 class="font-semibold text-slate-800 mb-3">4. Сопровождение (Follow Up)</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">К кому обращаться за помощью</label><textarea id="twi-help" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Назначенный наставник, мастер или другое ответственное лицо"></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Что контролировать после обучения</label><textarea id="twi-frequency" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Первые самостоятельные выполнения и наиболее важные Key Points"></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Какие признаки наблюдать</label><textarea id="twi-observe" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Безопасность, соблюдение Key Points, качество результата, затруднения и повторяющиеся ошибки"></textarea></div>
+    <div class="twi-field"><label class="block text-xs font-medium text-slate-600 mb-1">Как понять, что работник освоил работу</label><textarea id="twi-close" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm twi-long" placeholder="Работник самостоятельно и устойчиво выполняет работу правильно, безопасно и без подсказок"></textarea></div>
+  </div>
+</section>
+<section class="bg-slate-50 rounded-xl border border-slate-200 p-4">
+  <div class="flex items-center justify-between mb-2"><h3 class="font-semibold text-slate-800">📋 Краткая карта обучения</h3><span class="chip">TWI JI</span></div>
+  <div id="twiSummary" class="text-sm text-slate-700 grid grid-cols-1 md:grid-cols-4 gap-2"></div>
+</section>
+</div>
+<div id="tab-documents" class="tab-content hidden">
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div><h2 class="text-lg font-semibold text-slate-800">📚 Менеджер документов</h2><p class="text-sm text-slate-500 mt-1">Библиотека СОП: исходник хранится в JSON, готовый документ — в XLSX через существующий экспорт. В XLSX ничего нового не добавляется. Номер и версия окончательно фиксируются только при публикации.</p></div>
+    <div class="flex gap-2 flex-wrap">
+      <button id="docSaveDraftBtn" class="btn-primary text-white px-3 py-2 rounded-lg text-xs font-semibold">💾 Сохранить черновик</button>
+      <button id="docPublishBtn" class="btn-success text-white px-3 py-2 rounded-lg text-xs font-semibold">📢 Опубликовать</button>
+      <button id="docNewBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">＋ Новый документ</button>
+    </div>
+  </div>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <h3 class="font-semibold text-slate-800 mb-3">Параметры публикации</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Код подразделения</label><input id="docDeptCode" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="15"></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Год</label><input id="docYear" type="number" min="2000" max="2100" class="w-full px-3 py-2 border rounded-lg text-sm"></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Версия</label><input id="docVersion" type="number" min="1" step="1" value="1" class="w-full px-3 py-2 border rounded-lg text-sm"></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Создал</label><input id="docCreatedBy" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ФИО / должность"></div>
+    <div><label class="block text-xs font-medium text-slate-600 mb-1">Опубликовал</label><input id="docPublishedBy" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="ФИО / должность"></div>
+  </div>
+  <p class="small-note mt-2">При публикации номер фиксируется окончательно: <b>КОД.ПОРЯДКОВЫЙ_НОМЕР.ГОД ВЕРСИЯ</b>. Сквозной номер хранится отдельно и не сбрасывается.</p>
+</section>
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-semibold text-slate-800">Библиотека СОП</h3><p class="text-xs text-slate-500">Все документы имеют один из трёх статусов: Черновик, Опубликован, Архив. XLSX можно получить из любого статуса.</p></div><span id="docCountBadge" class="chip">0</span></div>
+  <div class="grid grid-cols-1 md:grid-cols-[1fr_180px_180px] gap-2 mb-3">
+    <input id="docLibrarySearch" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Поиск по названию, номеру, подразделению">
+    <select id="docLibraryStatusFilter" class="px-3 py-2 border border-slate-200 rounded-lg text-sm"><option value="all">Все статусы</option><option value="Черновик">Черновик</option><option value="Опубликован">Опубликован</option><option value="Архив">Архив</option></select>
+    <select id="docLibraryDeptFilter" class="px-3 py-2 border border-slate-200 rounded-lg text-sm"><option value="all">Все подразделения</option></select>
+    <select id="docLibraryYearFilter" class="px-3 py-2 border border-slate-200 rounded-lg text-sm"><option value="all">Все годы</option></select>
+    <select id="docLibrarySort" class="px-3 py-2 border border-slate-200 rounded-lg text-sm"><option value="updated">Последние изменения</option><option value="number">По номеру</option><option value="title">По названию</option></select>
+  </div>
+  <div id="docLibraryList" class="space-y-2"></div>
+</section>
+<section class="bg-slate-50 rounded-xl border border-slate-200 p-4">
+  <div class="flex items-center justify-between gap-3 flex-wrap"><h3 class="font-semibold text-slate-800">Текущий документ</h3><div class="flex gap-2 flex-wrap"><button id="docDownloadJsonBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">⬇ Скачать JSON</button><button id="docDownloadXlsxBtn" class="btn-primary text-white px-3 py-2 rounded-lg text-xs font-semibold">📥 Скачать XLSX</button><button id="docNewVersionCurrentBtn" class="btn-review text-white px-3 py-2 rounded-lg text-xs font-semibold">＋ Новая версия</button><button id="docArchiveBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">🗄 В архив</button></div></div>
+  <div id="docCurrentInfo" class="mt-2 text-sm text-slate-600">Документ ещё не сохранён в библиотеку.</div>
+  <div id="docVersionTree" class="mt-3"></div>
+</section>
+<section class="storage-panel bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-4">
+  <div class="storage-head">
+    <div class="storage-title-wrap">
+      <div class="storage-title"><span class="storage-title-icon">💾</span><h3>Папка хранения</h3></div>
+      <p class="storage-subtitle">Папку можно выбрать на сетевом диске, например X:\СОП. Путь запоминается браузером после разрешения доступа.</p>
+    </div>
+    <span id="docFolderStatus" class="storage-status">Не настроена</span>
+  </div>
+  <div class="storage-current-label">Текущая папка:</div>
+  <div class="storage-current">
+    <span class="storage-folder-icon">▱</span>
+    <span id="docFolderCurrentPath">Папка не выбрана</span>
+    <span id="docFolderAvailability" class="storage-availability hidden">● Доступна</span>
+  </div>
+  <div class="storage-primary-actions">
+    <button id="docChooseFolderBtn" class="storage-btn storage-btn-primary"><span>📁</span> Выбрать папку</button>
+    <button id="docSyncFolderBtn" class="storage-btn"><span>↻</span> Синхронизировать</button>
+    <button id="docTestFolderBtn" class="storage-btn storage-btn-access"><span>🛡</span> Проверить доступ</button>
+  </div>
+  <div class="storage-divider"></div>
+  <div class="storage-extra-title">Дополнительные операции</div>
+  <div class="storage-secondary-actions">
+    <button id="docIntegrityBtn" class="storage-btn"><span>🔐</span> Проверить целостность</button>
+    <button id="docBackupsBtn" class="storage-btn"><span>⟳</span> Резервные копии</button>
+  </div>
+  <div id="docBackupsList" class="mt-3 hidden text-xs border border-slate-200 rounded-lg p-3 bg-slate-50"></div>
+  <div id="docNetworkConflicts" class="mt-3 hidden border border-red-200 bg-red-50 rounded-xl p-3"></div>
+  <div class="storage-stats">
+    <div class="storage-stat"><span class="storage-stat-icon">▱</span><div><div class="storage-stat-label">Тип хранилища</div><div id="docStorageType" class="storage-stat-value">Сетевой диск</div></div></div>
+    <div class="storage-stat"><span class="storage-stat-icon">▤</span><div><div class="storage-stat-label">Последняя синхронизация</div><div id="docLastSyncText" class="storage-stat-value">—</div></div></div>
+    <div class="storage-stat"><span class="storage-stat-icon">☁</span><div><div class="storage-stat-label">Последняя запись</div><div id="docLastWriteText" class="storage-stat-value">—</div></div></div>
+    <div class="storage-stat"><span class="storage-stat-icon">◉</span><div><div class="storage-stat-label">Обновление индекса</div><div id="docLastIndexText" class="storage-stat-value">—</div></div></div>
+  </div>
+  <div class="storage-info-box"><span class="storage-info-icon">ⓘ</span><div><div class="storage-info-title">JSON — рабочий файл конструктора. XLSX — готовый документ для печати или передачи.</div><div class="storage-info-text">Файлы сохраняются в выбранной папке при сохранении, публикации и экспорте.</div></div></div>
+  <p id="docFolderNote" class="sr-only">Папка хранения документов. Если данные отличаются, конструктор покажет конфликт и не заменит файл автоматически. При отсутствии доступа можно использовать обычное скачивание файла.</p>
+  <div id="docNetworkSyncInfo" class="hidden"></div>
+  <div id="docIntegrityStatus" class="mt-3 text-xs"></div>
+  <div class="mt-4 border border-slate-200 rounded-xl p-3 bg-white">
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <div><div class="text-xs font-semibold text-slate-700">🕘 История документа</div><div class="text-[11px] text-slate-500">История создания, публикации, архивирования, версий, синхронизации и восстановления.</div></div>
+      <button id="docHistoryBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">Показать историю</button>
+    </div>
+    <div id="docHistoryList" class="mt-2 hidden text-xs border-t border-slate-100 pt-2"></div>
+  </div>
+  <div class="mt-3 border border-slate-200 rounded-xl p-3 bg-white">
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <div><div class="text-xs font-semibold text-slate-700">🧪 Проверка библиотеки</div><div class="text-[11px] text-slate-500">Проверяет основные функции библиотеки, не изменяя сохранённые документы и XLSX.</div></div>
+      <button id="docSelfTestBtn" class="btn-ghost px-3 py-2 rounded-lg text-xs border border-slate-200">Запустить проверку</button>
+    </div>
+    <div id="docSelfTestResult" class="mt-2 hidden text-xs"></div>
+  </div>
+</section>
+</div>
+<footer class="text-center text-xs text-slate-400 mt-6 pb-4">Технониколь • локальный конструктор СОП • Excel</footer>
+</div><div id="toastContainer" class="fixed top-6 right-6 z-50 flex flex-col gap-2"></div>
+<!-- SOP_SCRIPT_03 -->
+
+
+
+</body>
+</html>
