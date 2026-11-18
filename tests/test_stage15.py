@@ -26,13 +26,13 @@ class LocalSafetyIconsTests(unittest.TestCase):
         icons = json.loads(match.group(1))
         self.assertEqual(len(icons), 60)
         section = self.base.split("const ICON_LIB=[", 1)[1].split("].map(([id,type,label])", 1)[0]
-        catalog = re.findall(r"\\['([MWP]\\d{3})',", section)
+        catalog = re.findall(r"\['([MWP]\d{3})',", section)
         self.assertEqual(set(icons), set(catalog))
         for icon_id, svg in icons.items():
             with self.subTest(icon_id=icon_id):
                 self.assertIn("<svg", svg)
                 self.assertIn("</svg>", svg)
-                self.assertNotRegex(svg.lower(), r"<script|<foreignobject|onload\\s*=|onerror\\s*=")
+                self.assertNotRegex(svg.lower(), r"<script|<foreignobject|onload\s*=|onerror\s*=")
 
     def test_no_external_icon_network_and_immediate_load(self):
         app = self.html.split("<script>\n'use strict';", 1)[1]
@@ -55,7 +55,7 @@ class LocalSafetyIconsTests(unittest.TestCase):
         self.assertIn("const AI_PROXY_BASE=", self.html)
         self.assertEqual(self.base.split("<script>\n'use strict';",1)[0],self.html.split('<script type="application/json" id="sop-local-iso-icons">')[0])
         self.assertIn("stage14", str(builder.BASE))
-        self.assertEqual(self.base.count("class=\\\"tab-btn"),self.html.count("class=\\\"tab-btn"))
+        self.assertEqual(self.base.count('class="tab-btn'), self.html.count('class="tab-btn'))
 
 if __name__ == "__main__":
     unittest.main()
