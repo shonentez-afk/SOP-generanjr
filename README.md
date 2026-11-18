@@ -21,6 +21,10 @@
 
 ## Текущая версия
 
+Stage 13: `releases/stage13-layered-photo-editor.html` — неразрушающее редактирование фото и сохранение разметки по версиям документа. Код: `src/modules/photos/stage13-photo-section.js` и `src/patches/stage13-integrations.json`. Сборка: `python tools/build_stage13.py --verify-release`. См. `docs/RELEASE_STAGE13_RU.md`. Настройки ИИ и прокси сохранены.
+
+## Предыдущая версия
+
 Stage 12: `releases/stage12-local-exceljs-photo-studio.html`, изменения ограничены локальной ExcelJS и расширенным фоторедактором. Сборка: `python tools/build_stage12.py --verify-release`; подробности: `docs/RELEASE_STAGE12_RU.md`. **Настройки ИИ и прокси не изменять**.
 
 ## Первый базис
