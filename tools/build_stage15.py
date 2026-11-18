@@ -38,7 +38,7 @@ def build() -> str:
             svg = info["svg"].strip()
             if not svg.startswith(("<svg", "<?xml")) or "</svg>" not in svg:
                 raise AssertionError("Invalid vector: " + icon_id)
-            if re.search(r"<script\b|</script|<foreignObject\b|\bonload\s*=|\bonerror\s*=|\bhref\s*=\s*['\\"]https?://", svg, re.I):
+            if any(bad in svg.lower() for bad in ('<script', '</script', '<foreignobject', 'onload=', 'onerror=', 'href="http', "href='http")):
                 raise AssertionError("Disallowed SVG feature: " + icon_id)
             all_icons[icon_id] = svg
 
