@@ -24,6 +24,8 @@ class Stage16PhotoRegressionTests(unittest.TestCase):
         self.assertIn("state.steps=state.steps.map(normalizeExcelStepKeepingPhoto)",self.html)
         self.assertNotIn("state.steps=state.steps.map(normalizeStepShape);\n  recalcTotalTime();\n  await ensureStepImagesForExport();",self.html)
         self.assertIn("step.imageBuffer=source.imageBuffer||null",self.html)
+        self.assertEqual(self.html.count("function blobToDataUrl(blob){"),1)
+        self.assertNotIn("function blobToDataUrl(blob){",self.base)
         self.assertIn("step.imageData=typeof source.imageData==='string'?source.imageData:null",self.html)
 
     def test_excel_requires_every_photo(self):
