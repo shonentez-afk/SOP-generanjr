@@ -33,18 +33,18 @@ def build() -> str:
         if data.get("schemaVersion") != 1:
             raise AssertionError("Unexpected icon bundle: " + str(path))
         for icon_id, info in data["icons"].items():
-            if icon_id in all_icons or not re.fullmatch(r"[MWP]\\d{3}", icon_id):
+            if icon_id in all_icons or not re.fullmatch(r"[MWP]\d{3}", icon_id):
                 raise AssertionError("Duplicate/invalid ISO code: " + icon_id)
             svg = info["svg"].strip()
             if not svg.startswith(("<svg", "<?xml")) or "</svg>" not in svg:
                 raise AssertionError("Invalid vector: " + icon_id)
-            if re.search(r"<script\\b|</script|<foreignObject\\b|\\bonload\\s*=|\\bonerror\\s*=|\\bhref\\s*=\\s*['\\\"]https?://", svg, re.I):
+            if re.search(r"<script\b|</script|<foreignObject\b|\bonload\s*=|\bonerror\s*=|\bhref\s*=\s*['\\"]https?://", svg, re.I):
                 raise AssertionError("Disallowed SVG feature: " + icon_id)
             all_icons[icon_id] = svg
 
     icon_start = html.index("const ICON_LIB=[")
     icon_end = html.index("].map(([id,type,label])", icon_start)
-    codes = re.findall(r"\\['([MWP]\\d{3})',", html[icon_start:icon_end])
+    codes = re.findall(r"\['([MWP]\d{3})',", html[icon_start:icon_end])
     if len(codes) != 60 or len(set(codes)) != 60 or set(codes) != set(all_icons):
         raise AssertionError(f"Expected all 60 ISO codes, got {len(codes)}, missing={set(codes)-set(all_icons)}, extra={set(all_icons)-set(codes)}")
 
@@ -58,7 +58,7 @@ def build() -> str:
     html = html.replace(before, after, 1)
 
     # Escaping < ensures the JSON cannot accidentally terminate the HTML <script>.
-    payload = json.dumps(all_icons, ensure_ascii=False, separators=(",", ":")).replace("<", r"\\u003c")
+    payload = json.dumps(all_icons, ensure_ascii=False, separators=(",", ":")).replace("<", r"\u003c")
     html_marker = "<script>\n'use strict';"
     if html.count(html_marker) != 1:
         raise AssertionError("Main app script boundary changed")
