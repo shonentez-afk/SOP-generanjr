@@ -54,6 +54,13 @@ def assert_excel_photos(path,expected_photo_sha):
         if wb.sheetnames[:3]!=['СОП','ФРВ','Чек-лист оценки СОП']:
             raise AssertionError("Workbook sheet names/regression unexpected: "+repr(wb.sheetnames))
         if len(wb['СОП']._images)<3:
+            print("XLSX_IMAGE_ANCHORS",json.dumps({
+              "openpyxlImageCount":len(wb['СОП']._images),
+              "mediaNames":list(photos),
+              "drawingXml":xml.decode('utf-8','replace')[:6200],
+              "sheet1Drawing":archive.read('xl/worksheets/sheet1.xml').decode('utf-8','replace')[-1900:],
+              "rels":{x:archive.read(x).decode('utf-8','replace')[:1800] for x in names if x.startswith('xl/drawings/_rels/')},
+            },ensure_ascii=False),flush=True)
             raise AssertionError("openpyxl cannot see all three anchored pictures")
         return {"media":list(photos),"matchingStepPhoto":photo_hits[0],"drawingPics":xml.count(b"<xdr:pic>"),"openpyxlImages":len(wb['СОП']._images)}
 
