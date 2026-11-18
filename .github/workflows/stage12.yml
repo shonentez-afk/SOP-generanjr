@@ -1,0 +1,16 @@
+name: Stage 12 offline ExcelJS and Photo Studio
+on:
+  push:
+  pull_request:
+jobs:
+  stage12:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify Stage 12 standalone HTML
+        run: python tools/build_stage12.py --verify-release
+      - name: Run build and compatibility tests
+        run: python -m unittest discover -s tests -v
