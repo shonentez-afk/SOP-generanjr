@@ -178,7 +178,8 @@ function stage27Init(){
     '#stage27AssistantPanel .s27-summary{font-weight:600;margin:10px 0}',
     '#stage27AssistantPanel .s27-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px}',
     '#stage27AssistantPanel ol{padding-left:23px;list-style:decimal}',
-    '#stage27AssistantPanel [hidden]{display:none!important}'
+    '#stage27AssistantPanel [hidden]{display:none!important}',
+    '#sopReviewSummary:empty,#sopReviewIssues:empty{display:none}'
   ].join('\n');
   document.head.appendChild(style);
   const trigger=document.createElement('button');
@@ -250,7 +251,7 @@ function stage27Init(){
     trigger.setAttribute('aria-expanded',String(opening));
     if(opening){
       stage27SwitchTab(stage27ActiveTab);
-      panel.scrollIntoView({behavior:'instant',block:'nearest'});
+      panel.scrollIntoView({behavior:'auto',block:'nearest'});
     }else if(!$('sopReviewSummary').textContent.trim() &&
               !$('sopReviewIssues').textContent.trim()){
       reviewBox.classList.add('hidden');
