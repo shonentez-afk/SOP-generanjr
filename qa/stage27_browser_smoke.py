@@ -91,6 +91,7 @@ def check_assistant():
             assert not page.evaluate("() => !!state.steps[0].successCriteria")
             page.locator("[data-stage27-suggestion]").check()
             page.locator("#stage27ApplySuggestionsBtn").click()
+            page.evaluate("() => saveDraft()")
             applied=page.evaluate("""() => ({
               result:state.steps[0].successCriteria,
               time:state.steps[0].durationSeconds,
