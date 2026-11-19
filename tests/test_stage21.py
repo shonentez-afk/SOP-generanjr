@@ -43,7 +43,7 @@ class Stage21ReviewTests(unittest.TestCase):
     def test_review_state_unit_roundtrips_via_node(self):
         helper=(ROOT/"src/modules/documents/stage21-review-state.js").read_text(encoding="utf-8")
         draft=(ROOT/"src/modules/documents/stage21-draft.js").read_text(encoding="utf-8")
-        db=(ROOT/"src/modules/documents/stage21-db.js").read_text(encoding="utf-8")
+        db=(ROOT/"src/modules/documents/stage21-db.js").read_text(encoding="utf-8").removesuffix("async ")
         library=(ROOT/"src/modules/documents/stage21-library.js").read_text(encoding="utf-8")
         files=[helper,draft,db,library]
         harness=r"""
