@@ -84,7 +84,7 @@ def verify_real_xlsx(path,source_hashes):
         height=z.rowOff-a.rowOff
         h_ratio=height/full_height
         assert .94<h_ratio<1.0,("Not filled across row height",key,h_ratio)
-        assert anchor.editAs is None,("Step photo should resize with row/column",anchor.editAs)
+        assert anchor.editAs=='twoCell',("Step photo should resize with row/column",anchor.editAs)
         print("PHOTO_CELL",key,"width",round(ratio*100,1),"%","height",round(h_ratio*100,1),"%",flush=True)
     assert seen==expected,("Missing photo anchors",seen,expected)
     for cell in ("C15:E15","F15:I15","J15:L15","C19:E19"):
