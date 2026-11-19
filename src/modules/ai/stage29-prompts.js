@@ -1,6 +1,6 @@
 // Stage29: task-specific quality constraints without changing existing AI transport,
 // model selection, Yandex Cloud proxy or user's existing prompt baseline.
-const STAGE29_SOP_PROMPT=AI_SYS.generate+[
+const STAGE29_SOP_PROMPT=AI_SYS.generate.replace(/\nDATA BEGIN\s*$/,'')+[
   '',
   'QUALITY GATE STAGE 29 — СОП',
   'Пиши как технолог для исполнителя, а не как составитель универсальных инструкций.',
