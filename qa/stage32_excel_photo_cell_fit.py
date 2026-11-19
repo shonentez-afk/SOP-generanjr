@@ -39,8 +39,9 @@ def verify_real_xlsx(path,source_hashes):
             if k.startswith("xl/drawings/drawing") and k.endswith(".xml")]
         assert drawings,"Excel drawing anchors missing"
         drawing=b"".join(drawings)
-        assert drawing.count(b"<xdr:twoCellAnchor")>=4,"Expected 4 two-cell photo anchors"
-        assert b"editAs=\"oneCell\"" in drawing,"Logo/icon existing fixed geometry should be unchanged"
+        assert drawing.count(b"<xdr:oneCellAnchor>")>=4,"Expected 4 explicit-size one-cell picture anchors"
+        assert b"<xdr:oneCellAnchor editAs=" not in drawing,"Invalid ExcelJS oneCellAnchor editAs must be removed"
+        assert b"<xdr:twoCellAnchor editAs=\"oneCell\"" in drawing,"Logo geometry must be unchanged"
     wb=load_workbook(path)
     assert wb.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],wb.sheetnames
     ws=wb["СОП"]
@@ -61,37 +62,34 @@ def verify_real_xlsx(path,source_hashes):
     seen=set()
     for picture in ws._images:
         anchor=picture.anchor
-        if not hasattr(anchor,"to"):
-            continue  # Existing logo, not a step photo
+        if not hasattr(anchor,"ext"):
+            continue  # Previous logo remains a separate twoCellAnchor.
         a=anchor._from
         if a.row not in (14,18):
             continue
-        z=anchor.to
-        assert a.row==z.row,(a.row,z.row)
-        key=(a.row,a.col,z.col)
+        next_col={2:4,5:8,9:11}[a.col]
+        key=(a.row,a.col,next_col)
         assert key in expected,("Unexpected photo region",key)
         assert key not in seen,("Duplicate image region",key)
         seen.add(key)
         assert a.colOff==4*9525 and a.rowOff==4*9525,(a.colOff,a.rowOff)
-        first=a.col+1
-        last=z.col+1
-        full_width=sum(_column_emu(ws,c) for c in range(first,last+1))
-        occupied=sum(_column_emu(ws,c) for c in range(first,last)) + z.colOff - a.colOff
-        ratio=occupied/full_width
-        assert .94<ratio<1.0,("Not filled across merged width",key,ratio)
+        full_width=sum(_column_emu(ws,c) for c in range(a.col+1,next_col+2))
+        displayed=anchor.ext.width
+        ratio=displayed/full_width
+        assert .94<ratio<1.0,("Explicit Excel photo width does not fill cell",key,ratio)
         row=ws.row_dimensions[a.row+1]
         full_height=round((row.height or 15)*12700)
-        height=z.rowOff-a.rowOff
-        h_ratio=height/full_height
-        assert .94<h_ratio<1.0,("Not filled across row height",key,h_ratio)
-        assert anchor.editAs=='twoCell',("Step photo should resize with row/column",anchor.editAs)
-        print("PHOTO_CELL",key,"width",round(ratio*100,1),"%","height",round(h_ratio*100,1),"%",flush=True)
-    assert seen==expected,("Missing photo anchors",seen,expected)
+        h_ratio=anchor.ext.height/full_height
+        assert .94<h_ratio<1.0,("Explicit Excel photo height does not fill row",key,h_ratio)
+        assert type(anchor).__name__=="OneCellAnchor","Use Excel's explicit xdr:ext size"
+        print("EXPLICIT_PHOTO_SIZE",key,"width",round(ratio*100,1),
+              "%","height",round(h_ratio*100,1),"%",flush=True)
+    assert seen==expected,("Missing image extents",seen,expected)
     for cell in ("C15:E15","F15:I15","J15:L15","C19:E19"):
         assert cell in {str(x) for x in ws.merged_cells.ranges},cell
     assert ws.row_dimensions[15].height==120 and ws.row_dimensions[19].height==120
     assert wb["ФРВ"].max_row>=13
-    print("PASS Stage32 XLSX: all four source photos retained, anchors fill four merged cells, logo and other sheets preserved",flush=True)
+    print("PASS Stage32.1: explicit displayed XLSX picture sizes fill merged cells, originals retained, untouched logo and sheets",flush=True)
 
 def photo_cell_acceptance():
     with sync_playwright() as kit:
@@ -133,6 +131,7 @@ def photo_cell_acceptance():
             with page.expect_download(timeout=90000) as event:
                 page.locator("#generateBtn").click()
             SAMPLE.parent.mkdir(parents=True,exist_ok=True)
+            assert "_ФОТО_STAGE32_1.xlsx" in event.value.suggested_filename,event.value.suggested_filename
             event.value.save_as(str(SAMPLE))
             verify_real_xlsx(SAMPLE,hashes)
 
