@@ -19,13 +19,42 @@ function stage29Tokens(text){
     .filter(t=>!STAGE29_STOPWORDS.has(t)));
 }
 function stage29Numbers(text){
-  return (String(text||'').match(/(?<![a-zа-яё0-9])\d+(?:[.,]\d+)?(?![a-zа-яё0-9])/giu)||[])
+  // Part/model numbers (e.g. KF37, M12) are also source facts.
+  return (String(text||'').match(/\d+(?:[.,]\d+)?/gu)||[])
     .map(x=>x.replace(',','.').replace(/^0+(?=\d)/,''));
 }
-function stage29HasUnconfirmedNumber(value,source,numbers){
+function stage29HasUnconfirmedNumber(value,source,steps){
   const allowed=new Set(stage29Numbers(source));
-  for(let i=1;i<=numbers;i++)allowed.add(String(i)); // step labels 1..N
-  return [...new Set(stage29Numbers(value))].filter(x=>!allowed.has(x));
+  // Allow explicit sequence labels, not all small numbers: "через 3 дня" is
+  // still an invented commitment when the SOP has 3 or more steps.
+  const text=steps>0?String(value||'')
+    .replace(/(?:шаг|шаге|этап|пункт|номер)\s*(?:№|#)?\s*\d+/giu,'')
+    .replace(/^\s*\d+[.)]\s*/gm,''):String(value||'');
+  return [...new Set(stage29Numbers(text))].filter(x=>!allowed.has(x));
+}
+function stage29TimeConfirmed(value,source){
+  if(!value)return true;
+  const candidate=String(value).match(/^(\d{1,4}):([0-5]\d)$/);
+  if(!candidate)return false;
+  const seconds=Number(candidate[1])*60+Number(candidate[2]);
+  const text=String(source||'');
+  if(!seconds)return false;
+  if(text.includes(String(value)))return true;
+  const hhmm=/\b(\d{1,4}):([0-5]\d)\b/g;
+  for(const m of text.matchAll(hhmm)){
+    if(Number(m[1])*60+Number(m[2])===seconds)return true;
+  }
+  for(const m of text.matchAll(/(\d+)\s*мин(?:ута|уты|ут)?\s*(\d+)\s*сек(?:унд[аы]?|)?/giu)){
+    if(Number(m[1])*60+Number(m[2])===seconds)return true;
+  }
+  const units=/(\d+(?:[.,]\d+)?)\s*(секунд(?:а|ы|у|ами)?|сек|с\b|минут(?:а|ы|у|ами)?|мин\b|час(?:а|ов)?|ч\b)/giu;
+  for(const m of text.matchAll(units)){
+    const count=Number(m[1].replace(',','.'));
+    const multiplier=/^(?:сек|с$)/iu.test(m[2])?1:
+      /^(?:мин)/iu.test(m[2])?60:3600;
+    if(count*multiplier===seconds)return true;
+  }
+  return false;
 }
 function stage29QualityError(task,detail){
   const e=new Error('Результат ИИ содержит неподтверждённые сведения или неполную структуру. Документ не изменён.');
@@ -68,16 +97,12 @@ function stage29SopNormalize(sop,input){
         if(extras.length)claims.push('шаг '+(i+1)+' / '+field+': '+extras.join(', '));
       }
     }
-    if(s.time){
-      const val=String(s.time);
-      // Explicit time may be stated as 00:40, 40 секунд, or 0:40; no inferred durations.
-      const digits=stage29Numbers(val);
-      if(digits.length&&!digits.every(x=>stage29HasUnconfirmedNumber(x,source,0).length===0)){
-        claims.push('шаг '+(i+1)+' / time: '+val);
-      }
+    if(s.time&&!stage29TimeConfirmed(s.time,source)){
+      claims.push('шаг '+(i+1)+' / время без указанной исходной длительности: '+s.time);
     }
   }
-  for(const field of ['safety','tools','material']){
+  for(const field of ['department','workplace','executor','safety','tools','material']){
+    sop[field]=stage29Text(sop[field],1600);
     const extras=stage29HasUnconfirmedNumber(sop[field],source,0);
     if(extras.length)claims.push(field+': '+extras.join(', '));
   }
