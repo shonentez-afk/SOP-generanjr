@@ -87,8 +87,8 @@ let out=scope.stage27ParseProposals(JSON.stringify({proposals:[
     newValue:'10',why:'Недопустимо'},
   {stepId:5,field:'reason',questionId:'Q9',oldValue:'',
     newValue:'Факт от другого человека'},
-  {stepId:9,field:'reason',questionId:'Q1',oldValue:'Подмена',
-    newValue:'Недостоверно'}
+  {stepId:9,field:'reason',questionId:'Q1',oldValue:'',
+    newValue:'Недостоверно: вопрос о другом шаге'}
 ]}),data,q);
 assert.equal(out.length,1);
 assert.equal(out[0].field,'successCriteria');
