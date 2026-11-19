@@ -102,8 +102,8 @@ console.log('PASS Stage30: add/move/delete snapshots, undo/redo, dirty rollback,
                      "renderedBlob:blob", "sanitizeIllustrationAnnotations"):
             self.assertIn(flag,src)
         self.assertNotIn("↶ Убрать последний объект",src)
-        self.assertEqual(src.count("id='illUndo'"),1)
-        self.assertEqual(src.count("id='illRedo'"),1)
+        self.assertEqual(src.count('id="illUndo"'),1)
+        self.assertEqual(src.count('id="illRedo"'),1)
 
 if __name__=="__main__":
     unittest.main()
