@@ -2,8 +2,12 @@
 """Stage25 real Chrome file://: previews, safe SOP/FRV AI and old functional regression."""
 from __future__ import annotations
 import importlib.util
+import faulthandler
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+
+faulthandler.enable()
+faulthandler.dump_traceback_later(95,exit=True)
 
 ROOT=Path(__file__).resolve().parents[1]
 RELEASE=ROOT/"releases/stage25-ai-safe-replacement.html"
@@ -254,7 +258,9 @@ def tests_in_chrome():
             browser.close()
 
 def main():
+    print('CHECK Stage25 starting prior Chrome regressions',flush=True)
     previous_regression()
+    print('CHECK Stage25 prior Chrome regressions complete',flush=True)
     tests_in_chrome()
 
 if __name__=="__main__":
