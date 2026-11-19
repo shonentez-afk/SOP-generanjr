@@ -152,7 +152,7 @@ function stage28GroundAIReview(validated,raw,steps,meta){
       // Unsupported AI claims are questions, never a proven safety violation.
       severity:evidence.evidenceVerified?issue.severity:'question',
       // No direct fix unless source wording was located in SOP.
-      fixValue:evidence.evidenceVerified?issue.fixValue:null
+      fixValue:evidence.evidenceVerified&&issue.field!=='time'?issue.fixValue:null
     };
   }).filter(Boolean);
 }
@@ -161,6 +161,45 @@ function stage28GroundChecks(issues,steps,meta){
     ...issue,...stage28EvidenceForIssue(issue,null,steps,meta,'deterministic'),
     reviewOrigin:'rule'
   }));
+}
+function stage28TwiStructureChecks(steps){
+  // Detect only strictly demonstrable editorial contradictions. No requirement
+  // that every Important Step has a Key Point, photo or external safety standard.
+  const issues=[];
+  (Array.isArray(steps)?steps:[]).forEach((s,i)=>{
+    const stepId=i+1;
+    const km=Array.isArray(s?.keyMoments)?s.keyMoments.map(x=>String(x??'').trim())
+      .filter(Boolean):[];
+    const action=String(s?.action??'').trim();
+    const reason=String(s?.reason??'').trim();
+    const criterion=String(s?.successCriteria??'').trim();
+    const norm=x=>String(x||'').toLocaleLowerCase('ru').replace(/\s+/g,' ').trim();
+    if(km.length>3){
+      issues.push({stepId,field:'keyMoments',severity:'warning',
+        type:'incomplete',status:'open',fixValue:null,thread:[],
+        description:'В шаге более трёх ключевых моментов',
+        suggestion:'Проверьте, не смешаны ли разные важные действия; не создавайте лишние Key Points.'});
+    }
+    if(new Set(km.map(norm)).size!==km.length){
+      issues.push({stepId,field:'keyMoments',severity:'info',
+        type:'duplicate',status:'open',fixValue:null,thread:[],
+        description:'Одинаковый ключевой момент повторяется внутри шага',
+        suggestion:'Оставьте только действительно разные критичные детали.'});
+    }
+    if(reason.length>12&&(norm(reason)===norm(action)||km.some(x=>norm(x)===norm(reason)))){
+      issues.push({stepId,field:'reason',severity:'info',
+        type:'incomplete',status:'open',fixValue:null,thread:[],
+        description:'Объяснение «Почему важно» дословно повторяет действие или ключевой момент',
+        suggestion:'Проверьте, поясняет ли текст причину, а не только повторяет порядок действий.'});
+    }
+    if(action.length>12&&criterion.length>12&&norm(action)===norm(criterion)){
+      issues.push({stepId,field:'successCriteria',severity:'info',
+        type:'incomplete',status:'open',fixValue:null,thread:[],
+        description:'Критерий результата дословно повторяет действие',
+        suggestion:'Если результат можно наблюдать, опишите признак его успешного завершения.'});
+    }
+  });
+  return issues;
 }
 function stage28PhotoGuidance(steps){
   const out=[];
