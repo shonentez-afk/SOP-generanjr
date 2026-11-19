@@ -80,19 +80,36 @@ def check_assistant():
                 throw new Error('Unexpected AI task '+opts.task);
               };
               return {id:s.id,duration:s.durationSeconds,photo:s.hasPhoto,
-                buttons:[...document.querySelectorAll('[data-stage27-tab]')].length,
+                buttons:[...document.querySelectorAll('#stage27Actions [data-stage27-tab]')].length,
                 integrated:document.getElementById('stage27AssistantPanel').parentElement.id==='sopReviewContainer',
                 collapsed:document.getElementById('stage27AssistantPanel').hidden,
-                additionalButtons:document.querySelectorAll('#stage27AssistantToggle').length,
+                alwaysVisible:[...document.querySelectorAll('#stage27Actions [data-stage27-tab]')].every(b=>{
+                  const rect=b.getBoundingClientRect();
+                  return rect.width>0&&rect.height>=32;
+                }),
+                matchedStyles:[...document.querySelectorAll('#stage27Actions button')].every(b=>
+                  b.classList.contains('btn-ghost')&&b.classList.contains('rounded-lg')),
+                noPopup:!document.getElementById('stage27AssistantToggle') &&
+                  !document.querySelector('#stage27AssistantPanel [data-stage27-tab]'),
+                adjacent:document.getElementById('stage27Actions').previousElementSibling
+                  .contains(document.getElementById('reviewSopBtn')),
                 mainActions:document.querySelectorAll('#generateSopBtn,#reviewSopBtn').length,
                 model:AI_PROXY_BASE};
             }""")
             assert evidence["buttons"]==4,evidence
             assert evidence["integrated"] and evidence["collapsed"],evidence
-            assert evidence["additionalButtons"]==1 and evidence["mainActions"]==2,evidence
-            page.locator("#stage27AssistantToggle").click()
+            assert evidence["alwaysVisible"] and evidence["matchedStyles"],evidence
+            assert evidence["noPopup"] and evidence["adjacent"],evidence
+            assert evidence["mainActions"]==2,evidence
+            page.locator('#stage27Actions [data-stage27-tab="clarify"]').click()
             assert page.locator("#stage27AssistantPanel").is_visible()
             assert page.locator("#sopReviewContainer").is_visible()
+            assert page.locator('[data-stage27-tab="clarify"]').get_attribute('aria-pressed')=='true'
+            # The visible action button toggles its inline result off without a popup.
+            page.locator('#stage27Actions [data-stage27-tab="clarify"]').click()
+            assert not page.locator("#stage27AssistantPanel").is_visible()
+            assert page.locator('#stage27Actions [data-stage27-tab="clarify"]').is_visible()
+            page.locator('#stage27Actions [data-stage27-tab="clarify"]').click()
             assert page.get_by_role("button",name="Проверить весь СОП").count()==1
             assert evidence["model"]=="https://functions.yandexcloud.net/d4ehdpoue3sve6s0f92b",evidence
 
@@ -148,7 +165,9 @@ def check_assistant():
             page.evaluate("() => renderReviewResults(reviewSummary)")
             assert page.locator("#stage27AssistantPanel").is_visible()
             assert page.locator("#stage27MentorResults").is_visible()
-            assert page.locator("#stage27AssistantToggle").count()==1
+            assert page.locator("#stage27AssistantToggle").count()==0
+            assert page.locator("#stage27Actions [data-stage27-tab]").count()==4
+            assert page.locator('[data-stage27-tab="mentor"]').get_attribute("aria-pressed")=="true"
 
             page.evaluate(r"""async () => {
               const s=state.steps[0];
@@ -207,6 +226,13 @@ def check_assistant():
             assert "Изменений:" in diff,diff
             assert "Проверить TWI" in diff,diff
             assert "ФРВ" in diff,diff
+            assert page.locator('[data-stage27-tab="changes"]').get_attribute("aria-pressed")=="true"
+            page.locator('#closeReviewBtn').click()
+            assert not page.locator('#stage27AssistantPanel').is_visible()
+            assert page.locator('#stage27Actions [data-stage27-tab="changes"]').is_visible()
+            page.locator('#stage27Actions [data-stage27-tab="changes"]').click()
+            assert page.locator('#stage27AssistantPanel').is_visible()
+            assert page.locator('[data-stage27-tab="changes"]').get_attribute("aria-pressed")=="true"
             calls=page.evaluate("() => window.__s27Calls")
             assert set(("stage27_questions","stage27_proposals","stage27_mentor",
                         "stage27_explain","stage27_analog")).issubset(set(calls)),calls
