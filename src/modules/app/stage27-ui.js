@@ -136,22 +136,29 @@ function stage27Render(){
   stage27SetBusy(stage27Busy);
 }
 function stage27Init(){
+  // Extend the accepted full-SOP-review UI instead of creating a second AI
+  // dashboard above the editor. This panel is a direct descendant of the
+  // original results block, so its rendering never touches old review fields.
   if($('stage27AssistantPanel'))return;
-  const editor=$('tab-editor');if(!editor)return;
+  const reviewButton=$('reviewSopBtn');
+  const reviewBox=$('sopReviewContainer');
+  const reviewIssues=$('sopReviewIssues');
+  const closeButton=$('closeReviewBtn');
+  if(!reviewButton||!reviewBox||!reviewIssues||!closeButton)return;
   state.stage27=stage27Normalize(state.stage27);
   const style=document.createElement('style');
   style.id='stage27Styles';
   style.textContent=[
-    '#stage27AssistantPanel{border:1px solid #c7d2fe;border-radius:16px;background:#fff;padding:20px;margin-bottom:18px;font-size:14px;color:#1e293b}',
-    '#stage27AssistantPanel h2{font-size:19px;font-weight:700;margin:0 0 5px}',
+    '#stage27AssistantPanel{border:0;border-top:1px solid #ddd6fe;background:transparent;padding:14px 0 0;margin-top:14px;font-size:14px;color:#1e293b}',
+    '#stage27AssistantPanel .s27-heading{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:6px;font-weight:700;color:#581c87}',
     '#stage27AssistantPanel h3{font-size:16px;font-weight:700;margin:8px 0}',
-    '#stage27AssistantPanel .s27-intro{color:#475569;font-size:13px;margin-bottom:12px}',
-    '#stage27AssistantPanel .s27-nav{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0;padding-bottom:10px;border-bottom:1px solid #e2e8f0}',
+    '#stage27AssistantPanel .s27-intro{color:#64748b;font-weight:400;font-size:12px}',
+    '#stage27AssistantPanel .s27-nav{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;padding-bottom:8px;border-bottom:1px solid #e2e8f0}',
     '#stage27AssistantPanel button{border:1px solid #cbd5e1;border-radius:8px;padding:8px 11px;background:#f8fafc;color:#1e293b;font-weight:600;font-size:13px}',
-    '#stage27AssistantPanel button.active,#stage27AssistantPanel .s27-primary{background:#4338ca;color:#fff;border-color:#4338ca}',
+    '#stage27AssistantPanel button.active,#stage27AssistantPanel .s27-primary{background:#6d28d9;color:#fff;border-color:#6d28d9}',
     '#stage27AssistantPanel button:disabled{opacity:.5;cursor:not-allowed}',
     '#stage27AssistantPanel .s27-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:8px}',
-    '#stage27AssistantPanel .s27-card{padding:12px;margin:10px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;line-height:1.5}',
+    '#stage27AssistantPanel .s27-card{padding:10px;margin:8px 0;background:#fff;border:1px solid #e2e8f0;border-radius:9px;line-height:1.5}',
     '#stage27AssistantPanel .s27-question{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}',
     '#stage27AssistantPanel .s27-pill{padding:2px 7px;border-radius:10px;background:#e0e7ff;color:#3730a3;font-size:12px}',
     '#stage27AssistantPanel .s27-muted{color:#64748b;font-size:13px;margin:6px 0}',
@@ -174,58 +181,82 @@ function stage27Init(){
     '#stage27AssistantPanel [hidden]{display:none!important}'
   ].join('\n');
   document.head.appendChild(style);
-  const panel=document.createElement('section');
+  const trigger=document.createElement('button');
+  trigger.id='stage27AssistantToggle';
+  trigger.type='button';
+  trigger.className='btn-ghost px-3 py-2 rounded-lg text-xs font-semibold text-purple-700 border border-purple-200';
+  trigger.textContent='⋯ Дополнительно';
+  trigger.setAttribute('aria-expanded','false');
+  trigger.setAttribute('aria-controls','stage27AssistantPanel');
+  trigger.title='Уточнения, логика шагов, аналоги и сравнение версий';
+  reviewButton.insertAdjacentElement('afterend',trigger);
+  const panel=document.createElement('div');
   panel.id='stage27AssistantPanel';
-  panel.setAttribute('aria-label','Интеллектуальный помощник СОП');
+  panel.hidden=true;
+  panel.setAttribute('aria-label','Дополнительные инструменты проверки СОП');
   panel.innerHTML=[
-    '<h2>🧠 ИИ-помощник СОП</h2>',
-    '<p class="s27-intro">Stage 27 · Уточнение фактов, независимая проверка, локальные аналоги, сравнение редакций. Действующий прокси и настройки ИИ не меняются.</p>',
-    '<div class="s27-nav" role="tablist" aria-label="Функции ИИ-помощника">',
-      '<button type="button" role="tab" data-stage27-tab="clarify">Уточнить СОП</button>',
-      '<button type="button" role="tab" data-stage27-tab="mentor">Наставник 2.0</button>',
+    '<div class="s27-heading"><span>Дополнительно к проверке СОП</span><span class="s27-intro">Все изменения — только с подтверждением</span></div>',
+    '<div class="s27-nav" role="tablist" aria-label="Дополнительные инструменты">',
+      '<button type="button" role="tab" data-stage27-tab="clarify">Уточнения</button>',
+      '<button type="button" role="tab" data-stage27-tab="mentor">Логика шагов</button>',
       '<button type="button" role="tab" data-stage27-tab="analog">По аналогии</button>',
-      '<button type="button" role="tab" data-stage27-tab="changes">Сравнить версии</button>',
+      '<button type="button" role="tab" data-stage27-tab="changes">Изменения</button>',
     '</div>',
     '<div data-stage27-pane="clarify" role="tabpanel">',
-      '<h3>Уточнение исходных фактов</h3>',
-      '<p class="s27-muted">ИИ задаёт вопросы, вы подтверждаете сведения. Правки существующих шагов — только после выбора полей.</p>',
-      '<button type="button" class="s27-primary" id="stage27AskBtn" data-stage27-ai>✨ Найти важные уточнения</button>',
+      '<p class="s27-muted">Запросите недостающие факты, подтвердите ответы и выберите только нужные точечные исправления.</p>',
+      '<button type="button" class="s27-primary" id="stage27AskBtn" data-stage27-ai>✨ Найти уточнения</button>',
       '<div id="stage27QuestionsArea"></div>',
-      '<button type="button" id="stage27SuggestBtn" data-stage27-ai>✨ Предложить точечные изменения</button>',
+      '<button type="button" id="stage27SuggestBtn" data-stage27-ai>Предложить исправления</button>',
       '<div id="stage27ProposalsArea"></div>',
     '</div>',
     '<div data-stage27-pane="mentor" role="tabpanel" hidden>',
-      '<h3>Логическая проверка технологической операции</h3>',
-      '<p class="s27-muted">Дополнение к существующему наставнику: только смысловые противоречия и вопросы. До 18 шагов за один запрос.</p>',
-      '<button type="button" class="s27-primary" id="stage27MentorBtn" data-stage27-ai>🔍 Проверить логику СОП</button>',
+      '<p class="s27-muted">Дополнение к обычной проверке: смысловые связи действий и причин, не более 18 шагов за запрос.</p>',
+      '<button type="button" class="s27-primary" id="stage27MentorBtn" data-stage27-ai>✨ Проверить связи между шагами</button>',
       '<div id="stage27MentorResults"></div>',
     '</div>',
     '<div data-stage27-pane="analog" role="tabpanel" hidden>',
-      '<h3>Создать СОП на основе утверждённого аналога</h3>',
-      '<p class="s27-muted">Сначала локальный поиск по опубликованным СОП, затем явный выбор документа.</p>',
-      '<div class="s27-grid"><div><label for="stage27AnalogQuery">Оборудование или операция</label>',
+      '<p class="s27-muted">Поиск по опубликованным СОП в локальной библиотеке. Документ отправляется ИИ только после вашего выбора.</p>',
+      '<div class="s27-grid"><div><label for="stage27AnalogQuery">Название операции или оборудование</label>',
       '<input type="text" id="stage27AnalogQuery" placeholder="Например, проверка ленточного конвейера"></div>',
-      '<div class="s27-actions"><button type="button" id="stage27FindAnalogs">Найти в библиотеке</button></div></div>',
+      '<div class="s27-actions"><button type="button" id="stage27FindAnalogs">Найти аналог</button></div></div>',
       '<div id="stage27Candidates"></div>',
       '<div id="stage27AnalogSelected"></div>',
-      '<label for="stage27AnalogDifferences">Отличия целевой операции от аналога</label>',
-      '<textarea id="stage27AnalogDifferences" rows="3" placeholder="Укажите только подтверждённые различия. Если описание процесса уже заполнено выше, можно оставить пустым."></textarea>',
-      '<p class="s27-muted">Новый черновик не получает фотографии, время и требования безопасности из аналога автоматически.</p>',
-      '<button type="button" class="s27-primary" id="stage27MakeAnalogBtn" data-stage27-ai>✨ Создать черновик по выбранному аналогу</button>',
+      '<label for="stage27AnalogDifferences">Подтверждённые отличия целевой операции</label>',
+      '<textarea id="stage27AnalogDifferences" rows="3" placeholder="Что именно отличается от выбранного СОП?"></textarea>',
+      '<p class="s27-muted">Фотографии, время и требования безопасности не копируются из аналога.</p>',
+      '<button type="button" class="s27-primary" id="stage27MakeAnalogBtn" data-stage27-ai>✨ Подготовить черновик по аналогу</button>',
     '</div>',
     '<div data-stage27-pane="changes" role="tabpanel" hidden>',
-      '<h3>Анализ изменений между версиями</h3>',
-      '<p class="s27-muted">Сопоставление выполняется локально, без ИИ-запроса. Показывает возможное влияние на TWI, фото и ФРВ.</p>',
-      '<button type="button" id="stage27HistoryRefresh">Найти предыдущие редакции</button>',
-      '<label for="stage27HistorySelect">Предыдущая редакция</label>',
-      '<select id="stage27HistorySelect"><option value="">Выберите редакцию</option></select>',
-      '<button type="button" id="stage27HistoryCompare">Сравнить с текущим СОП</button>',
+      '<p class="s27-muted">Сравнение текущего СОП с редакцией из библиотеки. Локально, без запроса к ИИ.</p>',
+      '<button type="button" id="stage27HistoryRefresh">Найти редакции</button>',
+      '<label for="stage27HistorySelect">Сравнить с редакцией</label>',
+      '<select id="stage27HistorySelect"><option value="">Выберите предыдущую редакцию</option></select>',
+      '<button type="button" id="stage27HistoryCompare">Сравнить</button>',
       '<div id="stage27HistoryDiff" class="s27-card">Выберите предыдущую версию для сравнения.</div>',
     '</div>',
-    '<p id="stage27BusyLabel" class="s27-muted">Результаты ИИ применяются только после вашего подтверждения</p>'
+    '<p id="stage27BusyLabel" class="s27-muted">Подтверждение инженера обязательно</p>'
   ].join('');
-  if(editor.firstElementChild)editor.firstElementChild.after(panel);
-  else editor.appendChild(panel);
+  reviewIssues.insertAdjacentElement('afterend',panel);
+  const collapse=()=>{
+    panel.hidden=true;
+    trigger.textContent='⋯ Дополнительно';
+    trigger.setAttribute('aria-expanded','false');
+  };
+  trigger.addEventListener('click',()=>{
+    const opening=panel.hidden;
+    reviewBox.classList.remove('hidden');
+    panel.hidden=!opening;
+    trigger.textContent=opening?'⋯ Свернуть дополнения':'⋯ Дополнительно';
+    trigger.setAttribute('aria-expanded',String(opening));
+    if(opening){
+      stage27SwitchTab(stage27ActiveTab);
+      panel.scrollIntoView({behavior:'instant',block:'nearest'});
+    }else if(!$('sopReviewSummary').textContent.trim() &&
+              !$('sopReviewIssues').textContent.trim()){
+      reviewBox.classList.add('hidden');
+    }
+  });
+  closeButton.addEventListener('click',collapse);
   panel.addEventListener('click',event=>{
     const btn=event.target.closest('button');
     if(!btn||!panel.contains(btn))return;
