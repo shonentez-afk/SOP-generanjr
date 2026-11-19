@@ -46,9 +46,12 @@ def check_assistant():
               state.stage27=stage27Empty();
               stateToHtml();stage27Render();
               window.__s27Calls=[];
+              window.__s27DifferentQuestions=false;
               aiAsk=async (sys,user,opts)=>{
                 window.__s27Calls.push(opts.task);
                 const id=state.steps[0].id;
+                if(opts.task==='stage27_questions' && window.__s27DifferentQuestions)
+                  return JSON.stringify({questions:[{question:'Кто разрешает запуск после проверки оборудования?',stepId:id,why:'Требуется уточнение'}]});
                 if(opts.task==='stage27_questions')return JSON.stringify({questions:[{
                   question:'Как убедиться в исправности ограждения?',
                   stepId:id,why:'Без критерия завершения СОП неполон'
@@ -86,6 +89,10 @@ def check_assistant():
                 "Ограждение закрыто, крепление исправно")
             page.locator('[data-stage27-confirm="Q1"]').click()
             assert page.evaluate("() => state.stage27.questions[0].confirmed")
+            page.evaluate("() => window.__s27DifferentQuestions=true")
+            page.locator("#stage27AskBtn").click()
+            page.wait_for_function("() => state.stage27.questions.length===2",timeout=7000)
+            assert page.evaluate("() => state.stage27.questions[0].confirmed && state.stage27.questions[0].answer==='Ограждение закрыто, крепление исправно'")
             page.locator("#stage27SuggestBtn").click()
             page.wait_for_selector("[data-stage27-suggestion]",timeout=7000)
             assert not page.evaluate("() => !!state.steps[0].successCriteria")
