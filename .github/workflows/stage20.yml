@@ -1,0 +1,47 @@
+name: Stage 20 A2 safe export contracts
+on:
+  push:
+    branches: [main, feature/stage20-a2-export-snapshot-20261119]
+    paths:
+      - 'src/modules/**/stage20-*.js'
+      - 'src/app/stage20-parts.json'
+      - 'tools/build_stage19.py'
+      - 'tools/build_stage20.py'
+      - 'tests/test_stage20.py'
+      - 'qa/stage20*.py'
+      - 'qa/qa_image_check.py'
+      - 'releases/stage20-a2-safe-export.html'
+      - '.github/workflows/stage20.yml'
+  pull_request:
+jobs:
+  a2:
+    name: Module contracts, live-state immutability, file Chrome
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Stage19 baseline must remain identical
+        run: python tools/build_stage19.py --verify-baseline
+      - name: Stage20 build is reproducible and shell unchanged
+        run: |
+          python tools/build_stage20.py --verify-release
+          python tools/build_stage20.py --verify-static
+      - name: Run all unit regressions
+        run: python -m unittest discover -s tests -v
+      - name: JavaScript syntax of Stage20 runtime
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path('releases/stage20-a2-safe-export.html').read_text(encoding='utf-8')
+          marker="<script>\n'use strict';"
+          assert html.count(marker)==1
+          src="'use strict';\n"+html.split(marker,1)[1].split("</script>",1)[0]
+          Path('/tmp/stage20.js').write_text(src,encoding='utf-8')
+          PY
+          node --check /tmp/stage20.js
+      - name: Real Chrome file:// photo + Excel + non-destructive export
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage20_browser_smoke.py

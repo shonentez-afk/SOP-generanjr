@@ -53,8 +53,7 @@ def _manifest() -> dict:
         raise AssertionError("Runtime must come from semantic source modules only")
     return parts
 
-def build() -> str:
-    p=_manifest()
+def build_from_manifest(p: dict) -> str:
     body="".join(_read(path) for path in p["modules"])
     if not body.startswith("\n'use strict';"):
         raise AssertionError("Wrong runtime entrypoint")
@@ -72,6 +71,9 @@ def build() -> str:
         +p["runtimeOpen"]+body
         +_read(layout["afterRuntime"])
     )
+
+def build() -> str:
+    return build_from_manifest(_manifest())
 
 def main() -> None:
     ap=argparse.ArgumentParser()
