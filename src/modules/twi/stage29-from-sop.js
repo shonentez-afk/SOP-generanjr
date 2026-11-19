@@ -54,9 +54,10 @@ async function generateTwiPlan(){
     const guard=aiGuardCapture({twi:true});
     const raw=await aiAsk(STAGE29_TWI_PROMPT,'DATA BEGIN\n'+JSON.stringify(src,null,2)+'\nDATA END',
       {model:currentModel,temperature:.15,maxTokens:3200,task:'twi_generate'});
-    const proposal=stage29TwiNormalize(aiReadTwiPlan(raw),src).plan;
-    if(!aiGuardCanApply(guard))return;
     const current=state.twi||{};
+    const proposal=stage29TwiNormalize(aiReadTwiPlan(raw),src,
+      {repeat:twiHasGeneratedContent(current)}).plan;
+    if(!aiGuardCanApply(guard))return;
     const changes=twiProposalDiff(current,proposal);
     if(!twiHasGeneratedContent(current)){
       state.twi=twiCommitProposal(current,proposal,new Set(TWI_GENERATED_FIELDS.map(twiFieldId)));
