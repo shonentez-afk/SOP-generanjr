@@ -137,7 +137,8 @@ function stage27ParseProposals(raw,steps,questions){
     if(fact.stepId!==null&&fact.stepId!==stepId)continue;
     const oldValue=stage27Text(p?.oldValue,3000);
     const newValue=stage27Text(p?.newValue,3000);
-    if(!newValue||newValue===oldValue||oldValue!==stage27Text(step[field],3000))continue;
+    if(!newValue||/^(?:null|undefined|none|keep)$/i.test(newValue)||
+       newValue===oldValue||oldValue!==stage27Text(step[field],3000))continue;
     const key=String(stepId)+'|'+field;
     if(seen.has(key))continue;
     seen.add(key);
