@@ -1,19 +1,17 @@
-# Исходники актуального Конструктора СОП — Stage 26
+# Исходники актуального Конструктора СОП — Stage31
 
-**Единственная текущая сборка:** `tools/build_stage26.py` по `src/app/stage26-parts.json` → `releases/stage26-final-browser-candidate.html`. 50 функциональных JS-модулей, один автономный HTML для Chrome/Edge ПК через `file://`. Рядом с HTML не нужны папки, файлы, сервер или ES imports.
+**Текущая принятая сборка:** `python tools/build_stage31.py` по `src/app/stage31-parts.json` → `releases/stage31-photo-precision-browser-candidate.html`. 58 функциональных JS-модулей, один автономный HTML для настольного Chrome/Edge через `file://`. Рядом не нужны JS/CSS, локальный сервер или ES imports. Stage30/29/28/27/26 остаются контрольными выпусками.
 
-Границы исходников: `src/modules/core` (состояние и снимки), `shared` (медиа/общие функции), `editor` (шаги), `photos` (хранилище/разметка), `frv` (замеры и безопасные AI-предложения), `ai` (транспорт/протокол/диалоги), `review` (наставник/детерминированные замечания), `documents` (библиотека и сетевая папка), `excel` (локальная XLSX-сборка), `twi` (только из СОП), `app` (сборка и bootstrap).
+**Приёмка Stage31:** [PR #26](https://github.com/shonentez-afk/SOP-generanjr/pull/26), squash `b18575fd4383f7526bbaf3766c66f885c5f09c4a`. [GitHub Actions #44497012612](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44497012612) — полная Linux Chrome и Windows Chrome регрессия PASS. Пользователь подтвердил «работает». Исправления фотостудии перечислены в `docs/STAGE31_PHOTO_ANNOTATION_RU.md`.
 
-Синхронное объединение в одну общую JS-область имён, а не runtime ES Modules, — сознательная архитектура автономного `file://` файла. Нельзя вручную удалять общие функции при редактировании других блоков: сборка и CI сравнивают обязательные контракты.
+**Архитектура:** `src/modules/core` (модель/снимки), `shared` (общие медиа и UI), `editor` (шаги), `photos` (хранилище/разметка), `frv` (измерения), `ai` (транспорт/протокол/помощник), `review` (проверки), `documents` (библиотека/сеть), `excel` (XLSX), `twi` (производный из СОП) и `app` (инициализация). Все модули входят в один JS-runtime; структура разделена для сопровождения, а не для браузерных imports.
 
-Проверки:
-`python tools/build_stage26.py --verify-release --verify-static`
-`python -m unittest discover -s tests -v`
-`python qa/stage26_browser_smoke.py` (Linux Chrome)
-`python qa/stage26_windows_smoke.py` (Windows Chrome).
+**Регрессия:**
+- `python tools/build_stage31.py --verify-release --verify-static`
+- `python -m unittest discover -s tests -v`
+- `python qa/stage31_browser_smoke.py` (Chrome `file://` + полный регресс Stage30)
+- `.github/workflows/stage31.yml` (Linux и Windows).
 
-**PR #20 принят:** 68 unit, Linux полный Chrome регресс, Windows Chrome и внутренние проверки библиотеки 10/10 — PASS. Подробно: `docs/RELEASE_STAGE26_RU.md`, `docs/ARCHITECTURE_AUDIT_STAGE26_RU.md`.
+**Границы проекта:** TWI автоматически формируется из СОП; ФРВ отдельная и необязательная, цепочку ФРВ→СОП→TWI не начинать без команды. Не менять Yandex-прокси и флаг `SOP_ENABLE_MODEL_ROUTING` (выключен). Не создавать миграции ради старых пользовательских установок и мобильный UI. Реальная корпоративная сетевая папка на двух физических ПК ещё не проверена.
 
-`src/app/stage19-parts.json` и более старые сборщики остаются контрольными точками регрессии для разработчиков. **Не реализовать миграции или поддержку старых пользовательских инсталляций:** проект ещё разрабатывается. TWI автоматически создаётся из текущего СОП; ФРВ необязательна.
-
-Живой Yandex Cloud и доступ к сетевому диску нужно проверить на ПК пользователя по `docs/BROWSER_ACCEPTANCE_STAGE26_RU.md`. До неё новых этапов разработки не начинать.
+Подробное состояние и правила передачи в следующий чат — `docs/START_NEW_CHAT_RU.md`. Старые файлы и сборщики служат эталонами регрессии, а не актуальной версией.
