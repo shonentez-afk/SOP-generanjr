@@ -44,8 +44,14 @@ def main() -> None:
     result=build()
     if args.verify_static:
         verify_static()
-    if args.verify_release and result!=OUT.read_text(encoding="utf-8"):
-        raise SystemExit("Stage23 checked-in HTML differs from source build")
+    if args.verify_release:
+        checked=OUT.read_text(encoding="utf-8")
+        if result!=checked:
+            at=next((i for i,(a,b) in enumerate(zip(result,checked)) if a!=b),
+                    min(len(result),len(checked)))
+            raise SystemExit(f"Stage23 release mismatch at {at}; built={len(result)} checked={len(checked)}; "
+                             f"built_segment={result[max(0,at-90):at+160]!r}; "
+                             f"checked_segment={checked[max(0,at-90):at+160]!r}")
     if args.verify_release or args.verify_static:
         print("PASS Stage23 chars="+str(len(result))+
               " SHA256="+hashlib.sha256(result.encode("utf-8")).hexdigest())
