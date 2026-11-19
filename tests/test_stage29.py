@@ -111,6 +111,12 @@ assert(!good.plan.present.round2.includes('Внимательно работат
 assert(good.plan.present.round3.includes('Не допустить повреждения'));
 assert(good.plan.tryOut.check.includes('Замок закрыт'));
 assert.equal(good.quality.steps,2);
+const ungrounded=plan();ungrounded.followUp.control='Проверять каждую смену';
+let safe=q.stage29TwiNormalize(ungrounded,source).plan;
+assert(!safe.followUp.control.includes('каждую смену'));
+const repeat=q.stage29TwiNormalize({...plan(),present:{round1:'Показ',
+ round2:'Уточнённые Key Points',round3:'Объяснить'}},source,{repeat:true});
+assert.equal(repeat.plan.present.round2,'Уточнённые Key Points');
 const bad=plan();bad.followUp.control='Проверять через 3 дня';
 assert.throws(()=>q.stage29TwiNormalize(bad,source),/неподтвержд|неполную/i);
 const blankKP={...source,steps:[{...source.steps[0],keyPoints:[],reason:''}]};
