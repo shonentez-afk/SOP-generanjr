@@ -44,6 +44,18 @@ def verify_real_xlsx(path,source_hashes):
     wb=load_workbook(path)
     assert wb.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],wb.sheetnames
     ws=wb["СОП"]
+    if len(ws._images)!=5:
+        import json
+        with zipfile.ZipFile(path) as diag:
+            names=diag.namelist()
+            print("STAGE32_DRAWING_DIAG",json.dumps({
+                "imagesRead":len(ws._images),
+                "xml":{name:diag.read(name).decode("utf-8","replace")[:9500]
+                    for name in names
+                    if (name.startswith("xl/drawings/") and name.endswith(".xml"))
+                       or name=="xl/worksheets/_rels/sheet1.xml.rels"},
+                "sheetTail":diag.read("xl/worksheets/sheet1.xml").decode("utf-8","replace")[-2400:],
+            },ensure_ascii=False),flush=True)
     assert len(ws._images)==5,("Four step photos plus unchanged logo",len(ws._images))
     expected={(14,2,4),(14,5,8),(14,9,11),(18,2,4)}
     seen=set()
