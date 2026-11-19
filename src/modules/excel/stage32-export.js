@@ -450,7 +450,7 @@ async function generateExcel(){
     if(ws.getImages().length<embeddedStepPhotos)throw new Error('ExcelJS потеряла изображения визуализации до сохранения');
     status.textContent='Финализация файла...';
     const rawBuffer=await wb.xlsx.writeBuffer();
-    const buffer=await sopXlsxFixPictureAnchors(rawBuffer,embeddedStepPhotos);
+    const buffer=embeddedStepPhotos?await sopXlsxFixPictureAnchors(rawBuffer,embeddedStepPhotos):rawBuffer;
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     try{const dm=exportData.documentManager||{};const ok=await docWriteNetworkFile(docSafeFileBase(dm)+'.xlsx',buffer,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');if(ok)status.textContent='Файл сформирован и сохранён в выбранную папку.'}catch(ne){console.warn('Сохранение XLSX на сетевой диск',ne)}
     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
