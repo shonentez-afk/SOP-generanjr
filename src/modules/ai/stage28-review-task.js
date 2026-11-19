@@ -89,8 +89,9 @@ async function reviewEntireSOP(options={}){
       if(reviewIssues.length)return false;
     }
     const guard=aiGuardCapture({review:true});
-    const deterministic=stage28GroundChecks(runDeterministicChecks(),
-      state.steps,state.meta);
+    const deterministic=stage28GroundChecks([
+      ...runDeterministicChecks(),...stage28TwiStructureChecks(state.steps)
+    ],state.steps,state.meta);
     let ai=[],quality={},onlineOk=false;
     try{
       if(payload.length>58000)throw new Error('Stage28 oversized input');
