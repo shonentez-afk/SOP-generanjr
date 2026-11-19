@@ -11,7 +11,7 @@ on:
       - 'tools/build_stage28.py'
       - 'tests/test_stage28.py'
       - 'qa/stage28_*.py'
-      - 'docs/STAGE27_INTELLIGENT_ASSISTANT_RU.md'
+      - 'docs/STAGE28_EVIDENCE_MENTOR_RU.md'
       - 'docs/START_NEW_CHAT_RU.md'
       - '.github/workflows/stage28.yml'
   workflow_dispatch:
@@ -25,7 +25,7 @@ on:
       - 'tools/build_stage28.py'
       - 'tests/test_stage28.py'
       - 'qa/stage28_*.py'
-      - 'docs/STAGE27_INTELLIGENT_ASSISTANT_RU.md'
+      - 'docs/STAGE28_EVIDENCE_MENTOR_RU.md'
       - 'docs/START_NEW_CHAT_RU.md'
       - '.github/workflows/stage28.yml'
 permissions:
