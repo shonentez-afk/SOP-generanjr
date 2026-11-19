@@ -1,0 +1,47 @@
+name: Stage 23 A3.2 typed AI review fixes
+on:
+  push:
+    branches: [main, feature/stage23-a3-review-safe-fixes-20261119]
+    paths:
+      - 'src/modules/review/stage23-*.js'
+      - 'src/modules/ai/stage23-*.js'
+      - 'src/modules/documents/stage23-*.js'
+      - 'src/app/stage23-parts.json'
+      - 'tools/build_stage23.py'
+      - 'tests/test_stage23.py'
+      - 'qa/stage23_browser_smoke.py'
+      - 'releases/stage23-a3-review-fixes.html'
+      - '.github/workflows/stage23.yml'
+  pull_request:
+jobs:
+  safe-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify all frozen source builds and static vendor
+        run: |
+          python tools/build_stage19.py --verify-baseline
+          python tools/build_stage20.py --verify-release
+          python tools/build_stage21.py --verify-release
+          python tools/build_stage22.py --verify-release
+          python tools/build_stage23.py --verify-release
+          python tools/build_stage23.py --verify-static
+      - name: Run all historical and new unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Standalone runtime syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path("releases/stage23-a3-review-fixes.html").read_text(encoding="utf-8")
+          marker="<script>\n'use strict';"
+          assert html.count(marker)==1
+          Path("/tmp/stage23.js").write_text("'use strict';\n"+html.split(marker,1)[1].split("</script>",1)[0],encoding="utf-8")
+          PY
+          node --check /tmp/stage23.js
+      - name: Chrome file:// null screenshot regression plus all earlier Excel photo and AI tests
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage23_browser_smoke.py
