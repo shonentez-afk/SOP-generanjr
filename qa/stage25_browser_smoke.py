@@ -13,11 +13,35 @@ ROOT=Path(__file__).resolve().parents[1]
 RELEASE=ROOT/"releases/stage25-ai-safe-replacement.html"
 
 def previous_regression():
-    spec=importlib.util.spec_from_file_location("stage25_previous",ROOT/"qa/stage24_browser_smoke.py")
-    old=importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(old)
-    old.RELEASE=RELEASE
-    old.main()
+    """Re-run every previous functional test with one intentional UX adjustment.
+
+    The Stage22 normal-SOP test expected immediate replacement of a nonempty SOP.
+    Stage25 deliberately requires consent for this action. Run that *normal first-
+    generation* test against an empty SOP instead, keeping the entire remaining
+    Stage22 test and old suites unchanged. Then run Stage23 and Stage24 Chrome QA.
+    No historical data migration or production-code bypass is involved.
+    """
+    source=ROOT/"qa/stage22_browser_smoke.py"
+    original=source.read_text(encoding="utf-8")
+    old="setSop('Нормальная генерация СОП','sop-normal');\n              aiAsk="
+    new="setSop('Нормальная генерация СОП','sop-normal');\n              state.steps=[]; // first SOP generation needs no replacement confirmation\n              aiAsk="
+    if original.count(old)!=1:
+        raise AssertionError("Stage22 expected first SOP scenario changed")
+    namespace={"__name__":"stage25_previous_stage22","__file__":str(source)}
+    exec(compile(original.replace(old,new),str(source),"exec"),namespace)
+    namespace["RELEASE"]=RELEASE
+    namespace["main"]()
+
+    for filename,fn_name in (
+        ("stage23_browser_smoke.py","validate_review_ui"),
+        ("stage24_browser_smoke.py","current_twi_in_chrome")
+    ):
+        f=ROOT/"qa"/filename
+        spec=importlib.util.spec_from_file_location("stage25_prev_"+filename.replace(".","_"),f)
+        suite=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(suite)
+        suite.RELEASE=RELEASE
+        getattr(suite,fn_name)()
 
 def tests_in_chrome():
     with sync_playwright() as p:
