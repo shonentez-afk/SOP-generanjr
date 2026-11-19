@@ -1,3 +1,14 @@
+## Текущее состояние 19.11.2026 — Stage 29 принят, Stage 30 готов к пользовательской проверке
+
+- **Рабочая принятая версия:** Stage29 в `main`, файл `releases/stage29-sop-twi-quality-browser-candidate.html`; пользователь подтвердил, что СОП создаётся качественно и программа работает. 79/79 Python/Node unit и полный Chrome Linux/Windows file:// PASS.
+- **Следующий кандидат:** Stage30 `feature/stage30-photo-editor-undo-zoom-20261119`, [PR #25](https://github.com/shonentez-afk/SOP-generanjr/pull/25) (черновик); `releases/stage30-photo-editor-browser-candidate.html` в feature-ветке; [CI 82/82 и Chrome Linux/Windows PASS](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44492287315). Полные Undo/Redo, защита несохранённой разметки и масштабирование в существующем редакторе. Нужна **реальная проверка пользователя перед merge**.
+- **Старые незакрытые записи:** Issue #4 закрыта как реализованные кодовые дефекты Stage14, осталась лишь непроверенная реальная корпоративная сетевая папка между двумя ПК. PR #21 с опциональным исходным кодом прокси принят в main; текущая Cloud Function не развёртывалась повторно, флаг model routing остаётся выключенным и не проверялся на альтернативных моделях.
+- **Ограничения:** ФРВ независимая, TWI создаётся из СОП; пакет связки ФРВ → СОП → TWI **отложен пользователем**. Мобильный UI, поддержка старых установок и ненужные новые блоки не разрабатываются. Состояние для передачи нового чата — `docs/START_NEW_CHAT_RU.md`.
+
+> Исторические записи Stage26 и старше ниже описывают этапы на дату их создания и не заменяют текущий статус.
+
+---
+
 ## Stage 26 — принято в main; готово к браузерной проверке пользователя
 - **Release:** `releases/stage26-final-browser-candidate.html`; GitHub PR #20, commit `3dce33924c9c4c5fab8beb0ea2c244530284c049`. Автономный `file://` ПК; сборка **50 модулей**.
 - **CI PASS:** 68 unit-тестов, Linux Chrome полный регресс (Excel/фото/ISO/TWI/ФРВ/СОП/наставник), Windows Chrome `file://` без сети, 60 локальных знаков, ExcelJS, IndexedDB/библиотека 10/10, 0 ошибок JavaScript.
