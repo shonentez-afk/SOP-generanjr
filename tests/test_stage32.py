@@ -63,7 +63,7 @@ for(const [first,last,row] of [[3,5,15],[6,9,15],[10,12,15],[3,5,19]]){
   assert.equal(occupied,w-8*9525);
   assert(occupied/w>.94 && occupied/w<1);
   assert.equal(x.br.nativeRowOff-x.tl.nativeRowOff,120*12700-8*9525);
-  assert(!('editAs' in x));
+  assert.equal(x.editAs,'twoCell');
 }
 assert.throws(()=>range(ws,8,6,15),err=>err?.name==='RangeError');
 assert.throws(()=>range(ws,3,5,0),err=>err?.name==='RangeError');
