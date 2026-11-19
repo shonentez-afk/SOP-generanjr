@@ -1,0 +1,50 @@
+name: Stage 18 AI mentor reply presentation
+on:
+  push:
+    branches:
+      - main
+      - fix/stage18-mentor-reply-cleanup-20261119
+    paths:
+      - 'src/modules/ai/stage18-mentor-reply-presentation.js'
+      - 'tools/build_stage18.py'
+      - 'tests/test_stage18.py'
+      - 'qa/stage18_real_mentor_reply.py'
+      - 'releases/stage18-mentor-reply-cleanup.html'
+      - '.github/workflows/stage18.yml'
+  pull_request:
+jobs:
+  stage18:
+    name: Human-readable mentor replies and safe verdict handling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Reproduce standalone Stage 18 HTML
+        run: python tools/build_stage18.py --verify-release
+      - name: Run all regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify complete inline JavaScript syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('releases/stage18-mentor-reply-cleanup.html').read_text(encoding='utf-8')
+          parts=[x for x in re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>',s) if "'use strict';" in x]
+          assert len(parts)==1, f"Expected 1 main script, got {len(parts)}"
+          Path('/tmp/sop-stage18.js').write_text(parts[0],encoding='utf-8')
+          PY
+          node --check /tmp/sop-stage18.js
+      - name: Browser QA real Chrome file protocol
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage18_real_mentor_reply.py --screenshot /tmp/stage18-mentor-reply.png
+          python qa/stage16_real_excel_photos.py
+      - name: Upload browser screenshot if failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage18-mentor-reply-screenshot
+          path: /tmp/stage18-mentor-reply.png
+          if-no-files-found: ignore
