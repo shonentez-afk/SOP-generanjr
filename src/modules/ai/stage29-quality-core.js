@@ -149,7 +149,7 @@ function stage29SafeLines(lines,field){
     'Слишком объёмный раздел '+field+'; сократите черновик СОП для одного учебного плана');
   return text;
 }
-function stage29TwiNormalize(plan,source){
+function stage29TwiNormalize(plan,source,{repeat=false}={}){
   const steps=Array.isArray(source.steps)?source.steps.filter(x=>stage29Text(x.action)):[];
   if(!steps.length)throw stage29QualityError('twi_generate','Нет действий СОП');
   // No unsupported numeric detail in generic AI text, e.g. invented "after 3 days".
@@ -159,8 +159,8 @@ function stage29TwiNormalize(plan,source){
       const txt=stage29Text(value);
       // PRESENT fields are replaced below with verified SOP facts; generic model
       // placeholders and numbered training-round labels cannot leak into TWI.
-      const replaced=sec==='present'||sec==='tryOut'&&field==='check'&&
-        steps.some(s=>stage29Text(s.successCriteria));
+      const replaced=!repeat&&(sec==='present'||sec==='tryOut'&&field==='check'&&
+        steps.some(s=>stage29Text(s.successCriteria)));
       const extras=replaced?[]:stage29HasUnconfirmedNumber(txt,corpus,steps.length);
       if(extras.length)throw stage29QualityError('twi_generate',
         'Не подтверждены числа '+extras.join(', ')+' в '+sec+'.'+field);
@@ -182,17 +182,24 @@ function stage29TwiNormalize(plan,source){
     const result=stage29Text(s.successCriteria);
     if(result)criteria.push(number+'. '+result);
   }
-  plan.present.round1=stage29SafeLines(actions,'пошаговый показ');
-  plan.present.round2=stage29SafeLines(points.length?[
-    'Ключевые моменты — только из СОП:',...points
-  ]:['В СОП ключевые моменты не выделены. Не придумывайте их без подтверждения инженера.'],'ключевые моменты');
-  plan.present.round3=stage29SafeLines(reasons.length?[
-    'Объяснить причины, явно описанные в СОП:',...reasons
-  ]:['Причины для Key Points в СОП не указаны. Уточните их у инженера; не выдумывайте.'],'объяснение причин');
-  if(criteria.length){
-    plan.tryOut.check=stage29SafeLines([
-      'Сверить выполнение с критериями результата СОП:',...criteria
-    ],'проверка выполнения');
+  if(!repeat){
+    // First generation: ground every training round in SOP, not generic model prose.
+    plan.present.round1=stage29SafeLines(actions,'пошаговый показ');
+    plan.present.round2=stage29SafeLines(points.length?[
+      'Ключевые моменты — только из СОП:',...points
+    ]:['В СОП ключевые моменты не выделены. Не придумывайте их без подтверждения инженера.'],'ключевые моменты');
+    plan.present.round3=stage29SafeLines(reasons.length?[
+      'Объяснить причины, явно описанные в СОП:',...reasons
+    ]:['Причины для Key Points в СОП не указаны. Уточните их у инженера; не выдумывайте.'],'объяснение причин');
+    if(criteria.length){
+      plan.tryOut.check=stage29SafeLines([
+        'Сверить выполнение с критериями результата СОП:',...criteria
+      ],'проверка выполнения');
+    }
+  }else{
+    // Repeat generation is only a proposal: old TWI preview controls all writes.
+    // Leave model phrasing visible for deliberate user selection, and reject
+    // unsupported numbers above. Never silently overwrite the anchored plan.
   }
   // No confirmed follow-up frequency -> prevent invented commitments. Existing
   // model content remains only when it did not introduce unsupported numbers.
