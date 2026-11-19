@@ -85,11 +85,28 @@ async function stage27AskQuestions(){
       {model:currentModel,temperature:0.1,maxTokens:1250,task:'stage27_questions'});
     const incoming=stage27ParseQuestions(raw,state.steps);
     if(!stage27GuardCanApply(guard))return;
-    const known=new Map(stage27SafeQuestionState().map(q=>[q.question+'|'+q.stepId,q]));
-    state.stage27.questions=incoming.map(q=>{
-      const old=known.get(q.question+'|'+q.stepId);
-      return old?{...q,answer:old.answer,confirmed:old.confirmed}:q;
-    });
+    // A new AI question set may not silently erase confirmed answers or even
+    // unsent text typed by a person. Preserve those across repeated requests.
+    const previous=stage27SafeQuestionState();
+    const retained=previous.filter(q=>q.answer);
+    const result=retained.slice();
+    const existing=new Set(result.map(q=>q.question+'|'+q.stepId));
+    const usedIds=new Set(result.map(q=>q.id));
+    for(const item of incoming){
+      const key=item.question+'|'+item.stepId;
+      if(existing.has(key))continue;
+      const old=previous.find(q=>q.question+'|'+q.stepId===key);
+      let id=old?.id||item.id;
+      if(usedIds.has(id)){
+        let n=1;
+        while(usedIds.has('Q'+n))n++;
+        id='Q'+n;
+      }
+      usedIds.add(id);existing.add(key);
+      result.push({...item,id,answer:old?.answer||'',
+        confirmed:!!old?.confirmed&&!!old?.answer});
+    }
+    state.stage27.questions=result.slice(0,20);
     state.stage27.suggestions=[];state.stage27.suggestionSignature='';
     stage27Store();stage27Render();
     toast('Вопросы для уточнения сформированы. Ответьте и подтвердите факты.','success');
@@ -188,7 +205,7 @@ function stage27ParseMentor(raw,steps){
     if(seen.has(key))continue;
     seen.add(key);
     out.push({id:'M'+(out.length+1),stepId,description,
-      severity:['question','warning','safety_gap'].includes(rawItem.severity)?
+      severity:['question','warning','safety_gap'].includes(rawItem?.severity)?
         rawItem.severity:'question',
       evidence:stage27Text(rawItem?.evidence,700),
       suggestion:stage27Text(rawItem?.suggestion,700),explanation:''});
