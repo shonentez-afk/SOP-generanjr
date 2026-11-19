@@ -1,8 +1,8 @@
 # Stage 31 — точность разметки фотографий СОП
 
-**Состояние: кандидат в отдельной ветке; до зелёной CI и проверки в реальном браузере не принят.**
+**Состояние: ПРИНЯТ 19.11.2026.** Пользователь проверил приложение и подтвердил «работает». [PR #26](https://github.com/shonentez-afk/SOP-generanjr/pull/26) объединён с `main` методом squash (`b18575fd4383f7526bbaf3766c66f885c5f09c4a`).
 
-База: принятая Stage30 (58 модулей), без изменений в main. В Stage31 заменяется **только** `src/modules/photos/stage30-illustration-editor.js` на `src/modules/photos/stage31-illustration-editor.js`. Модуль истории Stage30, структура шагов, JSON-аннотации, IndexedDB, ExcelJS, фото, ИИ, прокси, TWI, ФРВ и ISO остаются неизменными.
+База: принятая Stage30 (58 модулей), сохранённая как контрольная версия; Stage31 теперь актуальная версия в `main`. В Stage31 заменяется **только** `src/modules/photos/stage30-illustration-editor.js` на `src/modules/photos/stage31-illustration-editor.js`. Модуль истории Stage30, структура шагов, JSON-аннотации, IndexedDB, ExcelJS, фото, ИИ, прокси, TWI, ФРВ и ISO остаются неизменными.
 
 ## Исправления
 - Стрелка выноски теперь указывает на **начальную точку перетаскивания** (выбранная деталь), а подпись располагается рядом с конечной точкой. Сама геометрия JSON не изменена.
@@ -13,7 +13,7 @@
 ## Сборка/QA
 `python tools/build_stage31.py` → `releases/stage31-photo-precision-browser-candidate.html`, автономный Chrome/Edge file://. `tests/test_stage31.py`: контракты и JS-синтаксис; `qa/stage31_browser_smoke.py`: полный Stage30 Chrome регресс + шаблон/Undo, выноска и отказ IndexedDB. `.github/workflows/stage31.yml`: Linux и Windows.
 
-## Обязательная приёмка
-После зелёного CI открыть HTML на Windows, загрузить фото, сделать выноску от детали к подписи, применить текстовый шаблон к выделенной подписи, Undo/Redo, сохранить и выгрузить XLSX. Результат без новых панелей, без изменений Yandex Cloud, без обязательной ФРВ. Сетевую папку двух физических ПК CI не проверяет.
+## Итог приёмки
+[GitHub Actions #44497012612](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44497012612): сквозные Stage30/Stage31 Linux Chrome и unit PASS; Windows Chrome XLSX/ISO PASS. Пользователь проверил браузерную версию и подтвердил её работоспособность. Новых панелей нет, Yandex Cloud и ФРВ не изменены. Испытание реальной сетевой папки на двух физических ПК по-прежнему не проводилось и остаётся отдельно.
 
-**Не объединять в main без подтверждения пользовательской проверки.**
+Stage31 — текущая версия, Stage30 остаётся контролем для регрессии.
