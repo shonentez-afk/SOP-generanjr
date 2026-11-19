@@ -15,7 +15,7 @@ def small_png(w=900,h=600):
     def chunk(tag,data):
         return struct.pack("!I",len(data))+tag+data+struct.pack("!I",zlib.crc32(tag+data)&0xffffffff)
     return (b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('!IIBBBBB',w,h,8,2,0,0,0))+
-            chunk(b'IDAT',zlib.compress(raw))+chunk(b'IEND',b'')
+            chunk(b'IDAT',zlib.compress(raw))+chunk(b'IEND',b''))
 
 def existing_regression():
     p=ROOT/"qa/stage29_browser_smoke.py"
