@@ -9,6 +9,7 @@ on:
       - 'tools/build_stage20.py'
       - 'tests/test_stage20.py'
       - 'qa/stage20*.py'
+      - 'qa/qa_image_check.py'
       - 'releases/stage20-a2-safe-export.html'
       - '.github/workflows/stage20.yml'
   pull_request:
