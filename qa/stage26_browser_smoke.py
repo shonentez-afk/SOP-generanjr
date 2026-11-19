@@ -91,7 +91,7 @@ def check_frv_safe_proposals():
               aiAsk=async()=>JSON.stringify(window.__frvRowAnswer);
               window.__rowPending=frvStudySuggestRow(0,0);
             }""","#frvRowSuggestionPreview")
-            assert page.locator("#frvRowSuggestionPreview").get_by_text("43").count()==0 or True
+            assert page.locator("#frvRowSuggestionPreview [data-ai-preview-action=\"fill\"]").count()==1
             page.locator('#frvRowSuggestionPreview [data-ai-preview-action="cancel"]').click()
             settle("row")
             assert page.evaluate("""() => window.__frvRow.reason==='Ручное обоснование'

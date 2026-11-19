@@ -57,7 +57,11 @@ def main():
             }""")
             assert not errors,errors
             assert evidence["icons"]>=50,evidence
-            print("PASS Stage26 Windows Chrome file:// offline ExcelJS, icons, SOP/TWI/FRV, local draft",evidence,flush=True)
+            checks=page.evaluate("async () => await docRunSelfTest()")
+            failed=[item for item in checks if not item["ok"]]
+            assert not failed,failed
+            evidence["librarySelfChecks"]=len(checks)
+            print("PASS Stage26 Windows Chrome file:// offline ExcelJS, icons, SOP/TWI/FRV, library self-test and local draft",evidence,flush=True)
         finally:
             browser.close()
 
