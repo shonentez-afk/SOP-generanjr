@@ -12,19 +12,19 @@ import build_stage19 as modular
 
 MANIFEST=ROOT/"src/app/stage28-parts.json"
 BASELINE=ROOT/"releases/stage27-intelligent-assistant-browser-candidate.html"
-OUT=ROOT/"releases/stage28-intelligent-assistant-browser-candidate.html"
+OUT=ROOT/"releases/stage28-evidence-mentor-browser-candidate.html"
 REQUIRED={
-    "src/modules/ai/stage28-core.js",
-    "src/modules/ai/stage28-intelligence.js",
-    "src/modules/ai/stage28-analogs-history.js",
+    "src/modules/ai/stage27-core.js",
+    "src/modules/ai/stage27-intelligence.js",
+    "src/modules/ai/stage27-analogs-history.js",
     "src/modules/app/stage28-ui.js",
     "src/modules/review/stage28-core.js",
     "src/modules/review/stage28-render.js",
     "src/modules/ai/stage28-review-task.js",
     "src/modules/documents/stage28-review-state.js",
-    "src/modules/documents/stage28-db.js",
-    "src/modules/documents/stage28-draft.js",
-    "src/modules/documents/stage28-library.js",
+    "src/modules/documents/stage27-db.js",
+    "src/modules/documents/stage27-draft.js",
+    "src/modules/documents/stage27-library.js",
     "src/modules/core/stage19-config.js",
     "src/modules/ai/stage26-transport.js",
     "src/modules/ai/stage25-generate-sop.js",
@@ -40,9 +40,9 @@ def build()->str:
     if not REQUIRED.issubset(modules):
         raise AssertionError("Stage28 required protected module missing")
     if modules[-4:]!=[
-        "src/modules/ai/stage28-core.js",
-        "src/modules/ai/stage28-intelligence.js",
-        "src/modules/ai/stage28-analogs-history.js",
+        "src/modules/ai/stage27-core.js",
+        "src/modules/ai/stage27-intelligence.js",
+        "src/modules/ai/stage27-analogs-history.js",
         "src/modules/app/stage28-ui.js",
     ]:
         raise AssertionError("Stage28 modules must run after existing bootstrap")
