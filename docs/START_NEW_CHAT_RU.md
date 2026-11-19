@@ -1,3 +1,15 @@
+## Кандидат Stage31 — точность фоторедактора (19.11.2026, НЕ принят)
+
+- **Рабочий baseline:** Stage30 подтверждён пользователем и находится в `main`. Следующие изменения только в `feature/stage31-photo-annotation-precision-20261119`. Текущий `main` не трогать до отдельного подтверждения теста Stage31.
+- **Цель:** устранить обратную стрелку выноски, исправить применение шаблона к выбранной подписи, перенос длинных слов/артикулов, блокировать двойное сохранение и сохранить разметку при отказе IndexedDB.
+- **Изменён только редактор:** `src/modules/photos/stage31-illustration-editor.js`; 58 модулей через `src/app/stage31-parts.json` и `tools/build_stage31.py`. Прежняя `stage30-history.js` остаётся. Тесты `tests/test_stage31.py`, `qa/stage31_browser_smoke.py`, CI `.github/workflows/stage31.yml`, отчёт `docs/STAGE31_PHOTO_ANNOTATION_RU.md`.
+- **CI:** [GitHub Actions #44497012612](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44497012612) — Linux unit + полный Chrome Stage30/Stage31 PASS, Windows Chrome офлайн Excel/ISO PASS. Проверено для исходного SHA `4555fac1c36d4bace56757c82ece2bd697aaad6c`; собранный HTML добавлен automation-коммитом `0ad3bce96736a6e2aa67157f517323def915daff`. Пользовательская проверка ещё нужна.
+- **HTML-кандидат после успешной сборки CI:** `releases/stage31-photo-precision-browser-candidate.html` в ветке. **Автоматическая CI пройдена; пользовательская приёмка ещё не пройдена.**
+- **Не менять:** Yandex Cloud-прокси, флаг `SOP_ENABLE_MODEL_ROUTING` (выключен), рабочую СОП→TWI, необязательную ФРВ, ExcelJS, ISO, фото-хранилище, JSON-аннотации и UI с четырьмя кнопками. Не начинать ФРВ→СОП→TWI.
+- **Реальное сетевое хранение на двух ПК** остаётся внешней непроверенной задачей; в CI не считать испытанным. После зелёной CI пользователь проверяет редактор в настольном Chrome/Edge, фото и Excel. При отрицательном результате Stage30 на main остаётся рабочей.
+
+---
+
 ## Актуальная передача — 19.11.2026: Stage30 ПРИНЯТ и в main
 
 - **Текущая рабочая версия:** **Stage30** — [PR #25](https://github.com/shonentez-afk/SOP-generanjr/pull/25) объединён с `main` (squash `a37fb3c25d2066a5908af0c33d5a0efcdb0f2f99`) после подтверждения пользователя **«всё работает»**. Актуальный автономный HTML для настольных Chrome/Edge `file://`: `releases/stage30-photo-editor-browser-candidate.html` в `main`. Предыдущие Stage29/28/27/26 сохранены как проверенные контрольные выпуски.
