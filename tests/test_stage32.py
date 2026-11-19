@@ -38,7 +38,9 @@ class Stage32ExcelPhotoTests(unittest.TestCase):
 
     def test_exact_merged_ranges_and_exceptions_in_node(self):
         src=(ROOT/"src/modules/excel/stage32-export.js").read_text(encoding="utf-8")
-        self.assertIn("sopExcelPhotoCellRange(ws,c1,c2,r)",src)
+        self.assertIn("sopExcelPhotoVisibleExtent(ws,c1,c2,r)",src)
+        self.assertIn("sopXlsxFixPictureAnchors(rawBuffer,embeddedStepPhotos)",src)
+        self.assertIn("ФОТО_STAGE32_1.xlsx",src)
         self.assertNotIn("sopExcelImageRange(ws,{col:c1-1+0.05,row:r-1+0.05},150,95)",src)
         self.assertIn("ws.addImage(logoId,sopExcelImageRange",src)
         self.assertIn("ws.addImage(icId,sopExcelImageRange",src)
@@ -47,6 +49,7 @@ class Stage32ExcelPhotoTests(unittest.TestCase):
 const vm=require('node:vm'),assert=require('node:assert/strict');
 const sandbox={};vm.createContext(sandbox);vm.runInContext(EXPORTER,sandbox);
 const range=sandbox.sopExcelPhotoCellRange;
+const visible=sandbox.sopExcelPhotoVisibleExtent;
 assert.equal(typeof range,'function');
 const cols=[1.75,5.5,19.1,18.5,8.9,17.6,4.9,13.1,9,13.9,23.1,9.1,1.6];
 const ws={getColumn(i){return {width:cols[i-1]};},
@@ -64,10 +67,18 @@ for(const [first,last,row] of [[3,5,15],[6,9,15],[10,12,15],[3,5,19]]){
   assert(occupied/w>.94 && occupied/w<1);
   assert.equal(x.br.nativeRowOff-x.tl.nativeRowOff,120*12700-8*9525);
   assert.equal(x.editAs,'twoCell');
+  const img=visible(ws,first,last,row);
+  assert.equal(img.tl.nativeCol,first-1);
+  assert.equal(img.tl.nativeRow,row-1);
+  assert.equal(img.tl.nativeColOff,4*9525);
+  assert.equal(img.ext.width,Math.round(occupied/9525));
+  assert.equal(img.ext.height,Math.round((120*12700-8*9525)/9525));
+  assert(!('br' in img));
+  assert(!('editAs' in img));
 }
 assert.throws(()=>range(ws,8,6,15),err=>err?.name==='RangeError');
 assert.throws(()=>range(ws,3,5,0),err=>err?.name==='RangeError');
-console.log('PASS Stage32 native EMU photo anchors: 3 different merged widths and next page row');
+console.log('PASS Stage32.1 explicit oneCell pixel extents: 3 merged widths and next group');
 """
         script="const EXPORTER="+json.dumps(src)+";\n"+js
         cmd=subprocess.run(["node","-e",script],text=True,capture_output=True)
