@@ -1,11 +1,12 @@
-## Актуальная версия — Stage 29 (принята); Stage 30 — кандидат редактора фото
-**Рабочий автономный HTML:** `releases/stage29-sop-twi-quality-browser-candidate.html` в `main`. Пользователь подтвердил качество генерации СОП и работоспособность Stage29; **79/79 unit PASS**, Chrome Linux/Windows PASS. TWI автоматически создаётся из СОП, ФРВ необязательна, интеграция ФРВ → СОП → TWI отложена.
+## Актуальная принятая версия — Stage 30 (19.11.2026)
 
-**Следующая необъединённая версия:** [Stage30 — редактор фото, PR #25](https://github.com/shonentez-afk/SOP-generanjr/pull/25), один HTML `releases/stage30-photo-editor-browser-candidate.html` в ветке `feature/stage30-photo-editor-undo-zoom-20261119`. Настоящие Undo/Redo, предупреждение о несохранённой разметке, масштаб; **82/82 unit и Windows/Linux Chrome PASS**. Ждём проверки пользователя, не считать Stage30 принятым. [Детали](https://github.com/shonentez-afk/SOP-generanjr/blob/feature/stage30-photo-editor-undo-zoom-20261119/docs/STAGE30_PHOTO_EDITOR_RU.md).
+**Скачать автономный HTML для Chrome/Edge на ПК:** `releases/stage30-photo-editor-browser-candidate.html` из `main`. Программа включает качественную генерацию СОП (подтверждена пользователем), TWI из СОП и обновлённый фоторедактор: Undo/Redo, масштаб и подтверждение закрытия несохранённой разметки.
 
-Ранее открытая Issue #4 закрыта как исправленные UX-дефекты. Прокси PR #21 принят как опциональный исходный код **без развёртывания и без включения model routing**. Корпоративная сетевая папка между физическими ПК остаётся внешней непроверенной эксплуатационной функцией. [Файл нового чата](docs/START_NEW_CHAT_RU.md) — основной актуальный источник статуса.
+**Приёмка:** [PR #25](https://github.com/shonentez-afk/SOP-generanjr/pull/25) объединён с `main`, пользователь подтвердил работоспособность. [82/82 unit PASS и Chrome Linux/Windows PASS](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44492287315). Контрольный HTML Stage29 сохранён отдельно.
 
-> Ниже — исторические разделы по более ранним этапам, не текущие релизы.
+**Ограничения:** интеграция ФРВ → СОП → TWI сознательно отложена. Опциональный код прокси из PR #21 принят без изменения вашей Cloud Function; `SOP_ENABLE_MODEL_ROUTING` остаётся выключенным. Доступ к корпоративной сетевой папке между физическими ПК не проверялся. [Статус для нового чата](docs/START_NEW_CHAT_RU.md), [документ Stage30](docs/STAGE30_PHOTO_EDITOR_RU.md).
+
+> Ниже — исторические материалы; ссылки на Stage26 и старше не являются текущим релизом.
 
 ---
 
