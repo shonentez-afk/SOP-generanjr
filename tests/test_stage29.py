@@ -24,7 +24,7 @@ class Stage29Quality(unittest.TestCase):
         html=stage29.build()
         for needle in ["function stage29SopNormalize","function stage29TwiNormalize",
                        "const STAGE29_TWI_PROMPT=","const STAGE29_SOP_PROMPT=",
-                       "stage29TwiNormalize(aiReadTwiPlan(raw),src).plan",
+                       "stage29TwiNormalize(aiReadTwiPlan(raw),src,",
                        "stage29SopNormalize(validateGeneratedSop"]:
             self.assertIn(needle,html)
         self.assertEqual(html.count("async function generateSOP()"),1)
