@@ -157,7 +157,11 @@ function stage29TwiNormalize(plan,source){
   for(const sec of ['prepare','present','tryOut','followUp']){
     for(const [field,value] of Object.entries(plan[sec]||{})){
       const txt=stage29Text(value);
-      const extras=stage29HasUnconfirmedNumber(txt,corpus,steps.length);
+      // PRESENT fields are replaced below with verified SOP facts; generic model
+      // placeholders and numbered training-round labels cannot leak into TWI.
+      const replaced=sec==='present'||sec==='tryOut'&&field==='check'&&
+        steps.some(s=>stage29Text(s.successCriteria));
+      const extras=replaced?[]:stage29HasUnconfirmedNumber(txt,corpus,steps.length);
       if(extras.length)throw stage29QualityError('twi_generate',
         'Не подтверждены числа '+extras.join(', ')+' в '+sec+'.'+field);
       plan[sec][field]=txt;
