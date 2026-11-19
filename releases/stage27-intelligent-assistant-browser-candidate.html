@@ -5953,7 +5953,7 @@ function stage27RenderHistoryOptions(){
   const previouslySelected=input.value;
   input.innerHTML='<option value="">Выберите редакцию для сравнения</option>'+
     stage27HistoryCandidates.map(d=>
-      '<option value="'+escapeHtml(d.id)+'">'+
+      '<option value="'+stage27Attr(d.id)+'">'+
       escapeHtml((d.number||'Черновик')+' · v'+(d.version||1)+
         ' · '+(d.title||'Без названия'))+'</option>').join('');
   if(stage27HistoryCandidates.some(d=>String(d.id)===previouslySelected))
@@ -5999,6 +5999,7 @@ function stage27CompareSelectedVersion(){
 // Existing buttons, tab navigation, screenshots/Excel and runtime are untouched.
 let stage27Busy=false;
 let stage27ActiveTab='clarify';
+function stage27Attr(value){return escapeHtml(value).replace(/\"/g,'&quot;').replace(/'/g,'&#39;');}
 function stage27SetBusy(next){
   if(next&&stage27Busy){toast('Дождитесь завершения текущего запроса ИИ.','info');return false;}
   stage27Busy=!!next;
@@ -6044,15 +6045,15 @@ function stage27RenderQuestions(){
     return;
   }
   el.innerHTML=items.map((q,i)=>
-    '<div class="s27-card" data-stage27-question-card="'+escapeHtml(q.id)+'">'+
+    '<div class="s27-card" data-stage27-question-card="'+stage27Attr(q.id)+'">'+
       '<div class="s27-question"><strong>'+(i+1)+'. '+escapeHtml(q.question)+'</strong>'+
       (q.stepId?'<span class="s27-pill">Шаг ID '+escapeHtml(q.stepId)+'</span>':'')+'</div>'+
       (q.why?'<p class="s27-muted">'+escapeHtml(q.why)+'</p>':'')+
       '<label for="stage27Answer'+i+'">Фактический ответ инженера</label>'+
-      '<textarea id="stage27Answer'+i+'" rows="2" maxlength="1800" data-stage27-answer="'+escapeHtml(q.id)+'" placeholder="Что действительно известно по операции?">'+escapeHtml(q.answer)+'</textarea>'+
+      '<textarea id="stage27Answer'+i+'" rows="2" maxlength="1800" data-stage27-answer="'+stage27Attr(q.id)+'" placeholder="Что действительно известно по операции?">'+escapeHtml(q.answer)+'</textarea>'+
       '<div class="s27-actions"><span class="s27-status">'+
       (q.confirmed?'✓ Подтверждено пользователем':'Ожидает подтверждения')+'</span>'+
-      '<button type="button" data-stage27-confirm="'+escapeHtml(q.id)+'"'+
+      '<button type="button" data-stage27-confirm="'+stage27Attr(q.id)+'"'+
       (q.confirmed?' disabled':'')+'>Подтвердить факт</button></div></div>'
   ).join('');
 }
@@ -6066,7 +6067,7 @@ function stage27RenderProposals(){
   const labels={action:'Действие',reason:'Почему важно',successCriteria:'Критерий результата'};
   el.innerHTML=(stale?'<p class="s27-danger">СОП изменился после формирования предложений. Запустите анализ заново.</p>':'')+
     d.suggestions.map(p=>'<div class="s27-card">'+
-    '<label class="s27-choice"><input type="checkbox" data-stage27-suggestion="'+escapeHtml(p.id)+'"'+
+    '<label class="s27-choice"><input type="checkbox" data-stage27-suggestion="'+stage27Attr(p.id)+'"'+
     (stale?' disabled':'')+'><b>Шаг ID '+escapeHtml(p.stepId)+' · '+escapeHtml(labels[p.field]||p.field)+'</b></label>'+
     '<div class="s27-old"><span>Сейчас:</span> '+escapeHtml(p.oldValue||'—')+'</div>'+
     '<div class="s27-new"><span>Предлагается:</span> '+escapeHtml(p.newValue)+'</div>'+
@@ -6091,7 +6092,7 @@ function stage27RenderMentor(){
       (i.evidence?'<p><b>Основание:</b> '+escapeHtml(i.evidence)+'</p>':'')+
       (i.suggestion?'<p><b>Проверить:</b> '+escapeHtml(i.suggestion)+'</p>':'')+
       (i.explanation?'<p class="s27-explain">'+escapeHtml(i.explanation)+'</p>':'')+
-      '<button type="button" data-stage27-explain="'+escapeHtml(i.id)+'" data-stage27-ai'+
+      '<button type="button" data-stage27-explain="'+stage27Attr(i.id)+'" data-stage27-ai'+
         (stale?' disabled':'')+'>Объяснить замечание</button></div>'
     ).join('');
 }
@@ -6106,7 +6107,7 @@ function stage27RenderAnalogs(){
       '<span class="s27-pill">'+escapeHtml(doc.number||'СОП')+'</span></div>'+
       '<p class="s27-muted">'+(doc.snapshot.steps?.length||0)+' шагов · совпадений по словам: '+
       score+' · версия '+escapeHtml(doc.version||1)+'</p>'+
-      '<button type="button" data-stage27-select-analog="'+escapeHtml(doc.id)+'">'+
+      '<button type="button" data-stage27-select-analog="'+stage27Attr(doc.id)+'">'+
       (stage27AnalogSelected?.id===doc.id?'✓ Выбран как аналог':'Выбрать как аналог')+
       '</button></div>').join('');
   }
