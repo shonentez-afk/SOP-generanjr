@@ -42,6 +42,13 @@ def verify_real_xlsx(path,source_hashes):
         assert drawing.count(b"<xdr:oneCellAnchor>")>=4,"Expected 4 explicit-size one-cell picture anchors"
         assert b"<xdr:oneCellAnchor editAs=" not in drawing,"Invalid ExcelJS oneCellAnchor editAs must be removed"
         assert b"<xdr:twoCellAnchor editAs=\"oneCell\"" in drawing,"Logo geometry must be unchanged"
+        from xml.etree import ElementTree as ET
+        root=ET.fromstring(drawings[0])
+        ns={"xdr":"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing",
+            "a":"http://schemas.openxmlformats.org/drawingml/2006/main"}
+        for anchor in root.findall("xdr:oneCellAnchor",ns):
+            assert anchor.find("xdr:pic/xdr:spPr/a:xfrm",ns) is None,"Zero-sized ExcelJS photo transform remained"
+            assert anchor.find("xdr:pic/xdr:nvPicPr/xdr:cNvPicPr/a:picLocks",ns) is None,"Photo aspect lock remained"
     wb=load_workbook(path)
     assert wb.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],wb.sheetnames
     ws=wb["СОП"]
