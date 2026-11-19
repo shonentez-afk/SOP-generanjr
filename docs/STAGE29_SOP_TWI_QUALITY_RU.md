@@ -2,7 +2,7 @@
 
 **Решение владельца проекта 19.11.2026:** приоритет — повысить качество автоматически созданного СОП и производного TWI; **связку ФРВ → СОП → TWI пока не разрабатывать**. ФРВ остаётся самостоятельной необязательной функцией.
 
-**Ветка-кандидат:** `feature/stage29-sop-twi-quality-20261119`, PR — отдельный, без автоматического merge. **База:** Stage28, принят на `main`. Файл для настольного Chrome/Edge `file://`: `releases/stage29-sop-twi-quality-browser-candidate.html`.
+**Ветка-кандидат:** `feature/stage29-sop-twi-quality-20261119`, [PR #24](https://github.com/shonentez-afk/SOP-generanjr/pull/24) — черновик, без автоматического объединения. [GitHub Actions: 79/79 unit PASS, Chrome Linux/Windows PASS](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44487301954). **Реальную YandexGPT-приёмку пользователь ещё не выполнял**. **База:** Stage28, принят на `main`. Файл для настольного Chrome/Edge `file://`: `releases/stage29-sop-twi-quality-browser-candidate.html`.
 
 ## Цель
 
