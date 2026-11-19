@@ -167,6 +167,16 @@ function stage29TwiNormalize(plan,source,{repeat=false}={}){
       plan[sec][field]=txt;
     }
   }
+  // Calendar follow-up promises cannot be invented, even without digits.
+  // This is a suggestion for the instructor, not an externally imposed schedule.
+  const cadence=/(каждую\s+смену|каждый\s+день|каждую\s+неделю|ежедневно|еженедельно|ежемесячно|раз\s+в\s+(?:день|смену|неделю|месяц)|по\s+графику)/giu;
+  for(const field of ['control','observe','close']){
+    const text=plan.followUp?.[field]||'';
+    const matches=[...text.matchAll(cadence)].map(m=>m[0]);
+    if(matches.some(x=>!corpus.toLocaleLowerCase('ru').includes(x.toLocaleLowerCase('ru')))){
+      plan.followUp[field]='Наблюдать первые самостоятельные выполнения; частоту и сроки уточнить у наставника.';
+    }
+  }
   // The actual job breakdown ALWAYS comes from the current SOP, never from a
   // generic AI paraphrase. The model still writes preparation, practice and follow-up.
   const actions=['Показать операцию целиком. Затем выполнить действия по СОП:'];
