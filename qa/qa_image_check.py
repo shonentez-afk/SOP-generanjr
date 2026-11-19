@@ -9,5 +9,5 @@ def check_xlsx(path: Path) -> None:
         images=[name for name in archive.namelist() if name.startswith("xl/media/")]
         assert len(images)>=3,images
     wb=load_workbook(path,read_only=False)
-    assert wb.sheetnames==["СОП","ФРВ","Чек-лист"],wb.sheetnames
+    assert wb.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],wb.sheetnames
     assert len(wb["СОП"]._images)>=3,len(wb["СОП"]._images)
