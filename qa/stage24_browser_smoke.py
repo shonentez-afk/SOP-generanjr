@@ -85,7 +85,9 @@ def current_twi_in_chrome():
                 debug:JSON.stringify({purpose:state.twi.prepare?.purpose,check:state.twi.tryOut?.check,
                   baselinePurpose:state.twi.generatedBaseline?.prepare?.purpose,manualCount:twiManualCount(state.twi),
                   marker:!!document.querySelector('[data-twi-manual-count]'),
-                  domPurpose:$('twi-purpose')?.value,domCheck:$('twi-check')?.value})};
+                  domPurpose:$('twi-purpose')?.value,domCheck:$('twi-check')?.value,
+                  differing:TWI_GENERATED_FIELDS.filter(e=>twiGetText(state.twi,e)!==twiGetText(state.twi.generatedBaseline,e))
+                    .map(e=>({id:twiFieldId(e),current:twiGetText(state.twi,e),baseline:twiGetText(state.twi.generatedBaseline,e)}))})};
             }""")
             assert all(v for k,v in first.items() if k!='debug'),first
             initial=page.evaluate("() => JSON.stringify(state.twi)")
