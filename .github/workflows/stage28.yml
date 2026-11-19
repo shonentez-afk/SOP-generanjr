@@ -1,0 +1,106 @@
+name: Stage 28 evidence-based SOP mentor
+on:
+  push:
+    branches: [feature/stage28-evidence-mentor-20261119]
+    paths:
+      - 'src/modules/review/stage28-*.js'
+      - 'src/modules/ai/stage28-*.js'
+      - 'src/modules/app/stage28-ui.js'
+      - 'src/modules/documents/stage28-*.js'
+      - 'src/app/stage28-parts.json'
+      - 'tools/build_stage28.py'
+      - 'tests/test_stage28.py'
+      - 'qa/stage28_*.py'
+      - 'docs/STAGE28_EVIDENCE_MENTOR_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage28.yml'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/modules/review/stage28-*.js'
+      - 'src/modules/ai/stage28-*.js'
+      - 'src/modules/app/stage28-ui.js'
+      - 'src/modules/documents/stage28-*.js'
+      - 'src/app/stage28-parts.json'
+      - 'tools/build_stage28.py'
+      - 'tests/test_stage28.py'
+      - 'qa/stage28_*.py'
+      - 'docs/STAGE28_EVIDENCE_MENTOR_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage28.yml'
+permissions:
+  contents: write
+concurrency:
+  group: stage28-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Stage28 full unit and Chrome file:// regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage28 and verify frozen Stage26
+        run: |
+          python tools/build_stage26.py --verify-release --verify-static
+          python tools/build_stage27.py --verify-release --verify-static
+          python tools/build_stage28.py
+          python tools/build_stage28.py --verify-release --verify-static
+      - name: Run all existing and Stage28 Python/Node unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Check standalone JS syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path("releases/stage28-evidence-mentor-browser-candidate.html").read_text(encoding="utf-8")
+          marker="<script>\n'use strict';"
+          assert html.count(marker)==1
+          Path("/tmp/stage28.js").write_text("'use strict';\n"+
+              html.split(marker,1)[1].split("</script>",1)[0],encoding="utf-8")
+          PY
+          node --check /tmp/stage28.js
+      - name: Chrome file:// full Stage26 and Stage28 regression
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage28_browser_smoke.py
+      - name: Upload verified standalone candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage28-evidence-mentor-html
+          path: releases/stage28-evidence-mentor-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+      - name: Commit generated HTML to feature branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage28-evidence-mentor-20261119'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage28-evidence-mentor-20261119
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced while tests ran. Do not publish an outdated HTML; latest CI will handle it."
+            exit 0
+          fi
+          git add releases/stage28-evidence-mentor-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: verified Stage28 offline evidence mentor HTML"
+            git push origin HEAD:feature/stage28-evidence-mentor-20261119
+          fi
+  windows:
+    name: Stage28 Windows Chrome + offline XLSX/ISO/photos
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build offline Stage28
+        run: python tools/build_stage28.py
+      - name: Install Playwright
+        run: python -m pip install "playwright>=1.50,<2"
+      - name: Reuse Stage26 native Windows acceptance against Stage28
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage28-evidence-mentor-browser-candidate.html'; m.main()"
