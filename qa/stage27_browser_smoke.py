@@ -170,7 +170,7 @@ def check_assistant():
 
             page.locator('[data-stage27-tab="changes"]').click()
             page.locator("#stage27HistoryRefresh").click()
-            page.wait_for_selector('#stage27HistorySelect option[value="qa-s27-old"]',timeout=7000)
+            page.wait_for_function("() => [...document.querySelectorAll('#stage27HistorySelect option')].some(o => o.value==='qa-s27-old')",timeout=7000)
             page.select_option("#stage27HistorySelect","qa-s27-old")
             page.locator("#stage27HistoryCompare").click()
             diff=page.locator("#stage27HistoryDiff").inner_text()
