@@ -82,6 +82,7 @@ def current_twi_in_chrome():
                 followUp:{...window.__stage24First.followUp,help:''}
               };
               return {generated,persisted:saved,library:inLibrary,manualPreserved,staleFlag,
+                domIntegrity:['twi-help','twi-frequency','twi-observe','twi-close'].every(id=>!!$(id)),
                 debug:JSON.stringify({purpose:state.twi.prepare?.purpose,check:state.twi.tryOut?.check,
                   baselinePurpose:state.twi.generatedBaseline?.prepare?.purpose,manualCount:twiManualCount(state.twi),
                   marker:!!document.querySelector('[data-twi-manual-count]'),

@@ -4,7 +4,7 @@
   "outputRelease": "releases/stage24-a3-a4-twi-protected.html",
   "static": {
     "beforeVendor": "src/app/stage19-before-vendor.html",
-    "betweenVendorIcons": "src/app/stage19-between-vendor-icons.html",
+    "betweenVendorIcons": "src/app/stage24-between-vendor-icons.html",
     "betweenIconsRuntime": "src/app/stage19-between-icons-runtime.html",
     "afterRuntime": "src/app/stage19-after-runtime.html"
   },

@@ -28,6 +28,14 @@ class Stage24TwiSafety(unittest.TestCase):
         self.assertEqual(self.html.count("function twiShowPreview("),1)
         self.assertEqual(len(self.manifest["modules"]),47)
 
+    def test_current_twi_form_has_matching_textareas(self):
+        html=(ROOT/"src/app/stage24-between-vendor-icons.html").read_text(encoding="utf-8")
+        twi=html.split('id="tab-twi"',1)[1].split('id="tab-documents"',1)[0]
+        self.assertEqual(twi.count("<textarea"),15)
+        self.assertEqual(twi.count("</textarea>"),15)
+        for field in ("twi-help","twi-frequency","twi-observe","twi-close"):
+            self.assertIn('id="'+field+'"',twi)
+
     def test_protected_source_code_unchanged(self):
         for path in (
             "src/modules/ai/stage19-transport.js",

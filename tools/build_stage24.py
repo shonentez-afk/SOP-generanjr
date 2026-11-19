@@ -35,8 +35,19 @@ def verify_static() -> None:
     old=BASELINE.read_text(encoding="utf-8")
     new=build()
     boundary="<script>\n'use strict';"
-    if old.split(boundary,1)[0]!=new.split(boundary,1)[0]:
-        raise AssertionError("Changed HTML shell, offline ExcelJS, ISO icons or styles")
+    shell=old.split(boundary,1)[0]
+    expected_patches=[
+        ('placeholder="Назначенный наставник, мастер или другое ответственное лицо"></div>',
+         'placeholder="Назначенный наставник, мастер или другое ответственное лицо"></textarea></div>'),
+        ('placeholder="Первые самостоятельные выполнения и наиболее важные Key Points"></div>',
+         'placeholder="Первые самостоятельные выполнения и наиболее важные Key Points"></textarea></div>'),
+    ]
+    for from_text,to_text in expected_patches:
+        if shell.count(from_text)!=1:
+            raise AssertionError("Missing original broken TWI textarea marker")
+        shell=shell.replace(from_text,to_text)
+    if shell!=new.split(boundary,1)[0]:
+        raise AssertionError("Stage24 changed static shell outside two TWI textarea repairs")
     if old.split("</script>",-1)[-1]!=new.split("</script>",-1)[-1]:
         raise AssertionError("Changed HTML footer")
 
