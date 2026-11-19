@@ -1,3 +1,14 @@
+## Stage 29 — качество генерации СОП и TWI (19.11.2026, до пользовательской приёмки)
+
+- **Решение владельца:** улучшать качество СОП и TWI вместо Stage29 пакета C; интеграция **ФРВ → СОП → TWI отложена**, пока не нужна. ФРВ необязательная и самостоятельная, TWI автоматически генерируется из СОП.
+- **Ветка:** `feature/stage29-sop-twi-quality-20261119`, отчёт `docs/STAGE29_SOP_TWI_QUALITY_RU.md`. **Stage28 принят и сохранён в main** (PR #23, merge `f075714a24f075c463ed7576150d875c1f65c7cc`). Main, Stage28 и Yandex Cloud-прокси не трогать до приёмки Stage29.
+- **СОП:** точный промпт по методике TWI JI; источник включает действующие требования безопасности; детерминированная очистка `null/keep`, дублей Key Points; пустое Key Point допустимо; придуманное время превращается в вопрос инженеру, неподтверждённые числа/параметры приводят к отказу от небезопасного предложения без изменения документа.
+- **TWI:** первый план строго построен из реальных действий, Key Points, причин и критериев текущего СОП (без выдуманных частей). Модель формирует рекомендации по четырём этапам, но не добавляет чисел и непроверенных графиков; повторная генерация предлагает новые формулировки только через прежний выборочный предпросмотр с защитой ручных правок. Новых UI-блоков нет.
+- **Сборка:** `tools/build_stage29.py` + `src/app/stage29-parts.json` (57 модулей) → `releases/stage29-sop-twi-quality-browser-candidate.html`. Запуск одним HTML `file://` Chrome/Edge, локальные ExcelJS/ISO и фото не затронуты.
+- **CI/PR:** PR #24 — https://github.com/shonentez-afk/SOP-generanjr/pull/24 (черновик, не объединён). Последняя проверка https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44487301954: **79/79 unit PASS**, полный Chrome `file://` регресс Stage22–28 + Stage29 PASS, Windows Chrome XLSX/ISO/фото PASS. `tests/test_stage29.py`, `qa/stage29_browser_smoke.py`, `.github/workflows/stage29.yml`. Финальный HTML опубликован в ветке `releases/stage29-sop-twi-quality-browser-candidate.html`. **Реальную технологическую оценку вывода YandexGPT/прокси пользователь ещё не проводил; Stage29 пока кандидат, не принят и не объединён в main**.
+
+---
+
 ## Stage 28 — ПРИНЯТ (19.11.2026)
 
 - Пользователь проверил Stage 28 в браузере и подтвердил: **«работает»**. PR #23 **объединён с main**, squash commit `f075714a24f075c463ed7576150d875c1f65c7cc`. Актуальный standalone: `releases/stage28-evidence-mentor-browser-candidate.html`. Контрольные Stage 26/27 сохранены.
