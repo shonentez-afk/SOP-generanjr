@@ -2,7 +2,7 @@
 
 Stage 19 — завершённый структурный этап A1 с нулевым изменением поведения, но НЕ весь архитектурный пакет A.
 
-- Основной JS Stage 18 перенесён в 27 файлов src/modules/*/stage19-*.js, порядок — src/app/stage19-parts.json.
+- Основной JS Stage 18 перенесён в 39 файлов src/modules/*/stage19-*.js, порядок — src/app/stage19-parts.json.
 - Оболочка в src/app/stage19-*.html; ExcelJS 4.4.0 и лицензия переиспользуются из src/vendor, 60 локальных ISO 7010 из src/assets/safety/iso7010-part01..07.json.
 - tools/build_stage19.py собирает releases/stage19-modular-runtime.html непосредственно из этих файлов без последовательного запуска прежних Stage 12–18 patch-builders.
 - Команды: python tools/build_stage19.py --verify-baseline; python tools/build_stage19.py --verify-release; python -m unittest discover -s tests -v.
@@ -21,3 +21,5 @@ Stage 19 — завершённый структурный этап A1 с нул
 
 tests/test_stage19.py и .github/workflows/stage19.yml проверяют идентичность Stage18/Stage19, Node JS syntax, реальные Chrome file:// сценарии фотографий/Excel и ответов наставника.
 Windows, штатный Excel, сетевая папка на двух ПК и рабочий Yandex Cloud-прокси требуют отдельной ручной приёмки.
+
+Также разделены большие исходные файлы документов (DB, сеть, переносимые фото, sync), ФРВ (структура, ввод/вывод, AI-анализ) и Excel export; общие функции blobToDataUrl/dataUrlToBlob вынесены в shared без смены их позиции в итоговом JS.

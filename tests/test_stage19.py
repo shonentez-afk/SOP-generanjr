@@ -57,5 +57,16 @@ class Stage19ModuleTests(unittest.TestCase):
         self.assertTrue(sections[0].startswith("\n'use strict';"))
         self.assertGreater(len(builder._icons(parts["iconParts"]).encode("utf-8")),150000)
 
+    def test_shared_media_converters_live_in_shared_sources(self):
+        names=self.manifest["modules"]
+        a="src/modules/shared/stage19-blob-to-dataurl.js"
+        b="src/modules/shared/stage19-dataurl-to-blob.js"
+        self.assertIn(a,names)
+        self.assertIn(b,names)
+        self.assertIn("function blobToDataUrl(blob)",builder._read(a))
+        self.assertIn("async function dataUrlToBlob(dataUrl)",builder._read(b))
+        self.assertEqual(sum(builder._read(p).count("function blobToDataUrl(blob)") for p in names),1)
+        self.assertEqual(sum(builder._read(p).count("async function dataUrlToBlob(dataUrl)") for p in names),1)
+
 if __name__=="__main__":
     unittest.main()
