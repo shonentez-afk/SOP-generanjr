@@ -1,0 +1,44 @@
+name: Stage 21 A2 review persistence
+on:
+  push:
+    branches: [main, feature/stage21-review-history-20261119]
+    paths:
+      - 'src/modules/documents/stage21-*.js'
+      - 'src/app/stage21-parts.json'
+      - 'tools/build_stage21.py'
+      - 'tests/test_stage21.py'
+      - 'qa/stage21_browser_smoke.py'
+      - 'releases/stage21-review-history.html'
+      - '.github/workflows/stage21.yml'
+  pull_request:
+jobs:
+  review-history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preserve previous baseline, releases, and vendor
+        run: |
+          python tools/build_stage19.py --verify-baseline
+          python tools/build_stage20.py --verify-release
+          python tools/build_stage21.py --verify-release
+          python tools/build_stage21.py --verify-static
+      - name: Run all Python and Node-driven unit regressions
+        run: python -m unittest discover -s tests -v
+      - name: Validate Stage21 runtime JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path('releases/stage21-review-history.html').read_text(encoding='utf-8')
+          marker="<script>\n'use strict';"
+          assert html.count(marker)==1
+          runtime="'use strict';\n"+html.split(marker,1)[1].split("</script>",1)[0]
+          Path('/tmp/stage21.js').write_text(runtime,encoding='utf-8')
+          PY
+          node --check /tmp/stage21.js
+      - name: Real Chrome file protocol, history, offline icons and XLSX
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage21_browser_smoke.py
