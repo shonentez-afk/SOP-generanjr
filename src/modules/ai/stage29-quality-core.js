@@ -85,6 +85,7 @@ function stage29SopNormalize(sop,input){
   // Numeric specifics are not safe to fabricate. If a number first appears in
   // the AI result, reject the proposal BEFORE modifying the live SOP.
   const claims=[];
+  const timeQuestions=[];
   for(let i=0;i<steps.length;i++){
     const s=steps[i];
     for(const field of ['action','reason','success_criteria']){
@@ -98,7 +99,11 @@ function stage29SopNormalize(sop,input){
       }
     }
     if(s.time&&!stage29TimeConfirmed(s.time,source)){
-      claims.push('шаг '+(i+1)+' / время без указанной исходной длительности: '+s.time);
+      // A fabricated estimate is discarded, not accepted as a measurement.
+      // The rest of a valid draft is still usable after the user's confirmation.
+      s.time=null;
+      timeQuestions.push('Уточните фактическую длительность шага '+(i+1)+
+        ': в исходном описании время не указано.');
     }
   }
   for(const field of ['department','workplace','executor','safety','tools','material']){
@@ -117,6 +122,7 @@ function stage29SopNormalize(sop,input){
   });
   const q=Array.isArray(sop.openQuestions)?sop.openQuestions:[];
   const questions=q.map(x=>stage29Text(x,500)).filter(Boolean);
+  questions.push(...timeQuestions);
   for(const [a,b] of repeats){
     questions.push('Проверьте, действительно ли действия шагов '+a+' и '+b+
       ' являются разными, или их нужно объединить.');
