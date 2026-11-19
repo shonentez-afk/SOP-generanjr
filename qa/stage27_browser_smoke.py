@@ -27,7 +27,7 @@ def check_assistant():
         page.route("http://**",lambda route:route.abort())
         try:
             page.goto(RELEASE.resolve().as_uri(),wait_until="domcontentloaded",timeout=30000)
-            page.wait_for_selector("#stage27AssistantPanel",timeout=8000)
+            page.wait_for_selector("#stage27AssistantPanel",state="attached",timeout=8000)
             evidence=page.evaluate(r"""() => {
               const s=createEmptyStep();
               s.action='Осмотреть конвейер';
@@ -67,6 +67,9 @@ def check_assistant():
                   suggestion:'Уточнить у ответственного инженера порядок проверки'
                 }]});
                 if(opts.task==='stage27_explain')return 'В документе есть осмотр, но не указан способ проверки блокировки. Уточните его у инженера.';
+                if(opts.task==='review')return JSON.stringify({
+                  issues:[],summary:'Штатная проверка СОП сохранена',overall_quality:'good'
+                });
                 if(opts.task==='stage27_analog')return JSON.stringify({
                   department:'',workplace:'',executor:'',safety:'',tools:'',material:'',
                   isoIconIds:[],openQuestions:['Какие ограничения у целевого конвейера?'],
@@ -78,9 +81,19 @@ def check_assistant():
               };
               return {id:s.id,duration:s.durationSeconds,photo:s.hasPhoto,
                 buttons:[...document.querySelectorAll('[data-stage27-tab]')].length,
+                integrated:document.getElementById('stage27AssistantPanel').parentElement.id==='sopReviewContainer',
+                collapsed:document.getElementById('stage27AssistantPanel').hidden,
+                additionalButtons:document.querySelectorAll('#stage27AssistantToggle').length,
+                mainActions:document.querySelectorAll('#generateSopBtn,#reviewSopBtn').length,
                 model:AI_PROXY_BASE};
             }""")
             assert evidence["buttons"]==4,evidence
+            assert evidence["integrated"] and evidence["collapsed"],evidence
+            assert evidence["additionalButtons"]==1 and evidence["mainActions"]==2,evidence
+            page.locator("#stage27AssistantToggle").click()
+            assert page.locator("#stage27AssistantPanel").is_visible()
+            assert page.locator("#sopReviewContainer").is_visible()
+            assert page.get_by_role("button",name="Проверить весь СОП").count()==1
             assert evidence["model"]=="https://functions.yandexcloud.net/d4ehdpoue3sve6s0f92b",evidence
 
             page.locator("#stage27AskBtn").click()
@@ -126,6 +139,16 @@ def check_assistant():
             page.locator("[data-stage27-explain]").click()
             page.wait_for_function("() => !!state.stage27.mentor[0].explanation",timeout=7000)
             assert page.evaluate("() => state.stage27.mentor[0].explanation.includes('блокировки')")
+            page.locator("#reviewSopBtn").click()
+            page.wait_for_function("() => !!reviewSummary && reviewSummary.summary==='Штатная проверка СОП сохранена'",timeout=7000)
+            assert page.locator("#sopReviewSummary").is_visible()
+            assert page.locator("#stage27AssistantPanel").is_visible()
+            assert page.evaluate("() => document.getElementById('stage27AssistantPanel').parentElement.id==='sopReviewContainer'")
+            # Existing review rerenders must not replace the Stage27 toolbar.
+            page.evaluate("() => renderReviewResults(reviewSummary)")
+            assert page.locator("#stage27AssistantPanel").is_visible()
+            assert page.locator("#stage27MentorResults").is_visible()
+            assert page.locator("#stage27AssistantToggle").count()==1
 
             page.evaluate(r"""async () => {
               const s=state.steps[0];
