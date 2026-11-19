@@ -37,7 +37,7 @@ REQUIRED={
 def build()->str:
     spec=json.loads(MANIFEST.read_text(encoding="utf-8"))
     modules=spec["modules"]
-    if spec.get("schemaVersion")!=1 or len(modules)!=57 or len(set(modules))!=55:
+    if spec.get("schemaVersion")!=1 or len(modules)!=57 or len(set(modules))!=57:
         raise AssertionError("Stage29 expects 57 unique JS modules")
     if not REQUIRED.issubset(modules):
         raise AssertionError("Stage29 required protected module missing")
