@@ -6028,14 +6028,26 @@ function stage27ResetTransient(){
 }
 function stage27SwitchTab(tab){
   if(!['clarify','mentor','analog','changes'].includes(tab))return;
+  const panel=$('stage27AssistantPanel'),toolbar=$('stage27Actions');
+  if(!panel||!toolbar)return;
   stage27ActiveTab=tab;
-  const el=$('stage27AssistantPanel');if(!el)return;
-  el.querySelectorAll('[data-stage27-tab]').forEach(button=>{
+  $('sopReviewContainer')?.classList.remove('hidden');
+  panel.hidden=false;
+  const titles={
+    clarify:'Уточнение технологических данных',
+    mentor:'Дополнительная проверка логики шагов',
+    analog:'Создание черновика по аналогу',
+    changes:'Сравнение редакций СОП'
+  };
+  const heading=$('stage27PanelTitle');
+  if(heading)heading.textContent=titles[tab];
+  toolbar.querySelectorAll('[data-stage27-tab]').forEach(button=>{
     const active=button.dataset.stage27Tab===tab;
-    button.setAttribute('aria-selected',String(active));
+    button.setAttribute('aria-pressed',String(active));
+    button.setAttribute('aria-expanded',String(active));
     button.classList.toggle('active',active);
   });
-  el.querySelectorAll('[data-stage27-pane]').forEach(pane=>{
+  panel.querySelectorAll('[data-stage27-pane]').forEach(pane=>{
     pane.hidden=pane.dataset.stage27Pane!==tab;
   });
 }
@@ -6132,7 +6144,7 @@ function stage27Render(){
   stage27RenderProposals();
   stage27RenderMentor();
   stage27RenderAnalogs();
-  stage27SwitchTab(stage27ActiveTab);
+  if(!$('stage27AssistantPanel').hidden)stage27SwitchTab(stage27ActiveTab);
   stage27SetBusy(stage27Busy);
 }
 function stage27Init(){
@@ -6153,7 +6165,11 @@ function stage27Init(){
     '#stage27AssistantPanel .s27-heading{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:6px;font-weight:700;color:#581c87}',
     '#stage27AssistantPanel h3{font-size:16px;font-weight:700;margin:8px 0}',
     '#stage27AssistantPanel .s27-intro{color:#64748b;font-weight:400;font-size:12px}',
-    '#stage27AssistantPanel .s27-nav{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;padding-bottom:8px;border-bottom:1px solid #e2e8f0}',
+    '#stage27Actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 0;max-width:100%}',
+    '#stage27Actions .s27-toolbar-btn{min-height:34px;background:#fff;color:#6b21a8;border-color:#d8b4fe;white-space:nowrap;transition:background .18s,color .18s,box-shadow .18s}',
+    '#stage27Actions .s27-toolbar-btn:hover{background:#faf5ff;border-color:#c084fc}',
+    '#stage27Actions .s27-toolbar-btn[aria-pressed="true"]{background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(168,85,247,.25)}',
+    '#stage27Actions .s27-toolbar-btn:focus-visible{outline:2px solid #7c3aed;outline-offset:2px}',
     '#stage27AssistantPanel button{border:1px solid #cbd5e1;border-radius:8px;padding:8px 11px;background:#f8fafc;color:#1e293b;font-weight:600;font-size:13px}',
     '#stage27AssistantPanel button.active,#stage27AssistantPanel .s27-primary{background:#6d28d9;color:#fff;border-color:#6d28d9}',
     '#stage27AssistantPanel button:disabled{opacity:.5;cursor:not-allowed}',
@@ -6182,27 +6198,27 @@ function stage27Init(){
     '#sopReviewSummary:empty,#sopReviewIssues:empty{display:none}'
   ].join('\n');
   document.head.appendChild(style);
-  const trigger=document.createElement('button');
-  trigger.id='stage27AssistantToggle';
-  trigger.type='button';
-  trigger.className='btn-ghost px-3 py-2 rounded-lg text-xs font-semibold text-purple-700 border border-purple-200';
-  trigger.textContent='⋯ Дополнительно';
-  trigger.setAttribute('aria-expanded','false');
-  trigger.setAttribute('aria-controls','stage27AssistantPanel');
-  trigger.title='Уточнения, логика шагов, аналоги и сравнение версий';
-  reviewButton.insertAdjacentElement('afterend',trigger);
+  // Four always-visible actions, styled like the existing SOP action buttons.
+  // The result surface remains the same original review panel.
+  const toolbar=document.createElement('div');
+  toolbar.id='stage27Actions';
+  toolbar.className='flex flex-wrap items-center gap-2 mt-2 mb-1';
+  toolbar.setAttribute('role','group');
+  toolbar.setAttribute('aria-label','Дополнительные функции СОП');
+  const actionBase='btn-ghost s27-toolbar-btn px-3 py-2 rounded-lg text-xs font-semibold border';
+  toolbar.innerHTML=[
+    '<button type="button" class="'+actionBase+'" data-stage27-tab="clarify" aria-pressed="false" aria-expanded="false" aria-controls="stage27AssistantPanel">❔ Уточнить СОП</button>',
+    '<button type="button" class="'+actionBase+'" data-stage27-tab="mentor" aria-pressed="false" aria-expanded="false" aria-controls="stage27AssistantPanel">🧩 Логика шагов</button>',
+    '<button type="button" class="'+actionBase+'" data-stage27-tab="analog" aria-pressed="false" aria-expanded="false" aria-controls="stage27AssistantPanel">📚 По аналогии</button>',
+    '<button type="button" class="'+actionBase+'" data-stage27-tab="changes" aria-pressed="false" aria-expanded="false" aria-controls="stage27AssistantPanel">🕘 Сравнить версии</button>'
+  ].join('');
+  reviewButton.parentElement.insertAdjacentElement('afterend',toolbar);
   const panel=document.createElement('div');
   panel.id='stage27AssistantPanel';
   panel.hidden=true;
   panel.setAttribute('aria-label','Дополнительные инструменты проверки СОП');
   panel.innerHTML=[
-    '<div class="s27-heading"><span>Дополнительно к проверке СОП</span><span class="s27-intro">Все изменения — только с подтверждением</span></div>',
-    '<div class="s27-nav" role="tablist" aria-label="Дополнительные инструменты">',
-      '<button type="button" role="tab" data-stage27-tab="clarify">Уточнения</button>',
-      '<button type="button" role="tab" data-stage27-tab="mentor">Логика шагов</button>',
-      '<button type="button" role="tab" data-stage27-tab="analog">По аналогии</button>',
-      '<button type="button" role="tab" data-stage27-tab="changes">Изменения</button>',
-    '</div>',
+    '<div class="s27-heading"><span id="stage27PanelTitle">Уточнение технологических данных</span><span class="s27-intro">Применение изменений — только после подтверждения</span></div>',
     '<div data-stage27-pane="clarify" role="tabpanel">',
       '<p class="s27-muted">Запросите недостающие факты, подтвердите ответы и выберите только нужные точечные исправления.</p>',
       '<button type="button" class="s27-primary" id="stage27AskBtn" data-stage27-ai>✨ Найти уточнения</button>',
@@ -6240,28 +6256,31 @@ function stage27Init(){
   reviewIssues.insertAdjacentElement('afterend',panel);
   const collapse=()=>{
     panel.hidden=true;
-    trigger.textContent='⋯ Дополнительно';
-    trigger.setAttribute('aria-expanded','false');
-  };
-  trigger.addEventListener('click',()=>{
-    const opening=panel.hidden;
-    reviewBox.classList.remove('hidden');
-    panel.hidden=!opening;
-    trigger.textContent=opening?'⋯ Свернуть дополнения':'⋯ Дополнительно';
-    trigger.setAttribute('aria-expanded',String(opening));
-    if(opening){
-      stage27SwitchTab(stage27ActiveTab);
-      panel.scrollIntoView({behavior:'auto',block:'nearest'});
-    }else if(!$('sopReviewSummary').textContent.trim() &&
-              !$('sopReviewIssues').textContent.trim()){
+    toolbar.querySelectorAll('[data-stage27-tab]').forEach(button=>{
+      button.classList.remove('active');
+      button.setAttribute('aria-pressed','false');
+      button.setAttribute('aria-expanded','false');
+    });
+    if(!$('sopReviewSummary')?.textContent.trim() &&
+       !$('sopReviewIssues')?.textContent.trim()){
       reviewBox.classList.add('hidden');
     }
+  };
+  toolbar.addEventListener('click',event=>{
+    const button=event.target.closest('[data-stage27-tab]');
+    if(!button||!toolbar.contains(button))return;
+    const tab=button.dataset.stage27Tab;
+    if(!panel.hidden&&tab===stage27ActiveTab){
+      collapse();
+      return;
+    }
+    stage27SwitchTab(tab);
+    panel.scrollIntoView({behavior:'auto',block:'nearest'});
   });
   closeButton.addEventListener('click',collapse);
   panel.addEventListener('click',event=>{
     const btn=event.target.closest('button');
     if(!btn||!panel.contains(btn))return;
-    if(btn.dataset.stage27Tab){stage27SwitchTab(btn.dataset.stage27Tab);return;}
     if(btn.dataset.stage27Confirm){stage27ConfirmAnswer(btn.dataset.stage27Confirm);return;}
     if(btn.dataset.stage27Explain){stage27ExplainMentor(btn.dataset.stage27Explain);return;}
     if(btn.dataset.stage27SelectAnalog){stage27SelectAnalog(btn.dataset.stage27SelectAnalog);return;}
