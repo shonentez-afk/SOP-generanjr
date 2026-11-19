@@ -81,9 +81,13 @@ def current_twi_in_chrome():
                 tryOut:{...window.__stage24First.tryOut,check:'Новый контроль ИИ'},
                 followUp:{...window.__stage24First.followUp,help:''}
               };
-              return {generated,persisted:saved,library:inLibrary,manualPreserved,staleFlag};
+              return {generated,persisted:saved,library:inLibrary,manualPreserved,staleFlag,
+                debug:JSON.stringify({purpose:state.twi.prepare?.purpose,check:state.twi.tryOut?.check,
+                  baselinePurpose:state.twi.generatedBaseline?.prepare?.purpose,manualCount:twiManualCount(state.twi),
+                  marker:!!document.querySelector('[data-twi-manual-count]'),
+                  domPurpose:$('twi-purpose')?.value,domCheck:$('twi-check')?.value})};
             }""")
-            assert all(first.values()),first
+            assert all(v for k,v in first.items() if k!='debug'),first
             initial=page.evaluate("() => JSON.stringify(state.twi)")
             page.evaluate("""() => {
               aiAsk=async()=>JSON.stringify(window.__stage24Second);
