@@ -1,0 +1,47 @@
+name: Stage 22 A3 safe AI application
+on:
+  push:
+    branches: [main, feature/stage22-a3-ai-stale-response-guard-20261119]
+    paths:
+      - 'src/modules/ai/stage22-*.js'
+      - 'src/modules/frv/stage22-*.js'
+      - 'src/modules/twi/stage22-*.js'
+      - 'src/app/stage22-parts.json'
+      - 'tools/build_stage22.py'
+      - 'tests/test_stage22.py'
+      - 'qa/stage22_browser_smoke.py'
+      - 'releases/stage22-a3-ai-guard.html'
+      - '.github/workflows/stage22.yml'
+  pull_request:
+jobs:
+  ai-guards:
+    name: Old releases, 48+ tests and Chrome file protocol
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: All old source builds must be preserved
+        run: |
+          python tools/build_stage19.py --verify-baseline
+          python tools/build_stage20.py --verify-release
+          python tools/build_stage21.py --verify-release
+          python tools/build_stage22.py --verify-release
+          python tools/build_stage22.py --verify-static
+      - name: Unit regression (legacy and new)
+        run: python -m unittest discover -s tests -v
+      - name: Stage22 runtime JS syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          h=Path("releases/stage22-a3-ai-guard.html").read_text(encoding="utf-8")
+          marker="<script>\n'use strict';"
+          assert h.count(marker)==1
+          Path("/tmp/stage22-runtime.js").write_text("'use strict';\n"+h.split(marker,1)[1].split("</script>",1)[0],encoding="utf-8")
+          PY
+          node --check /tmp/stage22-runtime.js
+      - name: Real Chrome file protocol, photos, Excel, mentor, AI stale response protection
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage22_browser_smoke.py
