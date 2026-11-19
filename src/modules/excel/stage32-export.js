@@ -111,10 +111,10 @@ async function sopXlsxFixPictureAnchors(input,expectedPictures){
       if(count){
         // The oneCellAnchor's xdr:ext explicitly supplies the photo width/height.
         // Remove ExcelJS's invalid editAs attribute, keeping all picture media.
-        const fixed=xml.replace(/<xdr:oneCellAnchor editAs="oneCell">([\\s\\S]*?)<\\/xdr:oneCellAnchor>/g,(block,inside)=>
+        const fixed=xml.replace(/<xdr:oneCellAnchor editAs="oneCell">([\s\S]*?)<\/xdr:oneCellAnchor>/g,(block,inside)=>
           '<xdr:oneCellAnchor>'+
-          inside.replace(/<a:xfrm><a:off x="0" y="0"\\/><a:ext cx="0" cy="0"\\/><\\/a:xfrm>/g,'')
-                .replace(/<a:picLocks noChangeAspect="1"\\/>/g,'')+
+          inside.replace(/<a:xfrm><a:off x="0" y="0"\/><a:ext cx="0" cy="0"\/><\/a:xfrm>/g,'')
+                .replace(/<a:picLocks noChangeAspect="1"\/>/g,'')+
           '</xdr:oneCellAnchor>');
         const plain=enc.encode(fixed);
         payload=plain;compressed=plain.length;uncompressed=plain.length;effectiveMethod=0;crc=crc32(plain);modified+=count;
