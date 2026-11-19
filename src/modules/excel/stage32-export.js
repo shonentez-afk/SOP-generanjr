@@ -44,8 +44,8 @@ function sopExcelPhotoCellRange(ws,firstCol,lastCol,rowNumber,marginPx=4){
     br:{
       nativeCol:lastCol-1,nativeColOff:lastWidthEmu-Math.round(gap),
       nativeRow:rowNumber-1,nativeRowOff:rowHeightEmu-Math.round(gap)
-    }
-    // No editAs: standards-valid twoCellAnchor that moves AND sizes with cells.
+    },
+    editAs:'twoCell' // picture follows changes to merged-cell geometry
   };
 }
 function excelPhotoMimeFromBytes(bytes){
