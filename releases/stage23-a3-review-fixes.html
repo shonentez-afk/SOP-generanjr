@@ -2178,9 +2178,6 @@ function validateDisputeResponse(x){
   return {reply:String(x.reply||'').trim().slice(0,1200),verdict:x.verdict==='withdraw'?'withdraw':'keep',new_fix:reviewNormalizeFixValue(x.new_fix)};
 }
 function pingAI(){setAIStatus('idle','AI: не проверен')}
-// ============================================================
-// 5. Render steps / editor
-// ============================================================
 // Stage22 A3.1: fail-closed check before applying an asynchronous AI suggestion.
 // No network, model, prompt, storage-schema, or document mutation happens here.
 const AI_GUARD_EDITOR_FIELDS=[
@@ -2247,6 +2244,9 @@ function aiGuardCanApply(token){
   toast('Документ изменился во время запроса ИИ. Устаревший ответ не применён; повторите действие.','info');
   return false;
 }
+// ============================================================
+// 5. Render steps / editor
+// ============================================================
 function renderSteps(){const c=$('stepsContainer');$('stepsCounter').textContent=`${state.steps.length} шагов`;recalcTotalTime();if(!state.steps.length){c.innerHTML='<div class="text-center py-12 text-slate-400"><div class="text-4xl mb-2">📋</div><p>Шаги не добавлены. Нажмите «+ Шаг» или «Демо»</p></div>';return}c.innerHTML=state.steps.map((s,i)=>`<div class="step-card bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
 <div class="flex items-start justify-between mb-3"><div class="flex items-center gap-2 flex-1"><div class="w-8 h-8 rounded bg-blue-500 text-white flex items-center justify-center font-bold flex-shrink-0">${i+1}</div><input type="text" value="${escapeHtml(s.action)}" data-step-field="action" data-id="${s.id}" class="flex-1 px-2 py-1 border rounded text-sm font-semibold min-w-0"><button type="button" title="Доработать через ИИ" data-ai="action" data-id="${s.id}" class="text-violet-600 hover:bg-violet-50 px-2 py-1 rounded">✨</button></div><button class="text-red-500 hover:bg-red-50 p-2 rounded" data-remove="${s.id}">🗑</button></div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
