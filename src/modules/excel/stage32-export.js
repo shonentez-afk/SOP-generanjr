@@ -48,6 +48,91 @@ function sopExcelPhotoCellRange(ws,firstCol,lastCol,rowNumber,marginPx=4){
     editAs:'twoCell' // picture follows changes to merged-cell geometry
   };
 }
+// Stage32.1: explicit fixed drawing extent in pixels. This is intentionally
+// distinct from twoCellAnchor: Excel 2019/365 uses the oneCell xdr:ext as a
+// definitive displayed picture size, not just the cell attachment corners.
+function sopExcelPhotoVisibleExtent(ws,firstCol,lastCol,rowNumber){
+  const r=sopExcelPhotoCellRange(ws,firstCol,lastCol,rowNumber);
+  const emuPerPx=9525;
+  let emuWidth=r.br.nativeColOff-r.tl.nativeColOff;
+  for(let c=firstCol;c<lastCol;c++){
+    const width=ws.getColumn(c).width||8.43;
+    emuWidth+=Math.round((width*7+5)*emuPerPx);
+  }
+  const emuHeight=r.br.nativeRowOff-r.tl.nativeRowOff;
+  if(emuWidth<=0||emuHeight<=0)throw new RangeError('Некорректный размер области Excel');
+  return {tl:r.tl,ext:{width:Math.round(emuWidth/emuPerPx),height:Math.round(emuHeight/emuPerPx)}};
+}
+// ExcelJS 4.4 writes an unsupported editAs attribute on oneCellAnchor, causing
+// some spreadsheet readers to discard the picture. Rewrite only this XML tag,
+// and do not decode/re-encode image bytes, formulas, workbook, or any ZIP entry
+// other than the drawing XML. ZIP entries are copied with original compression.
+async function sopXlsxFixPictureAnchors(input,expectedPictures){
+  if(typeof DecompressionStream!=='function')throw new Error('Требуется актуальный Chrome/Edge для экспорта изображений Excel');
+  const bytes=input instanceof Uint8Array?input:new Uint8Array(input);
+  const get16=(a,p)=>a[p]|a[p+1]<<8;
+  const get32=(a,p)=>(a[p]|a[p+1]<<8|a[p+2]<<16|a[p+3]<<24)>>>0;
+  const set16=(a,p,v)=>{a[p]=v&255;a[p+1]=(v>>>8)&255};
+  const set32=(a,p,v)=>{set16(a,p,v);set16(a,p+2,v>>>16)};
+  const concat=parts=>{const size=parts.reduce((s,b)=>s+b.length,0),out=new Uint8Array(size);let pos=0;for(const b of parts){out.set(b,pos);pos+=b.length}return out};
+  const crcTable=new Uint32Array(256);
+  for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);crcTable[i]=c>>>0}
+  const crc32=a=>{let c=0xffffffff;for(const b of a)c=crcTable[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0};
+  async function unzipRaw(buffer,method){
+    if(method===0)return buffer;
+    if(method!==8)throw new Error('Неподдерживаемое сжатие XLSX');
+    const stream=new Blob([buffer]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  let eocd=-1;
+  for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--){
+    if(get32(bytes,i)===0x06054b50 && i+22+get16(bytes,i+20)===bytes.length){eocd=i;break}
+  }
+  if(eocd<0)throw new Error('Не найден ZIP-каталог XLSX');
+  const num=get16(bytes,eocd+10),centralStart=get32(bytes,eocd+16);
+  if(get16(bytes,eocd+8)!==num||num===65535||centralStart===0xffffffff)throw new Error('Слишком большой XLSX ZIP');
+  let pointer=centralStart,offset=0,modified=0;
+  const locals=[],central=[],enc=new TextEncoder(),dec=new TextDecoder();
+  for(let index=0;index<num;index++){
+    if(get32(bytes,pointer)!==0x02014b50)throw new Error('Повреждён каталог XLSX');
+    const len=46+get16(bytes,pointer+28)+get16(bytes,pointer+30)+get16(bytes,pointer+32);
+    const oldC=bytes.slice(pointer,pointer+len),name=dec.decode(oldC.subarray(46,46+get16(oldC,28)));
+    const compressedSize=get32(oldC,20),method=get16(oldC,10),off=get32(oldC,42);
+    if(get32(bytes,off)!==0x04034b50)throw new Error('Повреждена запись XLSX');
+    const localNameLen=get16(bytes,off+26),localExtraLen=get16(bytes,off+28);
+    const payloadStart=off+30+localNameLen+localExtraLen;
+    if(payloadStart+compressedSize>bytes.length)throw new Error('Повреждено содержимое XLSX');
+    let payload=bytes.slice(payloadStart,payloadStart+compressedSize);
+    let effectiveMethod=method,crc=get32(oldC,16),compressed=compressedSize,uncompressed=get32(oldC,24);
+    if(/^xl\/drawings\/drawing\d+\.xml$/.test(name)){
+      const xml=dec.decode(await unzipRaw(payload,method));
+      const re=/<xdr:oneCellAnchor editAs="oneCell">/g;
+      const count=(xml.match(re)||[]).length;
+      if(count){
+        // The oneCellAnchor's xdr:ext explicitly supplies the photo width/height.
+        // Remove ExcelJS's invalid editAs attribute, keeping all picture media.
+        const fixed=xml.replace(re,'<xdr:oneCellAnchor>');
+        const plain=enc.encode(fixed);
+        payload=plain;compressed=plain.length;uncompressed=plain.length;effectiveMethod=0;crc=crc32(plain);modified+=count;
+      }
+    }
+    const local=bytes.slice(off,off+30+localNameLen+localExtraLen);
+    set16(local,6,get16(oldC,8)&~8);set16(local,8,effectiveMethod);
+    set32(local,14,crc);set32(local,18,compressed);set32(local,22,uncompressed);
+    locals.push(local,payload);
+    set16(oldC,8,get16(oldC,8)&~8);set16(oldC,10,effectiveMethod);
+    set32(oldC,16,crc);set32(oldC,20,compressed);set32(oldC,24,uncompressed);set32(oldC,42,offset);
+    central.push(oldC);
+    offset+=local.length+payload.length;
+    pointer+=len;
+  }
+  if(modified!==expectedPictures)throw new Error('Неверное число фото-якорей в Excel: '+modified+' из '+expectedPictures);
+  const centralStartNew=offset,centralSizeNew=central.reduce((s,x)=>s+x.length,0);
+  const footer=bytes.slice(eocd);
+  set32(footer,12,centralSizeNew);set32(footer,16,centralStartNew);
+  return concat([...locals,...central,footer]).buffer;
+}
+
 function excelPhotoMimeFromBytes(bytes){
   if(bytes.length>=3&&bytes[0]===255&&bytes[1]===216&&bytes[2]===255)return 'jpeg';
   if(bytes.length>=8&&bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71&&bytes[4]===13&&bytes[5]===10)return 'png';
@@ -124,6 +209,7 @@ async function generateExcel(){
     await ensureExcelJS();
     status.textContent='Генерация Excel-файла...';
     const wb=new ExcelJS.Workbook();
+    wb.subject='SOP XLSX PHOTO FIT STAGE32.1';
     const ws=wb.addWorksheet('СОП',{pageSetup:{paperSize:9,orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0}});
     const m=exportData.meta;
     const respList=exportData.responsibles.filter(x=>x&&x.trim()).join('\n');
@@ -235,7 +321,7 @@ async function generateExcel(){
         if(s?._excelPhoto){
           hasImg=true;
           const id=wb.addImage({base64:s._excelPhoto.base64,extension:s._excelPhoto.extension});
-          ws.addImage(id,sopExcelPhotoCellRange(ws,c1,c2,r));
+          ws.addImage(id,sopExcelPhotoVisibleExtent(ws,c1,c2,r));
           embeddedStepPhotos++;
         }
       }
@@ -359,13 +445,14 @@ async function generateExcel(){
     }
     if(ws.getImages().length<embeddedStepPhotos)throw new Error('ExcelJS потеряла изображения визуализации до сохранения');
     status.textContent='Финализация файла...';
-    const buffer=await wb.xlsx.writeBuffer();
+    const rawBuffer=await wb.xlsx.writeBuffer();
+    const buffer=await sopXlsxFixPictureAnchors(rawBuffer,embeddedStepPhotos);
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     try{const dm=exportData.documentManager||{};const ok=await docWriteNetworkFile(docSafeFileBase(dm)+'.xlsx',buffer,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');if(ok)status.textContent='Файл сформирован и сохранён в выбранную папку.'}catch(ne){console.warn('Сохранение XLSX на сетевой диск',ne)}
     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
-    a.download=`СОП_${m.sopNumber||'бн'}_${(m.operation||'без_названия').replace(/[^a-zA-Zа-яА-Я0-9]/g,'_')}.xlsx`;
+    a.download=`СОП_${m.sopNumber||'бн'}_${(m.operation||'без_названия').replace(/[^a-zA-Zа-яА-Я0-9]/g,'_')}_ФОТО_STAGE32_1.xlsx`;
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-    status.innerHTML='<span class="text-green-600 font-medium">✓ Файл успешно сгенерирован! (3 листа: СОП, ФРВ, Чек-лист; фотографий: '+embeddedStepPhotos+')</span>';
+    status.innerHTML='<span class="text-green-600 font-medium">✓ Фото в ячейках — Stage 32.1 (3 листа: СОП, ФРВ, Чек-лист; фотографий: '+embeddedStepPhotos+')</span>';
     toast('СОП успешно создан!');
     // XLSX download is not a commit or publish: preserve the working draft.
     saveDraft();
