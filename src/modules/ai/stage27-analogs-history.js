@@ -153,7 +153,7 @@ function stage27RenderHistoryOptions(){
   const previouslySelected=input.value;
   input.innerHTML='<option value="">Выберите редакцию для сравнения</option>'+
     stage27HistoryCandidates.map(d=>
-      '<option value="'+escapeHtml(d.id)+'">'+
+      '<option value="'+stage27Attr(d.id)+'">'+
       escapeHtml((d.number||'Черновик')+' · v'+(d.version||1)+
         ' · '+(d.title||'Без названия'))+'</option>').join('');
   if(stage27HistoryCandidates.some(d=>String(d.id)===previouslySelected))
