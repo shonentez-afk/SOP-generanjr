@@ -1,0 +1,26 @@
+name: SOP proxy safe opt-in tests
+on:
+  push:
+    branches: [feature/stage26-safe-proxy-optin-20261119]
+    paths:
+      - 'proxy/**'
+      - 'docs/PROXY_SAFE_UPGRADE_RU.md'
+      - '.github/workflows/proxy-safe.yml'
+  pull_request:
+    paths:
+      - 'proxy/**'
+      - 'docs/PROXY_SAFE_UPGRADE_RU.md'
+      - '.github/workflows/proxy-safe.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python syntax
+        run: python -m py_compile proxy/index.py proxy/tests/test_proxy.py
+      - name: Mock tests without network
+        run: python -m unittest discover -s proxy/tests -v
