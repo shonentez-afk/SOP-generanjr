@@ -95,18 +95,35 @@ let validated={issues:[
  {stepId:2,field:'action',severity:'improvement',type:'incomplete',
   description:'Проверить положение кожуха',fixValue:'Проверить фиксацию'},
  {stepId:4,field:'action',severity:'safety_gap',type:'contradiction',
-  description:'Выдуманное правило об остановке',fixValue:'Удалить шаг'}
+  description:'Выдуманное правило об остановке',fixValue:'Удалить шаг'},
+ {stepId:1,field:'time',severity:'improvement',type:'unrealistic',
+  description:'ИИ предложил заменить измеренное время',fixValue:'00:12'}
 ]};
 const raw={issues:[
  {evidence:{field:'action',quote:'Закрыть защитный кожух'}},
- {evidence:{field:'action',quote:'несуществующий норматив'}}]};
+ {evidence:{field:'action',quote:'несуществующий норматив'}},
+ {evidence:{field:'action',quote:'Осмотреть ограждение'}}]};
 let grounded=ctx.stage28GroundAIReview(validated,raw,steps,meta);
-assert.equal(grounded.length,2);
+assert.equal(grounded.length,3);
 assert.equal(grounded[0].evidenceKind,'observed');
 assert.equal(grounded[0].fixValue,'Проверить фиксацию');
 assert.equal(grounded[1].severity,'question');
 assert.equal(grounded[1].fixValue,null);
 assert(grounded[1].evidenceKind!=='observed');
+assert.equal(grounded[2].evidenceVerified,true);
+assert.equal(grounded[2].fixValue,null);
+assert.equal(ctx.stage28TwiStructureChecks(steps).length,0);
+const checks=ctx.stage28TwiStructureChecks([{
+ id:1,action:'Проверить фиксатор перед запуском',
+ keyMoments:['Проверить замок','Проверить замок','Записать','Проверить'],
+ reason:'Проверить фиксатор перед запуском',
+ successCriteria:'Проверить фиксатор перед запуском'
+}]);
+assert(checks.some(x=>x.field==='keyMoments'&&x.description.includes('трёх')));
+assert(checks.some(x=>x.field==='keyMoments'&&x.description.includes('повторяется')));
+assert(checks.some(x=>x.field==='reason'));
+assert(checks.some(x=>x.field==='successCriteria'));
+assert(checks.every(x=>x.fixValue===null));
 let old=[{stepId:4,field:'action',description:'Сохранённый вопрос',
   status:'deferred',thread:[{role:'user',text:'Проверено на месте'}]},
  {stepId:2,field:'action',description:'Старая формулировка',status:'withdrawn'}];
