@@ -67,7 +67,7 @@ def tests_in_chrome():
             page.wait_for_selector("#sopReplacementPreview",timeout=7000)
             assert page.locator("#sopReplacementPreview").get_by_text("фотографий").count()>=1
             page.locator('#sopReplacementPreview [data-ai-preview-action="cancel"]').click()
-            page.evaluate("() => window.__sopPending")
+            page.evaluate("() => Promise.race([window.__sopPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('SOP confirmation did not settle')),7000))])")
             unchanged=page.evaluate("""() => ({
               same:state.steps[0]===window.__stage25Old,
               photo:state.steps[0].imageData===window.__stage25Old.imageData,
@@ -76,6 +76,7 @@ def tests_in_chrome():
               questions:state.openQuestions[0]==='Старый вопрос'
             })""")
             assert all(unchanged.values()),unchanged
+            print('CHECK Stage25 SOP cancel OK',flush=True)
 
             page.evaluate("""() => {
               aiAsk=async()=>JSON.stringify(window.__stage25Sop);
@@ -84,7 +85,7 @@ def tests_in_chrome():
             }""")
             page.wait_for_selector("#sopReplacementPreview",timeout=7000)
             page.locator('#sopReplacementPreview [data-ai-preview-action="append"]').click()
-            page.evaluate("() => window.__sopPending")
+            page.evaluate("() => Promise.race([window.__sopPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('SOP confirmation did not settle')),7000))])")
             added=page.evaluate("""() => ({
               twoSteps:state.steps.length===2,
               oldStepPreserved:state.steps[0]===window.__stage25Old,
@@ -94,6 +95,7 @@ def tests_in_chrome():
               questions:state.openQuestions.includes('Старый вопрос')&&state.openQuestions.includes('Вопрос ИИ')
             })""")
             assert all(added.values()),added
+            print('CHECK Stage25 SOP append OK',flush=True)
 
             page.evaluate("""() => {
               aiAsk=async()=>JSON.stringify(window.__stage25Sop);
@@ -102,7 +104,7 @@ def tests_in_chrome():
             }""")
             page.wait_for_selector("#sopReplacementPreview",timeout=7000)
             page.locator('#sopReplacementPreview [data-ai-preview-action="replace"]').click()
-            page.evaluate("() => window.__sopPending")
+            page.evaluate("() => Promise.race([window.__sopPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('SOP confirmation did not settle')),7000))])")
             replaced=page.evaluate("""() => ({
               single:state.steps.length===1,
               newStep:state.steps[0].action==='Отключить питание',
@@ -110,6 +112,7 @@ def tests_in_chrome():
               newSafety:state.meta.safety==='Новые меры от ИИ'
             })""")
             assert all(replaced.values()),replaced
+            print('CHECK Stage25 SOP replace OK',flush=True)
 
             page.evaluate("""() => {
               aiAsk=async()=>JSON.stringify(window.__stage25Sop);
@@ -122,7 +125,7 @@ def tests_in_chrome():
               stateChanged();
             }""")
             page.locator('#sopReplacementPreview [data-ai-preview-action="append"]').click()
-            page.evaluate("() => window.__sopPending")
+            page.evaluate("() => Promise.race([window.__sopPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('SOP confirmation did not settle')),7000))])")
             stale=page.evaluate("""() => state.steps.length===1&&
               state.steps[0].action==='Правка пользователя во время предпросмотра'""")
             assert stale,"A stale SOP preview overwrote user changes"
@@ -133,16 +136,17 @@ def tests_in_chrome():
               state.description='Создать первый СОП';
               stateToHtml();
               aiAsk=async()=>JSON.stringify(window.__stage25Sop);
-              await generateSOP();
+              await Promise.race([generateSOP(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('unexpected SOP preview')),7000))]);
               const ok=state.steps.length===1&&
                 state.steps[0].action==='Отключить питание'&&
                 !document.getElementById('sopReplacementPreview');
               const reference=state.steps[0];
               aiAsk=async()=>'{broken JSON';
-              await generateSOP();
+              await Promise.race([generateSOP(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('unexpected SOP preview')),7000))]);
               return {initial:ok,invalidNonDestructive:state.steps.length===1&&state.steps[0]===reference};
             }""")
             assert all(first.values()),first
+            print('CHECK Stage25 SOP initial/error OK',flush=True)
 
             frv=page.evaluate("""() => {
               state.description='Операция с фактическим замером';
@@ -172,7 +176,7 @@ def tests_in_chrome():
             }""")
             page.wait_for_selector("#frvBuildPreview",timeout=7000)
             page.locator('#frvBuildPreview [data-ai-preview-action="cancel"]').click()
-            page.evaluate("() => window.__frvPending")
+            page.evaluate("() => Promise.race([window.__frvPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('FRV confirmation did not settle')),7000))])")
             frv_cancel=page.evaluate("""() => ({
               one:state.frvStudy.cycles.length===1,
               sameRef:state.frvStudy.cycles[0].observations[0]===window.__stage25FrvRef,
@@ -180,6 +184,7 @@ def tests_in_chrome():
               status:state.frvStudy.status==='Validated'
             })""")
             assert all(frv_cancel.values()),frv_cancel
+            print('CHECK Stage25 FRV cancel OK',flush=True)
             page.evaluate("""() => {
               aiAsk=async()=>JSON.stringify(window.__stage25FrvProposal);
               window.__frvPending=frvStudyBuild();
@@ -187,7 +192,7 @@ def tests_in_chrome():
             }""")
             page.wait_for_selector("#frvBuildPreview",timeout=7000)
             page.locator('#frvBuildPreview [data-ai-preview-action="append"]').click()
-            page.evaluate("() => window.__frvPending")
+            page.evaluate("() => Promise.race([window.__frvPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('FRV confirmation did not settle')),7000))])")
             frv_added=page.evaluate("""() => ({
               two:state.frvStudy.cycles.length===2,
               sameRef:state.frvStudy.cycles[0].observations[0]===window.__stage25FrvRef,
@@ -199,6 +204,7 @@ def tests_in_chrome():
               analysisMarked:state.frvStudy.analysisNeedsReview===true
             })""")
             assert all(frv_added.values()),frv_added
+            print('CHECK Stage25 FRV append OK',flush=True)
 
             page.evaluate("""() => {
               aiAsk=async()=>JSON.stringify(window.__stage25FrvProposal);
@@ -211,7 +217,7 @@ def tests_in_chrome():
               renderFrvStudy();
             }""")
             page.locator('#frvBuildPreview [data-ai-preview-action="append"]').click()
-            page.evaluate("() => window.__frvPending")
+            page.evaluate("() => Promise.race([window.__frvPending,new Promise((_,rej)=>setTimeout(()=>rej(new Error('FRV confirmation did not settle')),7000))])")
             frv_stale=page.evaluate("""() =>
               state.frvStudy.cycles.length===2&&
               state.frvStudy.cycles[0].observations[0].comment==='Уточнение факта во время предпросмотра'""")
@@ -223,16 +229,17 @@ def tests_in_chrome():
               d.cycles=[frvStudyEmptyCycle(1)];
               renderFrvStudy();
               aiAsk=async()=>JSON.stringify(window.__stage25FrvProposal);
-              await frvStudyBuild();
+              await Promise.race([frvStudyBuild(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('unexpected FRV preview')),7000))]);
               const ok=d.cycles.length===1&&d.cycles[0].observations[0].actionRaw==='Предложение ИИ'
                 &&d.cycles[0].observations[0].durationSec===null
                 &&!document.getElementById('frvBuildPreview');
               const previous=d.cycles[0];
               aiAsk=async()=>'{invalid JSON';
-              await frvStudyBuild();
+              await Promise.race([frvStudyBuild(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('unexpected FRV preview')),7000))]);
               return {first:ok,invalidNonDestructive:d.cycles[0]===previous};
             }""")
             assert all(frv_first.values()),frv_first
+            print('CHECK Stage25 FRV first/error OK',flush=True)
 
             messages=page.evaluate("""() => ({
               rate:aiErrorClassify(new Error('429 Too many requests')).kind==='rate_limit',
