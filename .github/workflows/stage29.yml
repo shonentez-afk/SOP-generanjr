@@ -1,0 +1,103 @@
+name: Stage 29 SOP and TWI quality
+on:
+  push:
+    branches: [feature/stage29-sop-twi-quality-20261119]
+    paths:
+      - 'src/modules/ai/stage29-*.js'
+      - 'src/modules/twi/stage29-*.js'
+      - 'src/app/stage29-parts.json'
+      - 'tools/build_stage29.py'
+      - 'tests/test_stage29.py'
+      - 'qa/stage29_*.py'
+      - 'docs/STAGE29_SOP_TWI_QUALITY_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage29.yml'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/modules/ai/stage29-*.js'
+      - 'src/modules/twi/stage29-*.js'
+      - 'src/app/stage29-parts.json'
+      - 'tools/build_stage29.py'
+      - 'tests/test_stage29.py'
+      - 'qa/stage29_*.py'
+      - 'docs/STAGE29_SOP_TWI_QUALITY_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage29.yml'
+permissions:
+  contents: write
+concurrency:
+  group: stage29-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Stage29 full unit and Chrome file:// regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage29 and verify frozen Stage26
+        run: |
+          python tools/build_stage26.py --verify-release --verify-static
+          python tools/build_stage27.py --verify-release --verify-static
+          python tools/build_stage28.py --verify-release --verify-static
+          python tools/build_stage29.py
+          python tools/build_stage29.py --verify-release --verify-static
+      - name: Run all existing and Stage29 Python/Node unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Check standalone JS syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path("releases/stage29-sop-twi-quality-browser-candidate.html").read_text(encoding="utf-8")
+          marker="<script>\n'use strict';"
+          assert html.count(marker)==1
+          Path("/tmp/stage29.js").write_text("'use strict';\n"+
+              html.split(marker,1)[1].split("</script>",1)[0],encoding="utf-8")
+          PY
+          node --check /tmp/stage29.js
+      - name: Chrome file:// full Stage29 and Stage29 regression
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage29_browser_smoke.py
+      - name: Upload verified standalone candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage29-sop-twi-quality-html
+          path: releases/stage29-sop-twi-quality-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+      - name: Commit generated HTML to feature branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage29-sop-twi-quality-20261119'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage29-sop-twi-quality-20261119
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced while tests ran. Do not publish an outdated HTML; latest CI will handle it."
+            exit 0
+          fi
+          git add releases/stage29-sop-twi-quality-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: verified Stage29 SOP/TWI quality HTML"
+            git push origin HEAD:feature/stage29-sop-twi-quality-20261119
+          fi
+  windows:
+    name: Stage29 Windows Chrome + offline XLSX/ISO/photos
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build offline Stage29
+        run: python tools/build_stage29.py
+      - name: Install Playwright
+        run: python -m pip install "playwright>=1.50,<2"
+      - name: Reuse Stage26 native Windows acceptance against Stage29
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage29-sop-twi-quality-browser-candidate.html'; m.main()"
