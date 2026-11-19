@@ -1,0 +1,90 @@
+name: Stage31 photo annotation precision
+on:
+  push:
+    branches: [feature/stage31-photo-annotation-precision-20261119]
+    paths:
+      - 'src/modules/photos/stage31-*.js'
+      - 'src/app/stage31-parts.json'
+      - 'tools/build_stage31.py'
+      - 'tests/test_stage31.py'
+      - 'qa/stage31_browser_smoke.py'
+      - 'docs/STAGE31_PHOTO_ANNOTATION_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage31.yml'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/modules/photos/stage31-*.js'
+      - 'src/app/stage31-parts.json'
+      - 'tools/build_stage31.py'
+      - 'tests/test_stage31.py'
+      - 'qa/stage31_browser_smoke.py'
+      - 'docs/STAGE31_PHOTO_ANNOTATION_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage31.yml'
+permissions:
+  contents: write
+concurrency:
+  group: stage31-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Stage31 full unit and Chrome file regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build and compare accepted baselines
+        run: |
+          python tools/build_stage26.py --verify-release --verify-static
+          python tools/build_stage29.py --verify-release --verify-static
+          python tools/build_stage30.py --verify-release --verify-static
+          python tools/build_stage31.py
+          python tools/build_stage31.py --verify-release --verify-static
+      - name: All Python and Node tests
+        run: python -m unittest discover -s tests -v
+      - name: Chrome full Stage30 regression plus Stage31 scenarios
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage31_browser_smoke.py
+      - name: Upload candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage31-photo-annotation-html
+          path: releases/stage31-photo-precision-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish verified HTML in feature branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage31-photo-annotation-precision-20261119'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage31-photo-annotation-precision-20261119
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; do not publish stale release."
+            exit 0
+          fi
+          git add releases/stage31-photo-precision-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: verified Stage31 standalone HTML"
+            git push origin HEAD:feature/stage31-photo-annotation-precision-20261119
+          fi
+  windows:
+    name: Stage31 native Windows offline Chrome
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage31
+        run: python tools/build_stage31.py
+      - name: Install browser automation
+        run: python -m pip install "playwright>=1.50,<2"
+      - name: Full original Windows Excel and ISO checks
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage31-photo-precision-browser-candidate.html'; m.main()"
