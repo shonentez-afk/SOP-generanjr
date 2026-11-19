@@ -1,3 +1,14 @@
+## Актуальная версия — Stage 29 (принята); Stage 30 — кандидат редактора фото
+**Рабочий автономный HTML:** `releases/stage29-sop-twi-quality-browser-candidate.html` в `main`. Пользователь подтвердил качество генерации СОП и работоспособность Stage29; **79/79 unit PASS**, Chrome Linux/Windows PASS. TWI автоматически создаётся из СОП, ФРВ необязательна, интеграция ФРВ → СОП → TWI отложена.
+
+**Следующая необъединённая версия:** [Stage30 — редактор фото, PR #25](https://github.com/shonentez-afk/SOP-generanjr/pull/25), один HTML `releases/stage30-photo-editor-browser-candidate.html` в ветке `feature/stage30-photo-editor-undo-zoom-20261119`. Настоящие Undo/Redo, предупреждение о несохранённой разметке, масштаб; **82/82 unit и Windows/Linux Chrome PASS**. Ждём проверки пользователя, не считать Stage30 принятым. [Детали](https://github.com/shonentez-afk/SOP-generanjr/blob/feature/stage30-photo-editor-undo-zoom-20261119/docs/STAGE30_PHOTO_EDITOR_RU.md).
+
+Ранее открытая Issue #4 закрыта как исправленные UX-дефекты. Прокси PR #21 принят как опциональный исходный код **без развёртывания и без включения model routing**. Корпоративная сетевая папка между физическими ПК остаётся внешней непроверенной эксплуатационной функцией. [Файл нового чата](docs/START_NEW_CHAT_RU.md) — основной актуальный источник статуса.
+
+> Ниже — исторические разделы по более ранним этапам, не текущие релизы.
+
+---
+
 ## Актуальная программа — Stage 26, готова к проверке в браузере
 **Скачать один автономный HTML:** `releases/stage26-final-browser-candidate.html`. Для Chrome/Edge на ПК через `file://`, без сервера и дополнительных файлов. **PR #20 принят**; 68 unit-тестов, Linux Chrome полный регресс и Windows Chrome с внутренней проверкой библиотеки 10/10 — PASS. Сохранены Yandex Cloud-прокси, разрешённые модели/промпты, ExcelJS/ISO, фотографии/разметка, библиотека и автоматический TWI из СОП. Завершены безопасная диагностика/ошибки ИИ и предпросмотр повторной генерации СОП/TWI и AI-операций ФРВ. **Проверка на вашем ПК:** `docs/BROWSER_ACCEPTANCE_STAGE26_RU.md`. Живые сервисы Yandex Cloud и сетевой диск должны быть проверены в вашей сети; CI не имеет к ним доступа. Подробности: `docs/RELEASE_STAGE26_RU.md`.
 
