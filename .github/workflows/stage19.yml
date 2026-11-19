@@ -1,0 +1,45 @@
+name: Stage 19 source modularization
+on:
+  push:
+    branches: [main, feature/stage19-source-modularization-20261119]
+    paths:
+      - 'src/modules/**/stage19-*.js'
+      - 'src/app/stage19-*'
+      - 'tools/build_stage19.py'
+      - 'tests/test_stage19.py'
+      - 'qa/stage19_browser_smoke.py'
+      - 'releases/stage19-modular-runtime.html'
+      - '.github/workflows/stage19.yml'
+  pull_request:
+jobs:
+  stage19:
+    name: Pure module assembly and real Chrome regressions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Stage19 source rebuild equals Stage18 exactly
+        run: |
+          python tools/build_stage19.py --verify-baseline
+          python tools/build_stage19.py --verify-release
+      - name: All Python regressions (Stage11 to Stage19)
+        run: python -m unittest discover -s tests -v
+      - name: Syntax of combined application JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('releases/stage19-modular-runtime.html').read_text(encoding='utf-8')
+          marker="<script>\n'use strict';"
+          assert text.count(marker)==1
+          code="'use strict';\n"+text.split(marker,1)[1].split("</script>",1)[0]
+          Path('/tmp/sop-stage19.js').write_text(code,encoding='utf-8')
+          PY
+          node --check /tmp/sop-stage19.js
+      - name: Actual Chrome file:// mentor, photo, IndexedDB, XLSX
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage19_browser_smoke.py
+      - name: Offline 60 safety icons on baseline
+        run: python qa/stage15_real_offline_icons.py

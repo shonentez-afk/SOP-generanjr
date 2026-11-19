@@ -1,0 +1,1 @@
+function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('Не удалось прочитать фото'));r.readAsDataURL(blob)})}
