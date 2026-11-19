@@ -192,14 +192,50 @@ async function openIllustrationEditor(stepId){
 
   textInput.addEventListener('input',()=>{const s=shapes[primary];if(s&&(s.type==='label'||s.type==='callout')){s.text=textInput.value;draw()}});
   textInput.addEventListener('change',commitIllustrationEdit);
-  const onKey=e=>{if(!overlay.isConnected)return;if(e.key==='Escape'){e.preventDefault();close()}if(e.key==='Tab'){const focusables=[...overlay.querySelectorAll('button,input,textarea,select,[tabindex]')].filter(x=>!x.disabled&&x.getClientRects().length);if(focusables.length){const first=focusables[0],last=focusables[focusables.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}}if(e.target?.closest?.('input,textarea,select,[contenteditable], [role="textbox"]'))return;if((e.key==='Delete'||e.key==='Backspace')&&selected.size){e.preventDefault();deleteSelected()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){e.preventDefault();duplicateSelected()}};window.addEventListener('keydown',onKey);
+  const onKey=e=>{
+    if(!overlay.isConnected)return;
+    if(e.key==='Escape'){e.preventDefault();close();return;}
+    if(e.key==='Tab'){
+      const focusables=[...overlay.querySelectorAll('button,input,textarea,select,[tabindex]')].filter(x=>!x.disabled&&x.getClientRects().length);
+      if(focusables.length){
+        const first=focusables[0],last=focusables[focusables.length-1];
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+        else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+      }
+    }
+    // Text inputs keep native Backspace/Delete and Ctrl+Z (old P1 fix).
+    if(e.target?.closest?.('input,textarea,select,[contenteditable],[role="textbox"]'))return;
+    const cmd=e.ctrlKey||e.metaKey;
+    if(cmd&&e.key.toLowerCase()==='z'){
+      e.preventDefault();restoreIllustrationSnapshot(e.shiftKey?photoHistory?.redo():photoHistory?.undo());return;
+    }
+    if(cmd&&e.key.toLowerCase()==='y'){
+      e.preventDefault();restoreIllustrationSnapshot(photoHistory?.redo());return;
+    }
+    if((e.key==='Delete'||e.key==='Backspace')&&selected.size){
+      e.preventDefault();deleteSelected();return;
+    }
+    if(cmd&&e.key.toLowerCase()==='d'){e.preventDefault();duplicateSelected()}
+  };
+  window.addEventListener('keydown',onKey);
 
   canvas.addEventListener('pointerdown',e=>{const p=getPointer(e);if(mode==='icon'){addShape({type:'icon',x:p.x,y:p.y,iconKind});return}if(mode==='badge'){addShape({type:'badge',x:p.x,y:p.y,n:nextNumber++});return}if(mode==='label'){const t=getText();if(!t)return toast('Введите текст подписи','info');addShape({type:'label',x:p.x+8,y:p.y+8,text:t,maxW:Math.min(260,canvas.width*.34)});return}if(mode==='select'){const hit=hitTest(p);selectHit(hit,e.shiftKey);if(hit){if(hit.part==='resize'&&selected.size===1)dragState={type:'resize',shape:shapes[hit.index]};else dragState={type:'move',last:p,indices:[...selected]}}canvas.setPointerCapture?.(e.pointerId);return}start=p;if(mode==='rect')preview={type:'rect',...normalizeRect(p,p),...currentStyle()};else if(mode==='arrow'||mode==='callout')preview={type:'arrow',x1:p.x,y1:p.y,x2:p.x,y2:p.y,...currentStyle()};canvas.setPointerCapture?.(e.pointerId)});
   canvas.addEventListener('pointermove',e=>{const p=getPointer(e);if(mode==='select'&&dragState){if(dragState.type==='move'){const dx=p.x-dragState.last.x,dy=p.y-dragState.last.y;dragState.indices.forEach(i=>shapes[i]&&moveShape(shapes[i],dx,dy));dragState.last=p}else resizeShape(dragState.shape,p);draw();return}if(!start||!preview)return;if(mode==='rect')preview={type:'rect',...normalizeRect(start,p),...currentStyle()};else preview={type:'arrow',x1:start.x,y1:start.y,x2:p.x,y2:p.y,...currentStyle()};draw()});
-  canvas.addEventListener('pointerup',e=>{const p=getPointer(e);if(mode==='select'){dragState=null;return}if(!start)return;if(mode==='rect'){const r=normalizeRect(start,p);if(r.w>8&&r.h>8)addShape({type:'rect',...r})}else if(mode==='arrow'){if(dist(start,p)>10)addShape({type:'arrow',x1:start.x,y1:start.y,x2:p.x,y2:p.y})}else if(mode==='callout'){if(dist(start,p)>14){const t=getText()||`Шаг ${nextNumber}`;addShape({type:'callout',x1:start.x,y1:start.y,x2:p.x,y2:p.y,labelX:p.x+12,labelY:p.y-8,n:nextNumber++,text:t,maxW:Math.min(260,canvas.width*.34)})}}start=null;preview=null;draw()});
-  canvas.addEventListener('dblclick',e=>{const hit=hitTest(getPointer(e));if(!hit)return;const s=shapes[hit.index];if(s.type==='label'||s.type==='callout'){primary=hit.index;selected.clear();selected.add(hit.index);const next=window.prompt('Изменить текст подписи',s.text||'');if(next!=null){s.text=String(next).trim();textInput.value=s.text;draw()}}});
+  canvas.addEventListener('pointerup',e=>{const p=getPointer(e);if(mode==='select'){if(dragState)commitIllustrationEdit();dragState=null;return}if(!start)return;if(mode==='rect'){const r=normalizeRect(start,p);if(r.w>8&&r.h>8)addShape({type:'rect',...r})}else if(mode==='arrow'){if(dist(start,p)>10)addShape({type:'arrow',x1:start.x,y1:start.y,x2:p.x,y2:p.y})}else if(mode==='callout'){if(dist(start,p)>14){const t=getText()||`Шаг ${nextNumber}`;addShape({type:'callout',x1:start.x,y1:start.y,x2:p.x,y2:p.y,labelX:p.x+12,labelY:p.y-8,n:nextNumber++,text:t,maxW:Math.min(260,canvas.width*.34)})}}start=null;preview=null;draw()});
+  canvas.addEventListener('pointercancel',()=>{
+    // Interrupted drag returns to the last committed edit.
+    if(mode==='select'&&dragState&&photoHistory)restoreIllustrationSnapshot(photoHistory.current());
+    dragState=null;start=null;preview=null;draw();
+  });
+  canvas.addEventListener('dblclick',e=>{const hit=hitTest(getPointer(e));if(!hit)return;const s=shapes[hit.index];if(s.type==='label'||s.type==='callout'){primary=hit.index;selected.clear();selected.add(hit.index);const next=window.prompt('Изменить текст подписи',s.text||'');if(next!=null){s.text=String(next).trim();textInput.value=s.text;draw();commitIllustrationEdit()}}});
 
-  const close=()=>{window.removeEventListener('keydown',onKey);overlay.remove();previouslyFocused?.focus?.()};overlay.querySelector('#illClose').onclick=close;overlay.querySelector('#illCancel').onclick=close;
+  const close=(saved=false)=>{
+    if(!saved&&photoHistory?.dirty(photoSnapshot())&&
+       !window.confirm('Разметка изменена, но не сохранена. Закрыть редактор без сохранения?'))return false;
+    window.removeEventListener('keydown',onKey);overlay.remove();previouslyFocused?.focus?.();return true;
+  };
+  overlay.querySelector('#illClose').onclick=()=>close();
+  overlay.querySelector('#illCancel').onclick=()=>close();
   overlay.querySelector('#illSave').onclick=async()=>{
     selected.clear();primary=-1;draw();
     const annotations=sanitizeIllustrationAnnotations(shapes.map(cloneShape));
@@ -214,10 +250,14 @@ async function openIllustrationEditor(stepId){
     step.hasPhoto=true;
     step.photoEdited=!!annotations.length;
     step.photoAnnotations=annotations;
-    close();renderSteps();stateChanged(false);toast(annotations.length?'Иллюстрация сохранена. Пометки можно редактировать повторно.':'Фото сохранено без пометок. Исходник оставлен без изменений.','success')
+    close(true);renderSteps();stateChanged(false);toast(annotations.length?'Иллюстрация сохранена. Пометки можно редактировать повторно.':'Фото сохранено без пометок. Исходник оставлен без изменений.','success')
   };
 
   recomputeNumbers();
-  modeButtons.find(b=>b.dataset.illMode==='select')?.click();draw();overlay.querySelector('#illClose')?.focus();
+  modeButtons.find(b=>b.dataset.illMode==='select')?.click();draw();
+  photoHistory=stage30CreatePhotoHistory(photoSnapshot());
+  updateHistoryButtons();
+  setIllustrationZoom(1,true);
+  overlay.querySelector('#illClose')?.focus();
 }
 
