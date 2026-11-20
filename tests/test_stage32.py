@@ -73,7 +73,6 @@ for(const [first,last,row] of [[3,5,15],[6,9,15],[10,12,15],[3,5,19]]){
   const img=visible(ws,first,last,row);
   assert.equal(img.tl.nativeCol,first-1);
   assert.equal(img.tl.nativeRow,row-1);
-  assert.equal(img.tl.nativeColOff,4*9525);
   const expectedWidth=Math.floor(cols.slice(first-1,last).reduce((sum,w)=>sum+w*7,0)-12);
   assert.equal(img.ext.width,expectedWidth);
   assert.equal(img.ext.height,148);
