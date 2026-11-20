@@ -96,3 +96,26 @@ jobs:
           python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage33-frv-research-to-sop-browser-candidate.html'; m.main()"
       - name: Real Windows FRV research and XLSX photo roundtrip
         run: python qa/stage33_browser_smoke.py
+      - name: Upload Windows-tested Stage33 HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage33-windows-verified-html
+          path: releases/stage33-frv-research-to-sop-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish verified HTML from successful Windows acceptance
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage33-frv-research-to-sop-20261120'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage33-frv-research-to-sop-20261120
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; do not publish stale HTML."
+            exit 0
+          fi
+          git add releases/stage33-frv-research-to-sop-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage33 standalone HTML verified on Windows"
+            git push origin HEAD:feature/stage33-frv-research-to-sop-20261120
+          fi
