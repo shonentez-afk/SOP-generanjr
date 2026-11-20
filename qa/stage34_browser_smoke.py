@@ -58,6 +58,7 @@ def stage34_library_and_reports():
             page.locator("#frvStudyOpenBtn").click()
             page.wait_for_selector("#frvStudyLibraryItems [data-frv-open]",timeout=12000)
             page.locator('#frvStudyLibraryItems [data-frv-open]').first.click()
+            page.wait_for_function("(id) => state.frvStudy?.libraryId === id",arg=study_id,timeout=15000)
             stored=page.evaluate("""() => ({
               id:state.frvStudy.libraryId,name:state.frvStudy.operationId,
               rows:state.frvStudy.cycles[0].observations.length,
