@@ -12,9 +12,13 @@ def old_excel_and_photo_regression():
     spec=importlib.util.spec_from_file_location("stage32_in_33",
         ROOT/"qa/stage32_excel_photo_cell_fit.py")
     old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)
+    # Historic Stage22 regression expected FRV AI suggestions to become real
+    # measured cycles. Run that accepted suite against the frozen Stage32.2
+    # baseline, then validate the Stage33 photo export with new semantics.
+    old.inherited_regression()
     old.RELEASE=RELEASE
     old.SAMPLE=ROOT/"artifacts/stage33-stage32-photo-regression.xlsx"
-    old.main()
+    old.photo_cell_acceptance()
 
 def frv_research_to_new_sop():
     with sync_playwright() as pw:
