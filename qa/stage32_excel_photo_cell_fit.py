@@ -89,8 +89,13 @@ def verify_real_xlsx(path,source_hashes):
             full_width=sum(_column_emu(ws,c) for c in range(left+1,right+2))
             # For actual Excel desktop, stored column width units *7 px is
             # closer to visible pixels than the old +5 px per-column formula.
-            expected_width=int(sum((ws.column_dimensions[get_column_letter(c)].width or 8.43)*7
-                for c in range(left+1,right+2)))-12
+            # openpyxl column_dimensions[letter] creates a phantom default
+            # width=13 when ExcelJS omitted an explicit width=9 (column I).
+            # Use .get() without mutation, matching the export manifest width.
+            def width_chars(c):
+                item=ws.column_dimensions.get(get_column_letter(c))
+                return item.width if item and item.width is not None else 9
+            expected_width=int(sum(width_chars(c)*7 for c in range(left+1,right+2)))-12
             assert abs(anchor.ext.width/9525-expected_width)<=1,(key,anchor.ext.width/9525,expected_width)
             assert anchor.ext.width < full_width
             assert anchor.ext.height==148*9525,("Photo frame height changed",key,anchor.ext.height/9525)
