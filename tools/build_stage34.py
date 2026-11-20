@@ -47,8 +47,8 @@ REQUIRED={
 def build()->str:
     spec=json.loads(MANIFEST.read_text(encoding="utf-8"))
     modules=spec["modules"]
-    if spec.get("schemaVersion")!=1 or len(modules)!=61 or len(set(modules))!=58:
-        raise AssertionError("Stage34 expects 58 unique JS modules")
+    if spec.get("schemaVersion")!=1 or len(modules)!=61 or len(set(modules))!=61:
+        raise AssertionError("Stage34 expects 61 unique JS modules")
     if "src/modules/photos/stage30-illustration-editor.js" in modules:
         raise AssertionError("Stage30 editor must be replaced in Stage34, not duplicated")
     if modules.count("src/modules/photos/stage31-illustration-editor.js")!=1:
