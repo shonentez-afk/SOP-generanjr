@@ -121,10 +121,15 @@ function frvStudyCommitPending(){
     await frv34StorePut(job.record);
     // A prior study's completed transaction must not update the current
     // study's indicator or mask later unsaved revisions.
-    if(job.seq===frv34SaveSeq &&
-       ensureFrvStudy().libraryId===job.record.id && !frv34Pending)
-      {frv35RememberActive(job.record.id);
-       frvStudySaveIndicator('Сохранено локально · '+new Date().toLocaleTimeString('ru-RU'),'saved');}
+    if(job.seq===frv34SaveSeq&&!frv34Pending){
+      // docNew()/docOpen() may replace state.frvStudy while the prior
+      // observation is being written. Remember the successfully committed
+      // independent study even when the SOP has already switched.
+      frv35RememberActive(job.record.id);
+      if(state.frvStudy?.libraryId===job.record.id)
+        frvStudySaveIndicator('Сохранено локально · '+
+          new Date().toLocaleTimeString('ru-RU'),'saved');
+    }
   }).catch(e=>{
     if(ensureFrvStudy().libraryId===job.record.id){
       if(!frv34Pending||frv34Pending.seq<job.seq)frv34Pending=job;
@@ -225,11 +230,16 @@ async function frvStudySwitchTo(d,{persist=true}={}){
   }
 }
 async function frv35RestoreActiveStudy(){
-  const id=frv35SelectedStudyId;
-  if(!id||frv34SwitchBusy||state.frvStudy?.libraryId===id)return;
+  if(frv34SwitchBusy)return;
+  if(!frv35SelectedStudyId&&!frv34Pending)return;
+  if(!frv34Pending&&state.frvStudy?.libraryId===frv35SelectedStudyId)return;
   frv34SetSwitchBusy(true);
   try{
+    // Flush a pending study first; its successful commit can establish the
+    // very first selected ID after a rapid switch to another SOP.
     await frvStudyFlush();
+    const id=frv35SelectedStudyId;
+    if(!id||state.frvStudy?.libraryId===id)return;
     const rec=await frv34StoreGet(id);
     if(!rec?.payload){
       frv35ClearActiveId();
