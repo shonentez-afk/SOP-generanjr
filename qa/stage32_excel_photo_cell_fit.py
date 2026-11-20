@@ -91,7 +91,7 @@ def verify_real_xlsx(path,source_hashes):
             # closer to visible pixels than the old +5 px per-column formula.
             expected_width=int(sum((ws.column_dimensions[get_column_letter(c)].width or 8.43)*7
                 for c in range(left+1,right+2)))-12
-            assert abs(anchor.ext.width-expected_width)<=1,(key,anchor.ext.width,expected_width)
+            assert abs(anchor.ext.width/9525-expected_width)<=1,(key,anchor.ext.width/9525,expected_width)
             assert anchor.ext.width < full_width
             assert anchor.ext.height==148,("Photo frame height changed",key,anchor.ext.height)
         found[key].append((is_foreground,anchor,digest))
