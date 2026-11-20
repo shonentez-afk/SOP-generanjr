@@ -58,7 +58,9 @@ const vm=require('node:vm'),assert=require('node:assert/strict');
 const scope={state:{frvStudy:null,steps:[]},$:(id)=>null,escapeHtml:String,
   saveDraft:()=>{},saveDraftDebounced:()=>{},frvStudyQueuePersist:()=>{},
   frvStudyHasBackup:()=>false,toast:()=>{},
-  localStorage:{getItem:()=>null},createEmptyStep:()=>({id:42,
+  localStorage:{getItem:()=>null},
+  frvStudyInternalId:d=>(d.libraryId||(d.libraryId='study-35-test')),
+  createEmptyStep:()=>({id:42,
     action:'',frv:{},keyMoments:[''],durationSeconds:0})};
 vm.createContext(scope);vm.runInContext(SOURCE,scope);
 const d=scope.ensureFrvStudy();
