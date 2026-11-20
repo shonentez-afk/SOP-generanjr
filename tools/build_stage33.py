@@ -23,7 +23,7 @@ REQUIRED={
     "src/modules/ai/stage28-review-task.js",
     "src/modules/documents/stage28-review-state.js",
     "src/modules/documents/stage27-db.js",
-    "src/modules/documents/stage27-draft.js",
+    "src/modules/documents/stage33-draft.js",
     "src/modules/documents/stage27-library.js",
     "src/modules/core/stage19-config.js",
     "src/modules/ai/stage26-transport.js",
@@ -60,6 +60,7 @@ def build()->str:
         "src/modules/frv/stage19-study-io.js",
         "src/modules/frv/stage26-study-ai.js",
         "src/modules/frv/stage19-study.js",
+        "src/modules/documents/stage27-draft.js",
     )):
         raise AssertionError("Stage33 legacy FRV modules must be replaced, not duplicated")
     if spec.get("static",{}).get("betweenVendorIcons")!="src/app/stage33-between-vendor-icons.html":
