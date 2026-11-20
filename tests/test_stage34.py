@@ -51,7 +51,8 @@ class Stage34Contracts(unittest.TestCase):
           'id="frvStudyClassifyBtn"'):
             self.assertEqual(html.count(marker),1,marker)
         self.assertIn("sopExcelPhotoForeground(ws,s._excelPhoto,frame)",html)
-        self.assertIn("_ФОТО_STAGE32_2.xlsx",html)
+        self.assertIn("_ФОТО_STAGE32_2",html)
+        self.assertIn("_ФРВ_ПРОВЕРИТЬ",html)
 
     def test_new_module_javascript_syntax(self):
         for file in NEW:
@@ -90,7 +91,7 @@ assert.equal(scope.computeFrv(steps).errors.length,1);
   assert.equal(snapshot[5].frv.m1,'');
   assert.equal(snapshot[5].frv.m2,'');
   assert.match(snapshot[5]._sopFrvExportWarning,/ФРВ не подтверждена/);
-  assert.deepEqual(scope.computeFrv(snapshot).errors,[]);
+  assert.equal(scope.computeFrv(snapshot).errors.length,0);
   assert.equal(JSON.stringify(steps),original,
     'Never mutate actual SOP values or independent FRV study');
   assert.equal(scope.state.frvStudy.studyId,'unrelated');
