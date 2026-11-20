@@ -71,9 +71,16 @@ def frv_research_to_new_sop():
             page.locator('[data-frvs-step="plannedTimeSec"]').nth(0).fill("27")
             assert page.evaluate("""() => state.frvStudy.cycles[0].observations[0].durationSec""")==28.5
             # Introduce an already open SOP, including a reserved image record.
-            page.evaluate("""() => {
+            page.evaluate("""async () => {
               const old=createEmptyStep();old.action='НЕ СТИРАТЬ СТАРЫЙ СОП';
               old.durationSeconds=60;old.keyMoments=['Исходный пункт'];
+              const c=document.createElement('canvas');c.width=80;c.height=50;
+              c.getContext('2d').fillRect(0,0,80,50);
+              const photo=await new Promise(resolve=>c.toBlob(resolve,'image/png'));
+              if(!photo||!(await idbPutPhoto(old.id,photo,'png')))throw new Error('Photo backup fixture failed');
+              old.hasPhoto=true;old.imageExt='png';
+              old.imageData=c.toDataURL('image/png');
+              old.imageBuffer=await photo.arrayBuffer();
               state.steps=[old];
               state.meta.operation='Существующий СОП';
               state.documentManager.status='Черновик';
@@ -100,6 +107,9 @@ def frv_research_to_new_sop():
             assert transfer=={"project":"Проверка электропитания","count":2,
                 "duration":27,"measured":28.5,"planned":27,
                 "source":1,"unaltered":28.5,"backup":True,"twi":False},transfer
+            persisted=page.evaluate("""() => collectDraft().steps[0].frvSource""")
+            assert persisted["observedTimeSec"]==28.5 and persisted["projectTimeSec"]==27
+            assert len(persisted["observationIds"])==1
             # Return to previous SOP and verify source draft is retained.
             page.locator('[data-tab="frvstudy"]').click()
             page.locator("#frvStudyRestoreBtn").click()
@@ -108,6 +118,9 @@ def frv_research_to_new_sop():
             page.wait_for_function("""() => state.steps.length===1 &&
               state.steps[0].action==='НЕ СТИРАТЬ СТАРЫЙ СОП'""",timeout=15000)
             assert page.evaluate("() => state.meta.operation")=="Существующий СОП"
+            page.wait_for_function("() => !!state.steps[0].imageData && !!state.steps[0].hasPhoto",timeout=15000)
+            assert page.evaluate("() => state.steps[0].id===window.__oldId")
+            assert page.evaluate("async () => !!(await idbGetPhoto(state.steps[0].id))?.blob")
             assert page.evaluate("() => state.frvStudy.cycles[0].observations.length")==3
             # New AI suggestions never become measured cycles by themselves.
             page.evaluate("""() => {
