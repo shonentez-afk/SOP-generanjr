@@ -1,6 +1,6 @@
 # Stage33 — самостоятельный «Анализ ФРВ» → новый проект СОП
 
-**Статус: Stage33 кандидат, CI Linux и Windows PASS, пользовательская приёмка ещё требуется.** Принятая Stage32.2 не менялась в `main`. [Отправной аудит](https://github.com/shonentez-afk/SOP-generanjr/blob/main/docs/FRV_ANALYSIS_UX_AUDIT_STAGE32_RU.md).
+**Статус: Stage33 объединена с `main` через [PR #28](https://github.com/shonentez-afk/SOP-generanjr/pull/28), commit `c3aa03ad9d36`.** На её основе далее принята Stage34.1 через PR #29; сведения ниже о кандидатах описывают первоначальный этап приёмки. [Отправной аудит](https://github.com/shonentez-afk/SOP-generanjr/blob/main/docs/FRV_ANALYSIS_UX_AUDIT_STAGE32_RU.md).
 
 ## Назначение двух вкладок
 
@@ -52,3 +52,7 @@
 На Windows пройдены собственный браузерный сценарий и регресс XLSX/фото/пользовательских черновиков. На реальном ПК пользователя **Stage33 ещё не проверен**, поэтому PR остаётся черновиком и `main` остаётся на принятой Stage32.2.
 
 **Проверенная сборка:** [Stage33 HTML](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage33-frv-research-to-sop-20261120/releases/stage33-frv-research-to-sop-browser-candidate.html).
+
+## Итог (20.11.2026)
+
+Реализация Stage33 вошла в `main` и стала основой принятой Stage34.1. Полный предварительный регресс Stage33 был PASS Linux/Windows ([#44672910744](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44672910744)); интеграционный Stage34.1 PASS Linux/Windows, 93/93 unit ([#44679110252](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/44679110252)). Пользователь подтвердил исправление проблемы экспорта СОП после работы в отдельном анализе ФРВ. **Рабочий HTML** находится в `releases/stage34-frv-study-library-analysis-browser-candidate.html` на `main`, не в исторической Stage33 ветке.
