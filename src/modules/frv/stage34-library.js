@@ -3,6 +3,27 @@
 // IndexedDB's transaction completes; file:// browser storage is not a backup.
 const FRV34_DB='SOP_FRV_Research_v1',FRV34_STORE='studies';
 let frv34Pending=null,frv34Timer=null,frv34SaveSeq=0,frv34Chain=Promise.resolve();
+// Disable editable controls while switching studies. Otherwise a fast first
+// keystroke can land in the previous study before the awaited IndexedDB save
+// and the new state assignment completes.
+let frv34SwitchBusy=false;
+function frv34SetSwitchBusy(busy){
+  frv34SwitchBusy=!!busy;
+  const root=$('tab-frvstudy');
+  if(!root)return;
+  root.setAttribute('aria-busy',busy?'true':'false');
+  for(const el of root.querySelectorAll('button,input,select,textarea')){
+    if(busy){
+      if(el.dataset.frv34PrevDisabled===undefined)
+        el.dataset.frv34PrevDisabled=el.disabled?'1':'0';
+      el.disabled=true;
+    }else if(el.dataset.frv34PrevDisabled!==undefined){
+      el.disabled=el.dataset.frv34PrevDisabled==='1';
+      delete el.dataset.frv34PrevDisabled;
+    }
+  }
+  if(busy)frvStudySaveIndicator('Открываю исследование…','pending');
+}
 function frvStudyNewId(){
   return 'frv-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,11);
 }
@@ -170,6 +191,8 @@ async function frvStudySwitchTo(d,{persist=true}={}){
   saveDraft();renderFrvStudy();
 }
 async function frvStudyCreateNew(){
+  if(frv34SwitchBusy)return;
+  frv34SetSwitchBusy(true);
   try{
     await frvStudyFlush();
     const current=ensureFrvStudy();
@@ -182,8 +205,11 @@ async function frvStudyCreateNew(){
     frvStudyShowLibrary(false);
     toast('Создано новое самостоятельное исследование ФРВ','success');
   }catch(e){toast('Не удалось создать исследование: '+e.message,'error')}
+  finally{frv34SetSwitchBusy(false)}
 }
 async function frvStudyOpenById(id){
+  if(frv34SwitchBusy)return;
+  frv34SetSwitchBusy(true);
   try{
     await frvStudyFlush();
     const rec=await frv34StoreGet(id);
@@ -193,8 +219,11 @@ async function frvStudyOpenById(id){
     frvStudyShowLibrary(false);
     toast('Исследование открыто','success');
   }catch(e){toast('Не удалось открыть: '+e.message,'error')}
+  finally{frv34SetSwitchBusy(false)}
 }
 async function frvStudyCopyById(id){
+  if(frv34SwitchBusy)return;
+  frv34SetSwitchBusy(true);
   try{
     await frvStudyFlush();
     const rec=await frv34StoreGet(id);
@@ -206,6 +235,7 @@ async function frvStudyCopyById(id){
     await frvStudySwitchTo(d);
     frvStudyShowLibrary(false);
   }catch(e){toast('Не удалось создать копию: '+e.message,'error')}
+  finally{frv34SetSwitchBusy(false)}
 }
 async function frvStudyArchiveById(id){
   if(!confirm('Перенести исследование в архив? Оно останется доступным.'))return;
@@ -245,8 +275,9 @@ async function frvStudyRefreshLibrary(){
   box.querySelectorAll('[data-frv-archive]').forEach(b=>b.onclick=()=>frvStudyArchiveById(b.dataset.frvArchive));
 }
 async function frvStudyRestoreFromFile(file){
+  if(!file||frv34SwitchBusy)return;
+  frv34SetSwitchBusy(true);
   try{
-    if(!file)return;
     if(file.size>8*1024*1024)throw new Error('Резервная копия слишком большая');
     const d=frv34RestoreExport(JSON.parse(await file.text()));
     const count=d.cycles.reduce((sum,c)=>sum+(c.observations||[]).length,0);
@@ -254,6 +285,7 @@ async function frvStudyRestoreFromFile(file){
     await frvStudySwitchTo(d);
     toast('Копия восстановлена отдельным исследованием','success');
   }catch(e){toast('Не удалось восстановить JSON: '+e.message,'error')}
+  finally{frv34SetSwitchBusy(false)}
 }
 (function bindFrv34Library(){
   $('frvStudyNewBtn')?.addEventListener('click',frvStudyCreateNew);
