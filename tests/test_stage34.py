@@ -16,14 +16,18 @@ NEW=[
  "src/modules/frv/stage34-library.js",
  "src/modules/frv/stage34-analytics.js",
  "src/modules/frv/stage34-xlsx.js",
+ "src/modules/frv/stage34-measurements.js",
+ "src/modules/frv/stage34-sop-frv-guard.js",
+ "src/modules/editor/stage34-steps.js",
+ "src/modules/excel/stage34-export.js",
 ]
 class Stage34Contracts(unittest.TestCase):
     def test_isolated_release_and_protected_bundles(self):
         stage34.verify_static()
         spec=json.loads(stage34.MANIFEST.read_text(encoding="utf-8"))
         old=json.loads((ROOT/"src/app/stage33-parts.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(spec["modules"]),61)
-        self.assertEqual(len(set(spec["modules"])),61)
+        self.assertEqual(len(spec["modules"]),62)
+        self.assertEqual(len(set(spec["modules"])),62)
         self.assertEqual(spec["static"]["betweenVendorIcons"],"src/app/stage34-between-vendor-icons.html")
         lost=set(old["modules"])-set(spec["modules"])
         added=set(spec["modules"])-set(old["modules"])
@@ -31,7 +35,10 @@ class Stage34Contracts(unittest.TestCase):
           "src/modules/frv/stage33-study-model.js",
           "src/modules/frv/stage33-study-io.js",
           "src/modules/frv/stage33-study-ai.js",
-          "src/modules/frv/stage33-study.js"})
+          "src/modules/frv/stage33-study.js",
+          "src/modules/frv/stage33-measurements.js",
+          "src/modules/editor/stage19-steps.js",
+          "src/modules/excel/stage33-export.js"})
         self.assertEqual(added,set(NEW))
         html=stage34.build()
         for function in ("frv34DbOpen","frvStudyQueuePersist","frvStudyRestoreFromFile",
@@ -52,6 +59,63 @@ class Stage34Contracts(unittest.TestCase):
             result=subprocess.run(["node","--check","-"],input=content,
               text=True,capture_output=True)
             self.assertEqual(result.returncode,0,file+": "+result.stderr)
+
+    def test_independent_sop_frvs_dont_break_export(self):
+        source="\n".join((ROOT/p).read_text(encoding="utf-8") for p in (
+            "src/modules/frv/stage34-measurements.js",
+            "src/modules/frv/stage34-sop-frv-guard.js"))
+        script=r"""
+const vm=require('node:vm'),assert=require('node:assert/strict');
+let answer='export',lastDialog=null;
+const scope={
+ state:{steps:[],frvStudy:{studyId:'unrelated'}},escapeHtml:String,
+ aiReviewChoiceModal:async p=>{lastDialog=p;return answer;},
+ formatHMS:s=>String(s),
+ setTimeout:()=>{}
+};
+vm.createContext(scope);vm.runInContext(SOURCE,scope);
+let steps=Array.from({length:6},(_,i)=>({
+ id:i+1,action:'Действие '+(i+1),durationSeconds:30,
+ frv:{vdc:false,m1:'',m2:'',move:''}
+}));
+steps[5].frv.m1=52;steps[5].frv.m2=8;
+const original=JSON.stringify(steps);
+assert.equal(scope.sopFrvExportIssues(steps).length,1);
+assert.equal(scope.computeFrv(steps).errors.length,1);
+(async()=>{
+  const snapshot=structuredClone(steps);
+  const outcome=await scope.sopFrvCheckBeforeExcel({steps:snapshot});
+  assert.equal(outcome.proceed,true);
+  assert.equal(outcome.excluded.length,1);
+  assert.equal(snapshot[5].frv.m1,'');
+  assert.equal(snapshot[5].frv.m2,'');
+  assert.match(snapshot[5]._sopFrvExportWarning,/ФРВ не подтверждена/);
+  assert.deepEqual(scope.computeFrv(snapshot).errors,[]);
+  assert.equal(JSON.stringify(steps),original,
+    'Never mutate actual SOP values or independent FRV study');
+  assert.equal(scope.state.frvStudy.studyId,'unrelated');
+  assert.match(lastDialog.details,/Шаг 6/);
+  assert.match(lastDialog.details,/М1 \+ М2 = 60 с, длительность = 30 с/);
+  answer='cancel';
+  const cancelled=await scope.sopFrvCheckBeforeExcel({steps:structuredClone(steps)});
+  assert.equal(cancelled.proceed,false);
+  const derived={durationSeconds:60,
+    frv:{m1:60,m2:'',vdc:false,autoFullStep:true},
+    frvSource:{observedTimeSec:52.5}};
+  derived.durationSeconds=25;
+  assert.equal(scope.sopFrvRefreshProjectedPart(derived,60),true);
+  assert.equal(derived.frv.m1,25);
+  assert.equal(derived.frvSource.observedTimeSec,52.5);
+  derived.frv.autoFullStep=false;
+  derived.durationSeconds=20;
+  assert.equal(scope.sopFrvRefreshProjectedPart(derived,25),false);
+  assert.equal(derived.frv.m1,25);
+  console.log('PASS Stage34.1: safe SOP export, step6 mismatch, cancelled validation, measured FRV separation');
+})().catch(e=>{console.error(e);process.exitCode=1});
+"""
+        result=subprocess.run(["node","-e","const SOURCE="+json.dumps(source)+";\n"+script],
+          capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+"\n"+result.stderr)
 
     def test_analytics_no_invented_measurements(self):
         source="\n".join((ROOT/p).read_text(encoding="utf-8")
