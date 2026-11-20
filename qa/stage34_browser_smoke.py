@@ -82,6 +82,7 @@ def stage34_library_and_reports():
             }""")
             assert result=={"total":115,"loss":43,"missing":0,"pareto":[28,15],
               "comparable":False,"baseline":70,"after":45},result
+            page.locator('summary:has-text("Сравнение «до / после»")').click()
             page.locator("#frv34CompareApproved").check()
             assert page.evaluate("() => frv34AnalyticsData().comparison.deltaSec")==25
             assert page.evaluate("() => frv34AnalyticsData().comparison.deltaPct")>35
@@ -100,6 +101,7 @@ def stage34_library_and_reports():
             page.locator("#frv34AiClassifications [data-frv34-classify]").first.click()
             assert page.evaluate("() => state.frvStudy.cycles[0].observations[1].lossCode")=="search_tool"
             # Exact backup roundtrip; do not overwrite another study.
+            page.locator('summary:has-text("Резервная копия JSON")').click()
             with page.expect_download() as d:
                 page.locator("#frvStudyDownloadBtn").click()
             json_path=OUT/"stage34-frv-study-backup.json"
