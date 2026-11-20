@@ -6,6 +6,8 @@ on:
       - 'src/app/stage34-*.html'
       - 'src/app/stage34-parts.json'
       - 'src/modules/frv/stage34-*.js'
+      - 'src/modules/editor/stage34-steps.js'
+      - 'src/modules/excel/stage34-export.js'
       - 'tools/build_stage34.py'
       - 'tests/test_stage34.py'
       - 'qa/stage34_browser_smoke.py'
@@ -52,6 +54,7 @@ jobs:
             releases/stage34-frv-study-library-analysis-browser-candidate.html
             artifacts/stage34-frv-study-report.xlsx
             artifacts/stage34-frv-study-backup.json
+            artifacts/stage34-sop-with-unverified-frv.xlsx
             artifacts/stage33-stage32-photo-regression.xlsx
           if-no-files-found: error
           retention-days: 30
