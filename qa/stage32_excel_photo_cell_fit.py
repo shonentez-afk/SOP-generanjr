@@ -93,7 +93,7 @@ def verify_real_xlsx(path,source_hashes):
                 for c in range(left+1,right+2)))-12
             assert abs(anchor.ext.width/9525-expected_width)<=1,(key,anchor.ext.width/9525,expected_width)
             assert anchor.ext.width < full_width
-            assert anchor.ext.height==148,("Photo frame height changed",key,anchor.ext.height)
+            assert anchor.ext.height==148*9525,("Photo frame height changed",key,anchor.ext.height/9525)
         found[key].append((is_foreground,anchor,digest))
     assert set(found)==set(expected),("Missing photo areas",found.keys())
     for key,hits in found.items():
