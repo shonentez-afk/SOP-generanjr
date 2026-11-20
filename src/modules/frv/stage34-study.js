@@ -94,7 +94,10 @@ function frvStudySourceStep(x,d){
   s.frv={vdc:x.valueType==='VA',
     m2:x.valueType==='NVA_Necessary'?s.durationSeconds:'',
     m1:x.valueType==='NVA_Waste'?s.durationSeconds:'',
-    move:x.distanceM??'',comment:String(x.comment||'')};
+    move:x.distanceM??'',comment:String(x.comment||''),
+    // Derived *project* allocation, not a new measured fact. The source
+    // measured seconds stay immutable in s.frvSource.
+    autoFullStep:['NVA_Necessary','NVA_Waste'].includes(x.valueType)};
   s.frvSource={studyId:d.studyId||'',observationId:x.sourceObservationId||'',
     observationIds:[...x.sourceObservationIds],cycleNo:x.sourceCycleNo??null,
     cycleNos:[...x.sourceCycleNos],observedTimeSec:x.observedTimeSec,
