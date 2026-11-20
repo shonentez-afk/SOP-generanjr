@@ -30,73 +30,86 @@ def _column_emu(ws,col):
     return round((width*7+5)*9525)
 
 def verify_real_xlsx(path,source_hashes):
+    """Real XLSX: two layered images per photo, visible cells filled, foreground intact."""
+    from collections import defaultdict
+    from io import BytesIO
+    from PIL import Image
+    from xml.etree import ElementTree as ET
     with zipfile.ZipFile(path) as z:
         assert z.testzip() is None,"Corrupted XLSX"
-        media=[z.read(k) for k in z.namelist() if k.startswith("xl/media/")]
-        hashes={hashlib.sha256(data).hexdigest() for data in media}
-        assert set(source_hashes).issubset(hashes),(source_hashes,hashes)
+        media={k:z.read(k) for k in z.namelist() if k.startswith("xl/media/")}
+        hashes={hashlib.sha256(data).hexdigest() for data in media.values()}
+        assert set(source_hashes).issubset(hashes),"Original step images missing"
         drawings=[z.read(k) for k in z.namelist()
             if k.startswith("xl/drawings/drawing") and k.endswith(".xml")]
         assert drawings,"Excel drawing anchors missing"
         drawing=b"".join(drawings)
-        assert drawing.count(b"<xdr:oneCellAnchor>")>=4,"Expected 4 explicit-size one-cell picture anchors"
-        assert b"<xdr:oneCellAnchor editAs=" not in drawing,"Invalid ExcelJS oneCellAnchor editAs must be removed"
-        assert b"<xdr:twoCellAnchor editAs=\"oneCell\"" in drawing,"Logo geometry must be unchanged"
-        from xml.etree import ElementTree as ET
-        root=ET.fromstring(drawings[0])
+        assert drawing.count(b"<xdr:oneCellAnchor>")>=8,"Expected 4 image-background pairs"
+        assert b"<xdr:oneCellAnchor editAs=" not in drawing,"Invalid ExcelJS anchor"
+        assert b"<xdr:twoCellAnchor editAs=\"oneCell\"" in drawing,"Original logo geometry changed"
         ns={"xdr":"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing",
             "a":"http://schemas.openxmlformats.org/drawingml/2006/main"}
-        for anchor in root.findall("xdr:oneCellAnchor",ns):
-            assert anchor.find("xdr:pic/xdr:spPr/a:xfrm",ns) is None,"Zero-sized ExcelJS photo transform remained"
-            assert anchor.find("xdr:pic/xdr:nvPicPr/xdr:cNvPicPr/a:picLocks",ns) is None,"Photo aspect lock remained"
+        for drawing_xml in drawings:
+            root=ET.fromstring(drawing_xml)
+            for anchor in root.findall("xdr:oneCellAnchor",ns):
+                assert anchor.find("xdr:pic/xdr:spPr/a:xfrm",ns) is None,"Zero picture transform"
+                assert anchor.find("xdr:pic/xdr:nvPicPr/xdr:cNvPicPr/a:picLocks",ns) is None,"Picture aspect lock"
     wb=load_workbook(path)
     assert wb.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],wb.sheetnames
     ws=wb["СОП"]
-    if len(ws._images)!=5:
-        import json
-        with zipfile.ZipFile(path) as diag:
-            names=diag.namelist()
-            print("STAGE32_DRAWING_DIAG",json.dumps({
-                "imagesRead":len(ws._images),
-                "xml":{name:diag.read(name).decode("utf-8","replace")[:9500]
-                    for name in names
-                    if (name.startswith("xl/drawings/") and name.endswith(".xml"))
-                       or name=="xl/worksheets/_rels/sheet1.xml.rels"},
-                "sheetTail":diag.read("xl/worksheets/sheet1.xml").decode("utf-8","replace")[-2400:],
-            },ensure_ascii=False),flush=True)
-    assert len(ws._images)==5,("Four step photos plus unchanged logo",len(ws._images))
-    expected={(14,2,4),(14,5,8),(14,9,11),(18,2,4)}
-    seen=set()
+    assert len(ws._images)==9,("4 original foreground + 4 backgrounds + logo",len(ws._images))
+    expected=[(14,2,4),(14,5,8),(14,9,11),(18,2,4)]
+    found=defaultdict(list)
+    photos_set=set(source_hashes)
     for picture in ws._images:
         anchor=picture.anchor
         if not hasattr(anchor,"ext"):
-            continue  # Previous logo remains a separate twoCellAnchor.
+            continue # The original template logo uses a two-cell anchor.
         a=anchor._from
         if a.row not in (14,18):
             continue
-        next_col={2:4,5:8,9:11}[a.col]
-        key=(a.row,a.col,next_col)
-        assert key in expected,("Unexpected photo region",key)
-        assert key not in seen,("Duplicate image region",key)
-        seen.add(key)
-        assert a.colOff==4*9525 and a.rowOff==4*9525,(a.colOff,a.rowOff)
-        full_width=sum(_column_emu(ws,c) for c in range(a.col+1,next_col+2))
-        displayed=anchor.ext.width
-        ratio=displayed/full_width
-        assert .94<ratio<1.0,("Explicit Excel photo width does not fill cell",key,ratio)
-        row=ws.row_dimensions[a.row+1]
-        full_height=round((row.height or 15)*12700)
-        h_ratio=anchor.ext.height/full_height
-        assert .94<h_ratio<1.0,("Explicit Excel photo height does not fill row",key,h_ratio)
-        assert type(anchor).__name__=="OneCellAnchor","Use Excel's explicit xdr:ext size"
-        print("EXPLICIT_PHOTO_SIZE",key,"width",round(ratio*100,1),
-              "%","height",round(h_ratio*100,1),"%",flush=True)
-    assert seen==expected,("Missing image extents",seen,expected)
+        if 2<=a.col<=4: left,right=2,4
+        elif 5<=a.col<=8: left,right=5,8
+        elif 9<=a.col<=11: left,right=9,11
+        else: raise AssertionError(("Image started outside SOP photo groups",a.col))
+        key=(a.row,left,right)
+        assert key in expected,("Unexpected image rectangle",key)
+        data=picture._data()
+        digest=hashlib.sha256(data).hexdigest()
+        is_foreground=digest in photos_set
+        native_width,native_height=Image.open(BytesIO(data)).size
+        assert native_width>0 and native_height>0
+        displayed=anchor.ext.width/anchor.ext.height
+        if is_foreground:
+            ratio=native_width/native_height
+            assert abs(displayed/ratio-1)<.025,("Photo stretched!",key,ratio,displayed)
+        else:
+            assert a.col==left and a.colOff==6*9525
+            assert a.rowOff==6*9525
+            full_width=sum(_column_emu(ws,c) for c in range(left+1,right+2))
+            # For actual Excel desktop, stored column width units *7 px is
+            # closer to visible pixels than the old +5 px per-column formula.
+            expected_width=int(sum((ws.column_dimensions[get_column_letter(c)].width or 8.43)*7
+                for c in range(left+1,right+2)))-12
+            assert abs(anchor.ext.width-expected_width)<=1,(key,anchor.ext.width,expected_width)
+            assert anchor.ext.width < full_width
+            assert anchor.ext.height==148,("Photo frame height changed",key,anchor.ext.height)
+        found[key].append((is_foreground,anchor,digest))
+    assert set(found)==set(expected),("Missing photo areas",found.keys())
+    for key,hits in found.items():
+        assert len(hits)==2 and not hits[0][0] and hits[1][0],("Wrong image layering",key,hits)
+        bg=hits[0][1]; fg=hits[1][1]
+        assert fg.ext.width<=bg.ext.width and fg.ext.height<=bg.ext.height,(key,fg.ext,bg.ext)
+        assert hits[1][2]==source_hashes[expected.index(key)],("Original order mismatch",key)
+        # Check shape extents without relying on a graphic program that
+        # discards image crops or silently distorts native proportions.
+        print("PHOTO_PAIR",key,"background_px",(round(bg.ext.width/9525),round(bg.ext.height/9525)),
+              "foreground_px",(round(fg.ext.width/9525),round(fg.ext.height/9525)),flush=True)
     for cell in ("C15:E15","F15:I15","J15:L15","C19:E19"):
         assert cell in {str(x) for x in ws.merged_cells.ranges},cell
     assert ws.row_dimensions[15].height==120 and ws.row_dimensions[19].height==120
     assert wb["ФРВ"].max_row>=13
-    print("PASS Stage32.1: explicit displayed XLSX picture sizes fill merged cells, originals retained, untouched logo and sheets",flush=True)
+    print("PASS Stage32.2 XLSX: 4 originals plus 4 backgrounds, no distortions, no missing photo, formulas and logo preserved",flush=True)
 
 def photo_cell_acceptance():
     with sync_playwright() as kit:
@@ -138,7 +151,7 @@ def photo_cell_acceptance():
             with page.expect_download(timeout=90000) as event:
                 page.locator("#generateBtn").click()
             SAMPLE.parent.mkdir(parents=True,exist_ok=True)
-            assert "_ФОТО_STAGE32_1.xlsx" in event.value.suggested_filename,event.value.suggested_filename
+            assert "_ФОТО_STAGE32_2.xlsx" in event.value.suggested_filename,event.value.suggested_filename
             event.value.save_as(str(SAMPLE))
             verify_real_xlsx(SAMPLE,hashes)
 
@@ -147,9 +160,12 @@ def photo_cell_acceptance():
             page.locator("#importSopInput").set_input_files(str(SAMPLE))
             page.wait_for_function("""() => state.steps.length===4 &&
               state.steps.every(s => s.hasPhoto && !!s.imageData)""",timeout=20000)
-            assert len(page.evaluate("() => state.steps"))==4
+            imported=page.evaluate("() => state.steps.map(s=>s.imageData)")
+            imported_hashes=[hashlib.sha256(base64.b64decode(url.split(",",1)[1])).hexdigest()
+                for url in imported]
+            assert imported_hashes==hashes,("Roundtrip must restore exact original photos",imported_hashes,hashes)
             assert not errors,errors
-            print("PASS Stage32 offline import roundtrip: 4 photos in correct SOP steps",flush=True)
+            print("PASS Stage32.2 Excel import: exact four source image SHA preserved",flush=True)
         finally:
             browser.close()
 
