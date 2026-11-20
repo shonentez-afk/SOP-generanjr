@@ -2486,7 +2486,14 @@ function renderSteps(){const c=$('stepsContainer');$('stepsCounter').textContent
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 border-t pt-3"><div><label class="text-xs font-medium text-slate-600 block mb-1">Критерий успешного выполнения</label><textarea rows="2" data-extra="successCriteria" data-id="${s.id}" class="w-full px-2 py-1 border rounded text-xs">${escapeHtml(s.successCriteria)}</textarea></div><div><label class="text-xs font-medium text-slate-600 block mb-1">Что делать при отклонении</label><textarea rows="2" data-extra="decisionPoints" data-id="${s.id}" class="w-full px-2 py-1 border rounded text-xs">${escapeHtml((s.decisionPoints||[]).join('\n'))}</textarea></div><div><label class="text-xs font-medium text-slate-600 block mb-1">Типичные ошибки</label><textarea rows="2" data-extra="commonPitfalls" data-id="${s.id}" class="w-full px-2 py-1 border rounded text-xs">${escapeHtml((s.commonPitfalls||[]).join('\n'))}</textarea></div></div>
 </div>`).join('');attachStepEvents()}
-function attachStepEvents(){document.querySelectorAll('[data-step-field]').forEach(el=>el.addEventListener('input',e=>{const s=state.steps.find(x=>x.id===Number(e.target.dataset.id));if(!s)return;if(e.target.dataset.stepField==='action')s.action=e.target.value;else if(e.target.dataset.stepField==='reason')s.reason=e.target.value;else if(e.target.dataset.stepField==='duration')s.durationSeconds=parseDuration(e.target.value);stateChanged(false)}));document.querySelectorAll('[data-km]').forEach(el=>el.addEventListener('input',e=>{const s=state.steps.find(x=>x.id===Number(e.target.dataset.km));if(s)s.keyMoments[Number(e.target.dataset.ki)]=e.target.value;stateChanged(false)}));document.querySelectorAll('[data-extra]').forEach(el=>el.addEventListener('input',e=>{const s=state.steps.find(x=>x.id===Number(e.target.dataset.id));if(!s)return;const arr=e.target.value.split(/\n+/).map(v=>v.trim()).filter(Boolean);s[e.target.dataset.extra]=e.target.dataset.extra==='successCriteria'?e.target.value:arr;stateChanged(false)}));document.querySelectorAll('[data-ai]').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();const s=state.steps.find(x=>x.id===Number(btn.dataset.id));if(!s)return;const type=btn.dataset.ai; const source=type==='duration'?formatDuration(s.durationSeconds):s[type]; await aiFillField(btn,type,source,result=>{if(type==='duration')s.durationSeconds=parseDuration(result);else s[type]=result})}));document.querySelectorAll('[data-ai-km]').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();const s=state.steps.find(x=>x.id===Number(btn.dataset.aiKm));if(!s)return;const ki=Number(btn.dataset.ki);await aiFillField(btn,'km',s.keyMoments[ki],r=>s.keyMoments[ki]=r)}));document.querySelectorAll('[data-hint-photo]').forEach(btn=>btn.addEventListener('click',()=>generatePhotoHint(Number(btn.dataset.hintPhoto))));document.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{const id=Number(b.dataset.remove);state.steps=state.steps.filter(s=>s.id!==id);idbDeletePhoto(id);stateChanged();renderFrv()}));document.querySelectorAll('[data-add-km]').forEach(b=>b.addEventListener('click',()=>{const s=state.steps.find(x=>x.id===Number(b.dataset.addKm));if(s&&s.keyMoments.length<3){s.keyMoments.push('');stateChanged()}}));document.querySelectorAll('[data-rm-km]').forEach(b=>b.addEventListener('click',()=>{const s=state.steps.find(x=>x.id===Number(b.dataset.rmKm));if(s)s.keyMoments.splice(Number(b.dataset.ki),1);stateChanged()}));document.querySelectorAll('[data-photo]').forEach(z=>{const id=Number(z.dataset.photo),inp=z.querySelector(`[data-input="${id}"]`);z.addEventListener('click',e=>{if(e.target.closest('button,input'))return;inp.click()});z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dragover')});z.addEventListener('dragleave',()=>z.classList.remove('dragover'));z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dragover');if(e.dataTransfer.files[0])handlePhoto(id,e.dataTransfer.files[0])});inp.addEventListener('change',e=>{if(e.target.files[0])handlePhoto(id,e.target.files[0])})});document.querySelectorAll('[data-edit-photo]').forEach(b=>b.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(state.documentManager?.status==='Опубликован'||state.documentManager?.status==='Архив'){toast('Для разметки фото создайте новую версию СОП','info');return;}try{await openIllustrationEditor(Number(b.dataset.editPhoto));}catch(err){console.error('Photo editor open failed',err);document.getElementById('illustrationEditorOverlay')?.remove();toast('Не удалось открыть разметку: '+(err?.message||err),'error');}}));document.querySelectorAll('[data-rm-photo]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const s=state.steps.find(x=>x.id===Number(b.dataset.rmPhoto));if(s){s.imageData=null;s.imageBuffer=null;s.imageExt=null;s.hasPhoto=false;s.photoEdited=false;s.photoAnnotations=[];idbDeletePhoto(s.id);stateChanged()}}))}
+function attachStepEvents(){document.querySelectorAll('[data-step-field]').forEach(el=>el.addEventListener('input',e=>{const s=state.steps.find(x=>x.id===Number(e.target.dataset.id));if(!s)return;if(e.target.dataset.stepField==='action')s.action=e.target.value;else if(e.target.dataset.stepField==='reason')s.reason=e.target.value;else if(e.target.dataset.stepField==='duration'){
+  const previousSeconds=s.durationSeconds;
+  s.durationSeconds=parseDuration(e.target.value);
+  // Automatically derived full-step FRV project time follows changes to the
+  // SOP project duration; the original measured time remains in frvSource.
+  // Manual M1/M2 edits are never rescaled or silently discarded.
+  sopFrvRefreshProjectedPart(s,previousSeconds);
+}stateChanged(false)}));document.querySelectorAll('[data-km]').forEach(el=>el.addEventListener('input',e=>{const s=state.steps.find(x=>x.id===Number(e.target.dataset.km));if(s)s.keyMoments[Number(e.target.dataset.ki)]=e.target.value;stateChanged(false)}));document.querySelectorAll('[data-extra]').forEach(el=>el.addEventListener('input',e=>{const s=state.steps.find(x=>x.id===Number(e.target.dataset.id));if(!s)return;const arr=e.target.value.split(/\n+/).map(v=>v.trim()).filter(Boolean);s[e.target.dataset.extra]=e.target.dataset.extra==='successCriteria'?e.target.value:arr;stateChanged(false)}));document.querySelectorAll('[data-ai]').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();const s=state.steps.find(x=>x.id===Number(btn.dataset.id));if(!s)return;const type=btn.dataset.ai; const source=type==='duration'?formatDuration(s.durationSeconds):s[type]; await aiFillField(btn,type,source,result=>{if(type==='duration')s.durationSeconds=parseDuration(result);else s[type]=result})}));document.querySelectorAll('[data-ai-km]').forEach(btn=>btn.addEventListener('click',async e=>{e.preventDefault();const s=state.steps.find(x=>x.id===Number(btn.dataset.aiKm));if(!s)return;const ki=Number(btn.dataset.ki);await aiFillField(btn,'km',s.keyMoments[ki],r=>s.keyMoments[ki]=r)}));document.querySelectorAll('[data-hint-photo]').forEach(btn=>btn.addEventListener('click',()=>generatePhotoHint(Number(btn.dataset.hintPhoto))));document.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{const id=Number(b.dataset.remove);state.steps=state.steps.filter(s=>s.id!==id);idbDeletePhoto(id);stateChanged();renderFrv()}));document.querySelectorAll('[data-add-km]').forEach(b=>b.addEventListener('click',()=>{const s=state.steps.find(x=>x.id===Number(b.dataset.addKm));if(s&&s.keyMoments.length<3){s.keyMoments.push('');stateChanged()}}));document.querySelectorAll('[data-rm-km]').forEach(b=>b.addEventListener('click',()=>{const s=state.steps.find(x=>x.id===Number(b.dataset.rmKm));if(s)s.keyMoments.splice(Number(b.dataset.ki),1);stateChanged()}));document.querySelectorAll('[data-photo]').forEach(z=>{const id=Number(z.dataset.photo),inp=z.querySelector(`[data-input="${id}"]`);z.addEventListener('click',e=>{if(e.target.closest('button,input'))return;inp.click()});z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dragover')});z.addEventListener('dragleave',()=>z.classList.remove('dragover'));z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dragover');if(e.dataTransfer.files[0])handlePhoto(id,e.dataTransfer.files[0])});inp.addEventListener('change',e=>{if(e.target.files[0])handlePhoto(id,e.target.files[0])})});document.querySelectorAll('[data-edit-photo]').forEach(b=>b.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(state.documentManager?.status==='Опубликован'||state.documentManager?.status==='Архив'){toast('Для разметки фото создайте новую версию СОП','info');return;}try{await openIllustrationEditor(Number(b.dataset.editPhoto));}catch(err){console.error('Photo editor open failed',err);document.getElementById('illustrationEditorOverlay')?.remove();toast('Не удалось открыть разметку: '+(err?.message||err),'error');}}));document.querySelectorAll('[data-rm-photo]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const s=state.steps.find(x=>x.id===Number(b.dataset.rmPhoto));if(s){s.imageData=null;s.imageBuffer=null;s.imageExt=null;s.hasPhoto=false;s.photoEdited=false;s.photoAnnotations=[];idbDeletePhoto(s.id);stateChanged()}}))}
 function cleanAIFieldResult(text,type){
   let v=String(text??'').trim();
   if(type==='reason'){
@@ -3036,6 +3043,9 @@ function renderFrv(){
       const s=state.steps.find(x=>x.id===Number(el.dataset.id));if(!s)return;
       s.frv=s.frv||{};
       s.frv[el.dataset.frv]=el.type==='checkbox'?el.checked:e.target.value;
+      // A manual FRV edit ends automatic project-time tracking. Later SOP
+      // duration changes must not invent an updated measured M1/M2.
+      if(['m1','m2','vdc'].includes(el.dataset.frv))s.frv.autoFullStep=false;
       stateChanged(false);renderIssues();
     }));
   renderIssues();
@@ -3047,6 +3057,104 @@ function pctEffect(cur,tgt){
   const diff=Number(cur)-Number(tgt);
   const pct=Math.round((Number(cur)-Number(tgt))/Number(cur)*100);
   return {effect:diff,pct:pct+'%'};
+}
+// Stage34.1: SOP-export FRV preflight. Independent FRV studies must never
+// silently affect a different SOP, and invalid optional classification must
+// not silently corrupt or prevent exporting the SOP and photos.
+function sopFrvExportIssues(steps){
+  const errors=[];
+  (steps||[]).forEach((s,index)=>{
+    const f=s.frv||{},dur=Number(s.durationSeconds);
+    const m1=frvClassifiedPart(f.m1),m2=frvClassifiedPart(f.m2),
+      move=frvClassifiedPart(f.move);
+    const invalidDuration=!Number.isFinite(dur)||dur<0;
+    const invalidParts=!Number.isFinite(m1)||!Number.isFinite(m2)||
+      (Number.isFinite(m1)&&Number.isFinite(m2)&&m1+m2>dur+.0001);
+    const invalidMove=!Number.isFinite(move);
+    if(!invalidDuration&&!invalidParts&&!invalidMove) return;
+    const reasons=[];
+    if(invalidDuration) reasons.push('длительность не определена');
+    if(!Number.isFinite(m1)||!Number.isFinite(m2)) reasons.push('М1/М2 не являются корректными числами');
+    else if(m1+m2>dur+.0001) reasons.push('М1 + М2 = '+(m1+m2)+' с, длительность = '+dur+' с');
+    if(invalidMove) reasons.push('некорректное значение перемещения');
+    errors.push({index,id:s.id,action:String(s.action||''),duration:dur,
+      m1:f.m1??'',m2:f.m2??'',move:f.move??'',invalidParts,
+      invalidMove,invalidDuration,reason:reasons.join('; ')});
+  });
+  return errors;
+}
+function sopFrvRefreshProjectedPart(step,previousDuration){
+  const f=step?.frv;
+  if(!step?.frvSource||!f||f.autoFullStep!==true)return false;
+  const duration=Number(step.durationSeconds);
+  if(!Number.isFinite(duration)||duration<0)return false;
+  const old=Number(previousDuration);
+  // Only an automatically assigned, whole-step project classification may be
+  // updated. Real observedTimeSec and manual FRV splits are never touched.
+  if(Number.isFinite(old)&&f.m1!==''&&Number(f.m1)===old&&
+     (f.m2===''||Number(f.m2)===0)){
+    f.m1=duration;return true;
+  }
+  if(Number.isFinite(old)&&f.m2!==''&&Number(f.m2)===old&&
+     (f.m1===''||Number(f.m1)===0)){
+    f.m2=duration;return true;
+  }
+  f.autoFullStep=false;
+  return false;
+}
+async function sopFrvCheckBeforeExcel(exportData){
+  const invalid=sopFrvExportIssues(exportData.steps);
+  if(!invalid.length)return {proceed:true,excluded:[]};
+  const detail='<div class="text-sm space-y-2">'+
+    '<p class="text-amber-800">Обнаружено '+invalid.length+
+    ' несоответствий только в ФРВ шагов <b>текущего СОП</b>. '+
+    'Данные отдельного «Анализа ФРВ» не проверяются и не меняются.</p>'+
+    '<div class="border rounded p-2 max-h-60 overflow-y-auto">'+
+    invalid.map(x=>'<div class="border-b py-2"><b>Шаг '+(x.index+1)+
+      ': '+escapeHtml(x.action||'Без названия')+'</b>'+
+      '<div>'+escapeHtml(x.reason)+'</div>'+
+      '<div class="text-xs text-slate-500">М1: '+escapeHtml(String(x.m1))+
+      ' с · М2: '+escapeHtml(String(x.m2))+
+      ' с · Длительность: '+escapeHtml(String(x.duration))+' с</div></div>').join('')+
+    '</div><p class="text-xs">При исключении для этой выгрузки невалидные М1/М2 '+
+    'будут пустыми в копии отчёта, а соответствующие строки получат явное '+
+    'предупреждение «ФРВ не подтверждена». Исходные значения в редакторе '+
+    'СОП и исследования ФРВ останутся неизменными.</p></div>';
+  const choices=[
+    {action:'cancel',label:'Отмена'},
+    {action:'edit',label:'Перейти в ФРВ и исправить'},
+    ...(invalid.every(x=>!x.invalidDuration)?[
+      {action:'export',label:'Скачать СОП с пометками ФРВ',primary:true}
+    ]:[])
+  ];
+  const decision=await aiReviewChoiceModal({
+    id:'sopFrvExportValidationPreview',
+    title:'Проверьте время ФРВ перед экспортом СОП',
+    intro:'Экспорт не будет обрывать всю работу без объяснения. Выберите, как поступить с противоречивыми данными.',
+    details:detail,choices
+  });
+  if(decision==='edit'){
+    document.querySelector('[data-tab="frv"]')?.click();
+    const target=invalid[0];
+    setTimeout(()=>{
+      const el=document.querySelector('#frvRowsContainer [data-frv="m1"][data-id="'+target.id+'"]');
+      if(el){el.scrollIntoView({block:'center',behavior:'smooth'});el.focus()}
+    },100);
+    return {proceed:false,excluded:[]};
+  }
+  if(decision!=='export')return {proceed:false,excluded:[]};
+  for(const issue of invalid){
+    const step=exportData.steps[issue.index];
+    if(!step)continue;
+    step.frv={...(step.frv||{})};
+    if(issue.invalidParts){
+      step.frv.m1='';step.frv.m2='';step.frv.vdc=false;
+    }
+    if(issue.invalidMove)step.frv.move='';
+    step._sopFrvExportWarning='ФРВ не подтверждена: '+issue.reason+
+      '. Неверные значения исключены только из выгруженного отчёта.';
+  }
+  return {proceed:true,excluded:invalid};
 }
 // ============================================================
 // 8. Preview
@@ -4890,7 +4998,10 @@ function frvStudySourceStep(x,d){
   s.frv={vdc:x.valueType==='VA',
     m2:x.valueType==='NVA_Necessary'?s.durationSeconds:'',
     m1:x.valueType==='NVA_Waste'?s.durationSeconds:'',
-    move:x.distanceM??'',comment:String(x.comment||'')};
+    move:x.distanceM??'',comment:String(x.comment||''),
+    // Derived *project* allocation, not a new measured fact. The source
+    // measured seconds stay immutable in s.frvSource.
+    autoFullStep:['NVA_Necessary','NVA_Waste'].includes(x.valueType)};
   s.frvSource={studyId:d.studyId||'',observationId:x.sourceObservationId||'',
     observationIds:[...x.sourceObservationIds],cycleNo:x.sourceCycleNo??null,
     cycleNos:[...x.sourceCycleNos],observedTimeSec:x.observedTimeSec,
@@ -7381,6 +7492,14 @@ async function generateExcel(){
   btn.disabled=true;status.classList.remove('hidden');status.textContent='Проверка библиотеки ExcelJS...';
   try{
     const exportData=createSopExportSnapshot(state);
+    // FRV is optional for creating a SOP. Do not silently erase source values,
+    // and do not abort the entire SOP download for a stale FRV classification.
+    const frvCheck=await sopFrvCheckBeforeExcel(exportData);
+    if(!frvCheck.proceed){
+      status.textContent='Экспорт отменён. Данные СОП не изменены.';
+      return;
+    }
+    const excludedFrv=frvCheck.excluded;
     status.textContent='Проверка фотографий для Excel...';
     const expectedStepPhotos=await ensureStepImagesForExport(exportData.steps,exportData.documentManager?.currentId);
     await ensureExcelJS();
@@ -7582,7 +7701,14 @@ async function generateExcel(){
       fw.getCell(fr,4).value=rw.vdcSec;
       fw.getCell(fr,5).value=rw.m2;fw.getCell(fr,6).value=rw.m1;fw.getCell(fr,7).value=rw.comment;fw.getCell(fr,8).value=rw.mv||'';
       for(let c=1;c<=8;c++){fw.getCell(fr,c).border=B;fw.getCell(fr,c).alignment=(c===2||c===7)?T:C;fw.getCell(fr,c).font={size:9};}
-      if(notes[idx])fw.getCell(fr,10).value=notes[idx];
+      const exportWarning=exportData.steps[idx]?._sopFrvExportWarning;
+      if(exportWarning){
+        fw.getCell(fr,7).value=[rw.comment,exportWarning].filter(Boolean).join(' | ');
+        fw.getCell(fr,7).font={size:9,color:{argb:'FFB91C1C'}};
+        fw.getCell(fr,10).value=['Внимание: М1/М2 не включены.',exportWarning,
+          notes[idx]||''].filter(Boolean).join(' ');
+        fw.getCell(fr,10).alignment={vertical:'top',wrapText:true};
+      }else if(notes[idx])fw.getCell(fr,10).value=notes[idx];
       cumSec+=rw.durSec;fr++;
     });
     const lastAct=fr-1;
@@ -7633,10 +7759,16 @@ async function generateExcel(){
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     try{const dm=exportData.documentManager||{};const ok=await docWriteNetworkFile(docSafeFileBase(dm)+'.xlsx',buffer,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');if(ok)status.textContent='Файл сформирован и сохранён в выбранную папку.'}catch(ne){console.warn('Сохранение XLSX на сетевой диск',ne)}
     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
-    a.download=`СОП_${m.sopNumber||'бн'}_${(m.operation||'без_названия').replace(/[^a-zA-Zа-яА-Я0-9]/g,'_')}_ФОТО_STAGE32_2.xlsx`;
+    a.download=`СОП_${m.sopNumber||'бн'}_${(m.operation||'без_названия').replace(/[^a-zA-Zа-яА-Я0-9]/g,'_')}_ФОТО_STAGE32_2${excludedFrv.length?'_ФРВ_ПРОВЕРИТЬ':''}.xlsx`;
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-    status.innerHTML='<span class="text-green-600 font-medium">✓ Фото без искажений — Stage 32.2 (3 листа: СОП, ФРВ, Чек-лист; фотографий: '+embeddedStepPhotos+')</span>';
-    toast('СОП успешно создан!');
+    status.innerHTML=excludedFrv.length?
+      '<span class="text-amber-700 font-medium">✓ СОП и фотографии экспортированы. '+
+      'В листе ФРВ '+excludedFrv.length+
+      ' шаг(ов) помечены «ФРВ не подтверждена»; исходный СОП не изменён.</span>':
+      '<span class="text-green-600 font-medium">✓ Фото без искажений — Stage 32.2 (3 листа: СОП, ФРВ, Чек-лист; фотографий: '+embeddedStepPhotos+')</span>';
+    toast(excludedFrv.length?
+      'СОП скачан. Проверьте отмеченные строки ФРВ ('+excludedFrv.length+').':
+      'СОП успешно создан!',excludedFrv.length?'warning':'success');
     // XLSX download is not a commit or publish: preserve the working draft.
     saveDraft();
   }catch(e){
