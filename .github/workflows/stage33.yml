@@ -1,0 +1,121 @@
+name: Stage33 independent FRV research to SOP
+on:
+  push:
+    branches: [feature/stage33-frv-research-to-sop-20261120]
+    paths:
+      - 'src/app/stage33-*.html'
+      - 'src/app/stage33-parts.json'
+      - 'src/modules/frv/stage33-*.js'
+      - 'src/modules/excel/stage33-export.js'
+      - 'tools/build_stage33.py'
+      - 'tests/test_stage33.py'
+      - 'qa/stage33_browser_smoke.py'
+      - 'docs/STAGE33_FRV_RESEARCH_TO_SOP_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage33.yml'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/app/stage33-*.html'
+      - 'src/app/stage33-parts.json'
+      - 'src/modules/frv/stage33-*.js'
+      - 'src/modules/excel/stage33-export.js'
+      - 'tools/build_stage33.py'
+      - 'tests/test_stage33.py'
+      - 'qa/stage33_browser_smoke.py'
+      - 'docs/STAGE33_FRV_RESEARCH_TO_SOP_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage33.yml'
+permissions:
+  contents: write
+concurrency:
+  group: stage33-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Full baseline and Stage33 Chrome research-to-SOP
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify accepted Stage32.2, build candidate and static assets
+        run: |
+          python tools/build_stage32.py --verify-release --verify-static
+          python tools/build_stage33.py
+          python tools/build_stage33.py --verify-release --verify-static
+      - name: Entire Python and JS unit regression
+        run: python -m unittest discover -s tests -v
+      - name: Offline Chrome end-to-end FRV research, protected SOP transfer, XLSX photos
+        run: |
+          python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+          python qa/stage33_browser_smoke.py
+      - name: Upload working HTML and photo-regression workbook
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage33-frv-research-sop-html-and-xlsx
+          path: |
+            releases/stage33-frv-research-to-sop-browser-candidate.html
+            artifacts/stage33-stage32-photo-regression.xlsx
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish tested HTML to feature branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage33-frv-research-to-sop-20261120'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage33-frv-research-to-sop-20261120
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; do not publish stale build."
+            exit 0
+          fi
+          git add releases/stage33-frv-research-to-sop-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: verified Stage33 independent FRV to SOP standalone"
+            git push origin HEAD:feature/stage33-frv-research-to-sop-20261120
+          fi
+  windows:
+    name: Windows Chrome FRV to SOP and Excel photo validation
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage33 offline candidate
+        run: python tools/build_stage33.py
+      - name: Install browser and XLSX tools
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Existing Windows ExcelJS and ISO regression
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage33-frv-research-to-sop-browser-candidate.html'; m.main()"
+      - name: Real Windows FRV research and XLSX photo roundtrip
+        run: python qa/stage33_browser_smoke.py
+      - name: Upload Windows-tested Stage33 HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage33-windows-verified-html
+          path: releases/stage33-frv-research-to-sop-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish verified HTML from successful Windows acceptance
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage33-frv-research-to-sop-20261120'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage33-frv-research-to-sop-20261120
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; do not publish stale HTML."
+            exit 0
+          fi
+          git add releases/stage33-frv-research-to-sop-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage33 standalone HTML verified on Windows"
+            git push origin HEAD:feature/stage33-frv-research-to-sop-20261120
+          fi
