@@ -153,7 +153,9 @@ def stage34_library_and_reports():
             assert restored["id"] not in (second,study_id),restored
             assert restored["durations"]==[40,20,10,32,8,5]
             page.locator("#frvStudyOpenBtn").click()
-            page.wait_for_selector("#frvStudyLibraryItems [data-frv-open]",timeout=15000)
+            page.wait_for_function("""() =>
+              document.querySelectorAll('#frvStudyLibraryItems [data-frv-open]').length>=3
+            """,timeout=15000)
             assert page.locator("#frvStudyLibraryItems [data-frv-open]").count()>=3
             # Storage failure must be reported, while external Excel remains possible.
             page.evaluate("""() => {
