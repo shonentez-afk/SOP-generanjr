@@ -171,8 +171,86 @@ def stage34_library_and_reports():
         finally:
             browser.close()
 
+def stage34_sop_excel_with_unrelated_research():
+    """Original user issue: independent FRV study, new SOP, step6 M1+M2 error."""
+    with sync_playwright() as pw:
+        browser=pw.chromium.launch(headless=True,channel="chrome",
+            args=["--no-sandbox","--disable-dev-shm-usage"])
+        context=browser.new_context(viewport={"width":1550,"height":1100},accept_downloads=True)
+        page=context.new_page()
+        errors=[]
+        page.on("pageerror",lambda e:errors.append(str(e)))
+        page.on("dialog",lambda dialog:dialog.accept())
+        page.route("http://**",lambda route:route.abort())
+        page.route("https://**",lambda route:route.abort())
+        try:
+            page.goto(RELEASE.resolve().as_uri(),wait_until="domcontentloaded",timeout=30000)
+            page.locator('[data-tab="frvstudy"]').click()
+            page.locator("#frvStudyNewBtn").click()
+            page.locator("#frvs-operationId").fill("Исследование ФРВ для первой работы")
+            page.locator('#frvStudyCycles [data-fs="actionRaw"]').first.fill("Реальное наблюдение")
+            page.locator('#frvStudyCycles [data-fs="durationSec"]').first.fill("18.5")
+            page.wait_for_function("""() =>
+              document.querySelector('#frvStudySaveStatus')?.dataset.status==='saved'
+            """,timeout=15000)
+            research_id=page.evaluate("() => state.frvStudy.libraryId")
+            page.locator('[data-tab="editor"]').click()
+            page.evaluate("async () => {await docNew()}")
+            # Another SOP is separate. Introduce stale split like user's Step 6.
+            page.evaluate("""() => {
+              state.steps=Array.from({length:6},(_,i)=>{
+                const step=createEmptyStep();
+                step.action='Действие другого СОП '+(i+1);
+                step.durationSeconds=30;
+                if(i===5)step.frv={vdc:false,m1:50,m2:15,move:'',comment:'Старое распределение'};
+                return step;
+              });
+              state.meta.operation='Другой независимый СОП';
+              stateChanged();
+              window.__step6Before=JSON.stringify(state.steps[5]);
+            }""")
+            assert page.evaluate("() => computeFrv().errors.some(x=>x.startsWith('Шаг 6:'))")
+            # Cancel must not change data, nor download anything.
+            page.locator("#generateBtn").click()
+            page.wait_for_selector("#sopFrvExportValidationPreview",timeout=15000)
+            assert "Шаг 6" in page.locator("#sopFrvExportValidationPreview").inner_text()
+            page.locator('#sopFrvExportValidationPreview [data-ai-preview-action="cancel"]').click()
+            assert page.evaluate("() => JSON.stringify(state.steps[5])===window.__step6Before")
+            # Direct repair route must select the ordinary SOP FRV, never the independent study.
+            page.locator("#generateBtn").click()
+            page.wait_for_selector("#sopFrvExportValidationPreview",timeout=15000)
+            page.locator('#sopFrvExportValidationPreview [data-ai-preview-action="edit"]').click()
+            assert page.locator('#tab-frv').is_visible()
+            assert page.locator('#frvRowsContainer [data-frv="m1"]').count()==6
+            assert page.evaluate("() => JSON.stringify(state.steps[5])===window.__step6Before")
+            # Export with human-acknowledged exclusion: SOP survives, source unchanged.
+            page.locator('[data-tab="editor"]').click()
+            with page.expect_download(timeout=120000) as dl:
+                page.locator("#generateBtn").click()
+                page.locator('#sopFrvExportValidationPreview [data-ai-preview-action="export"]').click()
+            file_path=OUT/"stage34-sop-with-unverified-frv.xlsx"
+            dl.value.save_as(str(file_path))
+            workbook=load_workbook(file_path)
+            assert workbook.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],workbook.sheetnames
+            frv=workbook["ФРВ"]
+            assert frv["E18"].value==0 and frv["F18"].value==0
+            assert "ФРВ не подтверждена" in str(frv["G18"].value)
+            assert "ФРВ не подтверждена" in str(frv["J18"].value)
+            # Safe export should preserve other valid classifications.
+            assert frv["C18"].value is not None
+            unchanged=page.evaluate("""async (id) => ({
+              same:JSON.stringify(state.steps[5])===window.__step6Before,
+              independent:(await frv34StoreGet(id))?.payload.cycles[0].observations[0].durationSec
+            })""",research_id)
+            assert unchanged=={"same":True,"independent":18.5},unchanged
+            assert not errors,errors
+            print("PASS Stage34.1: unrelated FRV study kept, Step6 mismatch modal cancel/edit/acknowledged XLSX and original values intact",flush=True)
+        finally:
+            browser.close()
+
 def main():
     regression_stage33_and_excel_photos()
     stage34_library_and_reports()
+    stage34_sop_excel_with_unrelated_research()
 
 if __name__=="__main__":main()
