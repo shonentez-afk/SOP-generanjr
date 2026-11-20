@@ -302,6 +302,9 @@ function renderFrvStudy(){
   renderFrvStudyDashboardOnly();
   const back=$('frvStudyRestoreBtn');
   if(back)back.classList.toggle('hidden',!frvStudyHasBackup());
+  // Rebuilt inputs must stay locked while switching study asynchronously.
+  if(typeof frv34SwitchBusy!=='undefined'&&frv34SwitchBusy)
+    frv34SetSwitchBusy(true);
 }
 function frvStudyInsights(d=ensureFrvStudy()){
   const cycles=d.cycles||[],all=cycles.flatMap(c=>c.observations||[]),
