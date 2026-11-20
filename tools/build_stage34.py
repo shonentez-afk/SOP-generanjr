@@ -38,24 +38,26 @@ REQUIRED={
     "src/modules/frv/stage34-library.js",
     "src/modules/frv/stage34-analytics.js",
     "src/modules/frv/stage34-xlsx.js",
-    "src/modules/frv/stage33-measurements.js",
+    "src/modules/frv/stage34-measurements.js",
+    "src/modules/frv/stage34-sop-frv-guard.js",
     "src/modules/photos/stage30-history.js",
     "src/modules/photos/stage31-illustration-editor.js",
-    "src/modules/excel/stage33-export.js",
+    "src/modules/editor/stage34-steps.js",
+    "src/modules/excel/stage34-export.js",
 }
 
 def build()->str:
     spec=json.loads(MANIFEST.read_text(encoding="utf-8"))
     modules=spec["modules"]
-    if spec.get("schemaVersion")!=1 or len(modules)!=61 or len(set(modules))!=61:
-        raise AssertionError("Stage34 expects 61 unique JS modules")
+    if spec.get("schemaVersion")!=1 or len(modules)!=62 or len(set(modules))!=62:
+        raise AssertionError("Stage34 expects 62 unique JS modules")
     if "src/modules/photos/stage30-illustration-editor.js" in modules:
         raise AssertionError("Stage30 editor must be replaced in Stage34, not duplicated")
     if modules.count("src/modules/photos/stage31-illustration-editor.js")!=1:
         raise AssertionError("Stage34 editor must appear exactly once")
     if "src/modules/excel/stage32-export.js" in modules:
         raise AssertionError("Legacy fixed 150x95 Excel photo export must not run in Stage34")
-    if modules.count("src/modules/excel/stage33-export.js")!=1:
+    if modules.count("src/modules/excel/stage34-export.js")!=1:
         raise AssertionError("Stage34 Excel export must appear exactly once")
     if any(old in modules for old in (
         "src/modules/frv/stage20-measurements.js",
