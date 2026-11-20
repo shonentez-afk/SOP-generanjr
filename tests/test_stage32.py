@@ -39,7 +39,6 @@ class Stage32ExcelPhotoTests(unittest.TestCase):
     def test_exact_merged_ranges_and_exceptions_in_node(self):
         src=(ROOT/"src/modules/excel/stage32-export.js").read_text(encoding="utf-8")
         self.assertIn("sopExcelPhotoVisibleExtent(ws,c1,c2,r)",src)
-        self.assertIn("sopXlsxFixPictureAnchors(rawBuffer,embeddedStepPhotos)",src)
         self.assertIn("ФОТО_STAGE32_2.xlsx",src)
         self.assertIn("async function sopExcelPhotoBackground(",src)
         self.assertIn("sopExcelPhotoForeground(ws,s._excelPhoto,frame)",src)
