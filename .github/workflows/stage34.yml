@@ -1,0 +1,102 @@
+name: Stage34 offline FRV library analytics and Excel
+on:
+  push:
+    branches: [feature/stage34-frv-study-library-analysis-20261120]
+    paths:
+      - 'src/app/stage34-*.html'
+      - 'src/app/stage34-parts.json'
+      - 'src/modules/frv/stage34-*.js'
+      - 'src/modules/editor/stage34-steps.js'
+      - 'src/modules/excel/stage34-export.js'
+      - 'tools/build_stage34.py'
+      - 'tests/test_stage34.py'
+      - 'qa/stage34_browser_smoke.py'
+      - 'docs/STAGE34_FRV_AUTOMATION_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage34.yml'
+  pull_request:
+    branches: [feature/stage33-frv-research-to-sop-20261120]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage34-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Linux Chrome Stage34 library JSON XLSX SOP photo full regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify Stage32 and Stage33 baselines then build Stage34
+        run: |
+          python tools/build_stage32.py --verify-release --verify-static
+          python tools/build_stage33.py --verify-release --verify-static
+          python tools/build_stage34.py
+          python tools/build_stage34.py --verify-release --verify-static
+      - name: Full Python and Node unit regression
+        run: python -m unittest discover -s tests -v
+      - name: Install offline Chrome QA requirements
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: Real browser study library, backup, report and SOP/photo regression
+        run: python qa/stage34_browser_smoke.py
+      - name: Upload HTML and verified FRV + photo Excel files
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage34-frv-excel-and-offline-html-linux
+          path: |
+            releases/stage34-frv-study-library-analysis-browser-candidate.html
+            artifacts/stage34-frv-study-report.xlsx
+            artifacts/stage34-frv-study-backup.json
+            artifacts/stage34-sop-with-unverified-frv.xlsx
+            artifacts/stage33-stage32-photo-regression.xlsx
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish verified standalone HTML in feature branch only
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage34-frv-study-library-analysis-20261120'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage34-frv-study-library-analysis-20261120
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; refuse to publish stale HTML."
+            exit 0
+          fi
+          git add releases/stage34-frv-study-library-analysis-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage34 browser-verified FRV standalone candidate"
+            git push origin HEAD:feature/stage34-frv-study-library-analysis-20261120
+          fi
+  windows:
+    name: Windows Chrome Stage34 offline FRV full acceptance
+    runs-on: windows-latest
+    timeout-minutes: 40
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage34
+        run: python tools/build_stage34.py
+      - name: Install QA requirements
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Native Windows Chrome, Excel and full FRV regression
+        run: python qa/stage34_browser_smoke.py
+      - name: Windows smoke for existing local JS and ISO
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage34-frv-study-library-analysis-browser-candidate.html'; m.main()"
+      - name: Upload Windows-tested HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage34-windows-verified-html
+          path: releases/stage34-frv-study-library-analysis-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
