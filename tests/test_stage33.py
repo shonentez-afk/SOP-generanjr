@@ -17,6 +17,7 @@ FRV_FILES=[
  "src/modules/frv/stage33-study-ai.js",
  "src/modules/frv/stage33-study.js",
  "src/modules/excel/stage33-export.js",
+ "src/modules/documents/stage33-draft.js",
 ]
 
 class Stage33Contracts(unittest.TestCase):
@@ -30,7 +31,7 @@ class Stage33Contracts(unittest.TestCase):
         allowed=set(FRV_FILES)
         left=set(original["modules"])-set(spec["modules"])
         right=set(spec["modules"])-set(original["modules"])
-        self.assertEqual(len(left),6)
+        self.assertEqual(len(left),7)
         self.assertEqual(right,allowed)
         html=stage33.build()
         for name in ("async function frvStudyBuild(","async function frvStudyAnalyze(",
