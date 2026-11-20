@@ -53,6 +53,14 @@ def stage34_library_and_reports():
               document.querySelector('#frvStudySaveStatus')?.dataset.status==='saved'""",timeout=15000)
             study_id=page.evaluate("() => state.frvStudy.libraryId")
             assert study_id
+            pre=page.evaluate("""async () => ({
+              live:state.frvStudy.cycles[0].observations.map(o=>({
+                action:o.actionRaw,duration:o.durationSec,type:o.valueType})),
+              saved:(await frv34StoreGet(state.frvStudy.libraryId))?.payload.cycles[0].observations.map(o=>({
+                action:o.actionRaw,duration:o.durationSec,type:o.valueType}))
+            })""")
+            print("STAGE34_PRE_RELOAD",pre,flush=True)
+            assert pre["live"]==pre["saved"],("Autosave not an exact observation snapshot",pre)
             page.reload(wait_until="domcontentloaded")
             page.locator('[data-tab="frvstudy"]').click()
             page.locator("#frvStudyOpenBtn").click()
@@ -64,6 +72,10 @@ def stage34_library_and_reports():
               rows:state.frvStudy.cycles[0].observations.length,
               total:frv34AnalyticsData().total
             })""")
+            if stored["total"]!=70:
+                print("STAGE34_POST_RELOAD",page.evaluate("""() =>
+                  state.frvStudy.cycles[0].observations.map(o=>({
+                    action:o.actionRaw,duration:o.durationSec,type:o.valueType}))"""),flush=True)
             assert stored=={"id":study_id,"name":"Проверка приводного агрегата",
               "rows":3,"total":70},stored
             # Repeat the sequence without manufacturing fresh measured seconds.
