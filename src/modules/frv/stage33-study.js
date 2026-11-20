@@ -162,6 +162,13 @@ async function frvStudySendSop(){
     sopNumber:'',safety:'',tools:'',material:'',approverPost:'',approverName:''};
   state.description=d.processDescription||'';
   state.openQuestions=[];state.totalTimeSeconds=0;
+  // A new SOP cannot inherit the prior document's targets, AI suggestions or
+  // review results. The complete previous state is retained in its backup.
+  state.frvMeta={observers:'',quality:'',other:'',
+    purpose:'зафиксировать текущее исполнение операции',
+    tOp:'',tVdc:'',tM2:'',tM1:'',tMove:'',tArea:'',tIn:'',tOut:''};
+  state.stage27=stage27Empty();
+  reviewIssues=[];reviewSummary=null;deferredIssueKeys=new Set();
   state.responsibles=[''];state.agreedList=[{post:'',name:''}];state.safetyIconIds=[];
   state.checklist=JSON.parse(JSON.stringify(CHECKLIST_DEFAULT));
   state.twi={enabled:false,trainer:'',trainee:'',
