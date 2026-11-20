@@ -30,8 +30,8 @@ class Stage35Contracts(unittest.TestCase):
         self.assertEqual(spec["static"]["betweenVendorIcons"],
                          "src/app/stage35-between-vendor-icons.html")
         html=stage35.build()
-        for name in ["frv35RestoreActiveStudy","frv35RememberActive",
-                     "frv35AiEvidenceKey","frv35ClassificationCurrent",
+        for name in ["function frv35RestoreActiveStudy(","function frv35RememberActive(",
+                     "function frv35AiEvidenceKey(","function frv35ClassificationCurrent(",
                      "function frvStudySendSop(","function renderFrv(",
                      "async function generateExcel(","async function generateTwiPlan(",
                      'id="frvStudyLibrarySearch"','id="frvStudyShowArchived"']:
