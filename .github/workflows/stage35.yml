@@ -1,0 +1,99 @@
+name: Stage35 FRV UX and functional acceptance
+on:
+  push:
+    branches: [feature/stage35-frv-ux-functional-audit-20261120]
+    paths:
+      - 'src/app/stage35-*'
+      - 'src/modules/frv/stage35-*.js'
+      - 'tools/build_stage35.py'
+      - 'tests/test_stage35.py'
+      - 'qa/stage35_browser_smoke.py'
+      - 'docs/STAGE35_FRV_UX_FUNCTIONAL_AUDIT_RU.md'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage35.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage35-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Linux Chrome FRV UX end-to-end and full historical regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify accepted Stage34.1, then build isolated Stage35
+        run: |
+          python tools/build_stage34.py --verify-release --verify-static
+          python tools/build_stage35.py
+          python tools/build_stage35.py --verify-release --verify-static
+      - name: Entire Python and JS module regression
+        run: python -m unittest discover -s tests -v
+      - name: Install Chrome offline QA requirements
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: FRV independent studies, safe library, AI and SOP photo regression
+        run: python qa/stage35_browser_smoke.py
+      - name: Upload test screenshot, Excel samples and offline HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage35-frv-ux-linux-verified-artifacts
+          path: |
+            releases/stage35-frv-ux-functional-audit-browser-candidate.html
+            artifacts/stage35-frv-ux-audit.png
+            artifacts/stage34-frv-study-report.xlsx
+            artifacts/stage34-frv-study-backup.json
+            artifacts/stage34-sop-with-unverified-frv.xlsx
+            artifacts/stage33-stage32-photo-regression.xlsx
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish only the fully tested Stage35 candidate on feature branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage35-frv-ux-functional-audit-20261120'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage35-frv-ux-functional-audit-20261120
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; skip stale build publish"
+            exit 0
+          fi
+          git add releases/stage35-frv-ux-functional-audit-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage35 FRV UX fully tested standalone HTML"
+            git push origin HEAD:feature/stage35-frv-ux-functional-audit-20261120
+          fi
+  windows:
+    name: Windows Chrome Stage35 FRV and accepted XLSX/photo regression
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage35 candidate
+        run: python tools/build_stage35.py
+      - name: Install Chrome QA and XLSX dependencies
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Windows Chrome accepted and new FRV audit end-to-end
+        run: python qa/stage35_browser_smoke.py
+      - name: Existing Windows ExcelJS, ISO and TWI smoke
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage35-frv-ux-functional-audit-browser-candidate.html'; m.main()"
+      - name: Upload verified Windows HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage35-windows-verified-html
+          path: releases/stage35-frv-ux-functional-audit-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
