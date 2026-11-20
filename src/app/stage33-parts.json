@@ -62,7 +62,7 @@
     "src/modules/twi/stage24-preview.js",
     "src/modules/twi/stage29-from-sop.js",
     "src/modules/documents/stage28-review-state.js",
-    "src/modules/documents/stage27-draft.js",
+    "src/modules/documents/stage33-draft.js",
     "src/modules/documents/stage27-db.js",
     "src/modules/documents/stage19-network-io.js",
     "src/modules/documents/stage19-library-audit.js",
