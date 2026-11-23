@@ -26,10 +26,12 @@ function stage391StarReasonOnly(text,step){
     const label=match[1],body=match[2].trim();
     if(!body){output.push(line);continue;}
     let next=body;
-    // Accept only a visually clear "Key Point — Reason Why" construction.
-    // A dash inside the actual reason stays untouched. Hyphens in words and
-    // equipment part numbers must never be used as separators.
-    const separators=/\s+[—–-]\s+|\s*:\s+/gu;
+    // Only remove a full, verbatim Key Point/Action at the line start.
+    // Models may separate the HOW from WHY with "—", ":" OR a full stop:
+    // "1. Проверить вилку. Это важно для предотвращения ..."
+    // No free-form sentence cutting: protect correct causes, abbreviations,
+    // part numbers, and punctuation within the actual explanation.
+    const separators=/\s+[—–-]\s+|\s*:\s+|[.!?;]\s+/gu;
     for(const split of body.matchAll(separators)){
       const prefix=body.slice(0,split.index).trim();
       const cause=body.slice(split.index+split[0].length).trim();
@@ -39,7 +41,16 @@ function stage391StarReasonOnly(text,step){
       if(!cause||stage391TwiPlain(cause).length<8){
         return {ok:false,message:'ИИ повторил ключевой момент без объяснения «почему». Исходная причина сохранена.'};
       }
-      next=cause;
+      // Remove empty lead-ins, but do not invent a new technical assertion.
+      // Keep the literal rationale supplied by AI for fact-based validation.
+      next=cause
+        .replace(/^Это\s+(?:важно|необходимо|нужно|требуется)\s+для\s+/iu,'Для ')
+        .replace(/^Это\s+важно\s*,?\s*(поскольку|потому\s+что|так\s+как)\s+/iu,(_,link)=>
+          link.charAt(0).toUpperCase()+link.slice(1)+' ')
+        .replace(/^Это\s+(?:нужно|важно)\s*,?\s*чтобы\s+/iu,'Чтобы ');
+      if(/^(?:это\s+(?:важно|необходимо|нужно|требуется)|для\s+безопасности)\s*[.!?]?$/iu.test(next.trim())){
+        return {ok:false,message:'ИИ не объяснил, почему важен ключевой момент. Исходная причина сохранена.'};
+      }
       removed++;
       break;
     }
@@ -77,7 +88,7 @@ async function aiFillField(btn,type,source,applyFn){
     const instruction=type==='km'?
       '\nКорпоративное правило: причины относятся к критическим Key Points и хранятся ОДНИМ полем. Не меняй другие Key Points и Reasons. Если новая формулировка изменила бы смысл существующих причин, верни исходный Key Point без изменения. Не выдумывай параметры.':
       type==='reason'?
-      '\nКнопка ✨ редактирует ТОЛЬКО Reasons Why. Верни СТРОГО объяснения ПОЧЕМУ, без текста Key Points и без конструкции «КМ — причина». Плохо: «1. Проверить кабель на повреждения — предотвращает риск». Хорошо: «1. Снижает риск при использовании повреждённого кабеля» (только если риск подтверждён исходными фактами). Не повторяй ни одно действие или критический приём в начале причины. Корпоративное правило: одно поле Reason на шаг. Общая причина может быть без номера; несколько причин — строго отдельными строками 1., 2., 3. Сохрани имеющиеся номера и количество причин, не заменяй отдельные причины общей. Не добавляй параметры или последствия, которых нет в фактическом контексте. Если причина не подтверждена, не сочиняй её.':
+      '\nКнопка ✨ редактирует ТОЛЬКО Reasons Why. Верни СТРОГО объяснения ПОЧЕМУ, без текста Key Points и без конструкции «КМ — причина». Плохо: «1. Проверить кабель на повреждения — предотвращает риск» или «1. Проверить кабель на повреждения. Это важно для предотвращения риска». Хорошо: «1. Снижает риск при использовании повреждённого кабеля» (только если риск подтверждён исходными фактами). Не повторяй ни одно действие или критический приём в начале причины. Корпоративное правило: одно поле Reason на шаг. Общая причина может быть без номера; несколько причин — строго отдельными строками 1., 2., 3. Сохрани имеющиеся номера и количество причин, не заменяй отдельные причины общей. Не добавляй параметры или последствия, которых нет в фактическом контексте. Если причина не подтверждена, не сочиняй её.':
       '';
     const raw=await aiAsk(AI_SYS[type]+instruction,context,{
       model:currentModel,maxTokens:type==='reason'?1200:400,task:'edit_'+type
