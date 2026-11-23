@@ -133,6 +133,44 @@ def main():
             assert page.locator('button[data-stage391-cleanup]').count()==0
             assert page.locator('#stage391ReasonAIReview').count()==0
             assert page.locator('#stage391CleanupOverlay').count()==0
+            # Stage40 remains operative on the Stage41 candidate: the
+            # existing review cards render old/new and protect manual edits.
+            page.evaluate("""() => {
+              const s=state.steps[0];
+              reviewIssues=[{
+                stepId:1,field:'reason',type:'incomplete',
+                status:'open',severity:'improvement',thread:[],
+                description:'Уточнить формулировку подтверждённой причины',
+                suggestion:'Сделать объяснение точнее',
+                evidenceKind:'observed',evidenceVerified:true,
+                evidence:s.reason,evidenceSource:'Шаг 1 · Почему важно',
+                fixValue:'Позволяет выявить повреждения перед использованием.'
+              }];
+              reviewSummary={overall_quality:'needs_improvement',
+                summary:'Есть одно уточнение'};
+              stage28ReviewMeta=stage28NormalizeMeta({
+                documentId:state.documentManager?.currentId??null,
+                contextSignature:stage28DocumentSignature(state),
+                stepSignatures:state.steps.map(stage28StepSignature),
+                aiComplete:true,lastMode:'full',checkedAt:Date.now(),reviewedSteps:1
+              });
+              renderReviewResults(reviewSummary);
+            }""")
+            assert page.locator('[data-stage40-compare]').count()==1
+            assert page.locator('button[data-apply]').count()==1
+            preview=page.locator('[data-stage40-compare="0"]').inner_text()
+            assert "Сейчас" in preview and "После применения" in preview,preview
+            page.evaluate("""() => {
+              state.steps[0].reason='Причина уточнена вручную инженером.';
+              renderSteps();renderReviewResults(reviewSummary);
+            }""")
+            assert page.locator('button[data-apply="0"]').is_disabled()
+            page.evaluate("() => applyIssueFix(0)")
+            assert page.evaluate(
+                "() => state.steps[0].reason")=="Причина уточнена вручную инженером."
+            assert page.locator('button[data-stage391-cleanup]').count()==0
+            assert page.locator('#stage391ReasonAIReview').count()==0
+
             assert not errors,errors
             print("PASS Stage41 Chrome: task-limited prompts, no review NORM_BASE, "
                   "Reason/KM untouched, exact AI review dedup only, model options "
