@@ -116,6 +116,7 @@ def stage36_browser():
             other.route("http://**",lambda route:route.abort())
             other.route("https://**",lambda route:route.abort())
             other.goto(RELEASE.resolve().as_uri(),wait_until="domcontentloaded",timeout=30000)
+            other.locator('[data-tab="frvstudy"]').click()
             other.evaluate("""async id => {await frvStudyOpenById(id)}""",
                            p.evaluate("() => window.stage36Id"))
             p.evaluate("""() => {
