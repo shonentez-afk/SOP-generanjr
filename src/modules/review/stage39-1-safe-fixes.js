@@ -44,7 +44,9 @@ function reviewGetApplicableFix(issue){
     if(issue.field==='keyMoments'){
       const points=Array.isArray(step.keyMoments)?step.keyMoments.filter(x=>String(x??'').trim()):[];
       if(points.length>=3||points.includes(value))return null;
-      return {scope:'step',index,field:'keyMoments',value};
+      const checked=stage391ValidateKeyPointProposal(value,step);
+      if(!checked.ok)return null;
+      return {scope:'step',index,field:'keyMoments',value:checked.value};
     }
     if(['action','reason','successCriteria'].includes(issue.field)){
       if(String(step[issue.field]??'').trim()===value)return null;
@@ -53,7 +55,9 @@ function reviewGetApplicableFix(issue){
         if(!checked.ok)return null; // Never apply unsupported numbers or broken ordinals.
         return {scope:'step',index,field:issue.field,value:checked.value};
       }
-      return {scope:'step',index,field:issue.field,value};
+      const checked=stage391ValidateTextProposal(value,step);
+      if(!checked.ok)return null;
+      return {scope:'step',index,field:issue.field,value:checked.value};
     }
     return null;
   }
