@@ -59,8 +59,6 @@ function twiPrintIssues(data){
     if(!step.keyPoints.length)issues.push('Шаг '+step.index+': нет ключевых моментов.');
     if(step.keyPoints.length&&!step.reason)
       issues.push('Шаг '+step.index+': нет причины ключевых моментов.');
-    for(const notice of stage38ReasonIssues(step.reason,step.keyPoints.length,step.index))
-      issues.push('Шаг '+step.index+': '+notice.description);
   }
   if(!twiPrintText(data.meta.safety))
     issues.push('В СОП не указаны требования безопасности.');
