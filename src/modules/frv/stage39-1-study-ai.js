@@ -97,6 +97,11 @@ async function frvStudySuggestRow(ci,oi){
 keyMoment — только действительно важная деталь выполнения шага. reason — кратко почему эта деталь важна. В корпоративском СОП одна общая причина пишется без номера, разные причины — в ОДНОМ поле строками 1. ...\\n2. ... Сохраняй уже записанные номера, не выдумывай дополнительные причины и числа. Если оснований недостаточно, оставь поля пустыми. Не придумывай нормативы, значения, СИЗ или требования.`;
     const raw=await aiAsk(system,JSON.stringify({actionRaw:String(o.actionRaw||''),durationSec:o.durationSec==null?null:Number(o.durationSec)}),{model:currentModel,temperature:.1,maxTokens:1000,task:'frv_study_row_suggest'});
     const proposal=frvAiRowProposal(parseFrvAIJson(raw));
+    if(proposal.keyMoment){
+      const safe=stage391ValidateTextProposal(proposal.keyMoment,o,stage391FrvFacts(o,d));
+      if(!safe.ok){toast(safe.message+' Ключевой момент ФРВ не применён.','warning');return;}
+      proposal.keyMoment=safe.value;
+    }
     if(proposal.reason){
       const safe=stage391ValidateReasonProposal(o.reason||'',proposal.reason,
         {reason:o.reason},stage391FrvFacts(o,d));
@@ -163,9 +168,14 @@ async function frvStudyAnalyze(){
     const proposal=frvAiNormalizeAnalysis(parseFrvAIJson(raw),observations);
     const sourceRows=d.cycles.flatMap(c=>c.observations||[]);
     for(const candidate of proposal.standardCandidates){
-      if(!candidate.reason)continue;
       const row=sourceRows.find(o=>String(o.id)===String(candidate.observationId));
       if(!row)continue;
+      if(candidate.keyMoment){
+        const point=stage391ValidateTextProposal(candidate.keyMoment,row,stage391FrvFacts(row,d));
+        if(!point.ok){toast('КМ анализа ФРВ: '+point.message+' Ответ не применён.','warning');return;}
+        candidate.keyMoment=point.value;
+      }
+      if(!candidate.reason)continue;
       const safe=stage391ValidateReasonProposal(row.reason||'',candidate.reason,
         {reason:row.reason},stage391FrvFacts(row,d));
       if(!safe.ok){toast('Предложение анализа ФРВ: '+safe.message+' Ответ не применён.','warning');return;}
