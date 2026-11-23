@@ -1,3 +1,14 @@
+## STAGE40 ПРИНЯТА И ОБЪЕДИНЕНА В MAIN — 23.11.2026
+
+- **Подтверждение пользователя:** после тестирования опубликованной Stage40 пользователь сообщил **«работает»**. Версия Stage40 принята.
+- **GitHub:** [PR #38](https://github.com/shonentez-afk/SOP-generanjr/pull/38) объединена с `main`; merge commit `6ecf6dc62cc673e50e8fdbcad743e1cc48036c85`. Сообщения ниже «Draft», «не сливать», «ожидает проверки» — **исторические**, больше не отражают текущий статус.
+- **QA:** [Stage40 Actions #45146745986](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45146745986) — Linux SUCCESS, Windows SUCCESS, Publish SUCCESS. 115 модульных тестов, Chrome для встроенного сравнения и проверки устаревших предложений, наследованная Stage39.1 Reason/WHY, ФРВ, корпоративский SOP/TWI XLSX, Windows фото/ISO/ExcelJS.
+- **Принятая сборка:** [stage40-inline-review-20261123.html](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/main/releases/stage40-inline-review-20261123.html) (blob SHA `92f76201c2d05fbf8c088e87eb67e532e9c0e146`).
+- **Функции:** в существующем блоке полной проверки СОП сравнение «Сейчас / После применения» без новой панели или окна; кнопка «Применить» прежняя, устаревшие предложения не заменяют ручные правки. Индивидуальная ✨ «Причина» сохраняет прямое применение без подтверждения (Stage39.1).
+- **Ограничения:** формат причин Stage38, Excel-шаблоны, Yandex Cloud proxy и ФРВ/фотографии не изменены. Для дальнейшей разработки базовой считать **Stage40 в main**, новую Stage41 вести отдельно и с проверками; не принимать новые изменения автоматически.
+
+---
+
 ## STAGE40 — LINUX/WINDOWS/PUBLISH SUCCESS, HTML ГОТОВ К ПРОВЕРКЕ ПОЛЬЗОВАТЕЛЯ (23.11.2026)
 
 - **Текущее положение:** Stage40 реализована в feature/stage40-inline-ai-review-20261123, [PR #38](https://github.com/shonentez-afk/SOP-generanjr/pull/38) Draft. Пользователь ещё НЕ подтвердил новую сборку; принятую main Stage39.1 не менять.
