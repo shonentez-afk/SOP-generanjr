@@ -1,6 +1,6 @@
 // Stage39.1: safe ✨ Reasons proposal. This is deliberately an independent
-// overlay: the accepted Stage39 Reason handler and the manual "Убрать повтор КМ"
-// tool remain unchanged. No generated response writes to SOP without consent.
+// overlay over the accepted Stage39 Reason handler. A valid grounded AI WHY
+// updates the editable Reason directly, without an extra modal or KM button.
 const stage391BeforeReasonReviewFill=aiFillField;
 
 // A normative citation or "ask someone / consult instructions" is not a
@@ -73,68 +73,6 @@ function stage391ReasonAIInspect(previous,proposed,step){
     changedCount,oldCount:old.labels.length,newCount:incoming.labels.length,
     echoesRemoved:cleaned.changed};
 }
-function stage391ReasonAIReviewDetails(inspection,step){
-  const old=escapeHtml(inspection.previous||'(пусто)');
-  const revised=escapeHtml(inspection.value);
-  const note=inspection.changedCount?
-    '<p style="color:#9a3412;font-weight:600;margin:0 0 10px;">'+
-    'Меняется количество причин: '+
-    (inspection.oldCount||'одна общая')+' → '+
-    (inspection.newCount||'одна общая')+
-    '. Проверьте, что важные обоснования не потеряны.</p>':'';
-  const echo=inspection.echoesRemoved?
-    '<p style="color:#475569;margin:0 0 10px;">Удалено точных повторов КМ из предложения ИИ: '+
-    inspection.echoesRemoved+' (проверяйте смысл).</p>':'';
-  const panel=(name,value)=>'<section style="min-width:0;">'+
-    '<p style="font-weight:700;font-size:13px;margin:0 0 5px;">'+name+'</p>'+
-    '<pre style="font-family:inherit;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;'+
-    'padding:12px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:9px;'+
-    'min-height:90px;margin:0;">'+value+'</pre></section>';
-  return note+echo+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));'+
-    'gap:12px;margin-bottom:10px;">'+
-    panel('Было',old)+panel('Стало',revised)+'</div>'+
-    '<p style="font-size:12px;color:#92400e;">Контроль ИИ не подтверждает технологическую '+
-    'достоверность причин. Проверьте их по фактам операции и инструкции оборудования.</p>';
-}
-function stage391ReasonAIReviewModal(inspection,step){
-  const pending=aiReviewChoiceModal({
-    id:'stage391ReasonAIReview',
-    title:'Предложение ИИ: причины TWI',
-    intro:'ИИ предлагает изменить только поле «Причина» шага «'+
-      String(step.action||'').slice(0,90)+'». Документ не изменится без вашего подтверждения.',
-    details:stage391ReasonAIReviewDetails(inspection,step),
-    choices:[
-      {action:'cancel',label:'Оставить как было'},
-      {action:'apply',label:'Применить к причине',primary:true}
-    ]
-  });
-  // Use the existing shared review modal, with the same fixed-height footer
-  // behavior as our user-approved manual cleanup preview. This affects only
-  // the current modal instance; it cannot change other FRV/TWI dialogs.
-  const root=document.getElementById('stage391ReasonAIReview');
-  if(root){
-    root.style.padding='8px';
-    const dialog=root.querySelector('[role="dialog"]');
-    if(dialog){
-      Object.assign(dialog.style,{
-        display:'flex',flexDirection:'column',
-        maxHeight:'calc(100vh - 16px)',overflow:'hidden'
-      });
-      const content=dialog.children[2];
-      if(content)Object.assign(content.style,{
-        flex:'1 1 auto',minHeight:'0',maxHeight:'none',
-        overflowY:'auto',overflowX:'hidden'
-      });
-      const footer=dialog.lastElementChild;
-      if(footer)Object.assign(footer.style,{
-        flex:'0 0 auto',background:'#fff',
-        paddingBottom:'2px'
-      });
-    }
-  }
-  return pending;
-}
 aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
   if(type!=='reason')
     return stage391BeforeReasonReviewFill(btn,type,source,applyFn);
@@ -201,8 +139,6 @@ aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
         (inspection?.message||'Уточните технологическую цель у специалиста.'),'warning');
       return;
     }
-    const choice=await stage391ReasonAIReviewModal(inspection,step);
-    if(choice!=='apply')return;
     if(!aiGuardCanApply(guard))return;
     if(['Опубликован','Архив'].includes(state.documentManager?.status)){
       toast('Документ защищён. Создайте новую версию для изменения.','warning');return;
@@ -215,7 +151,7 @@ aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
     }
     applyFn(fresh.value);
     stateChanged();renderSteps();
-    toast('Изменение причины применено после подтверждения. Проверьте актуальность TWI.','success');
+    toast('Причина обновлена ИИ. Проверьте технологический смысл и актуальность TWI.','success');
   }catch(e){
     toast(diagnoseAIError(e),'error');
   }finally{
