@@ -72,9 +72,8 @@ def ai_fields(p):
     assert '2. Защитить' in ctx,ctx
     assert p.evaluate("() => state.steps[0].keyMoments[0]")=="Проверить отсутствие перекоса"
     before=p.evaluate("() => state.steps[0].reason")
-    # Stage39.1 validator remains active for mentor, FRV and fact-driven AI
-    # proposals. Only the ✨ Reason button is deliberately rolled back to
-    # accepted Stage39, so it no longer calls the proposed-reason guard.
+    # The same validator now protects mentor/FRV AND ✨ Reason proposals;
+    # the individual ✨ does not write before user approval.
     checks=p.evaluate("""() => {
       const step=state.steps[0];
       const badOrder=stage391ValidateReasonProposal(step.reason,
@@ -84,9 +83,15 @@ def ai_fields(p):
       return {badOrder:!badOrder.ok,invented:!invented.ok};
     }""")
     assert checks["badOrder"] and checks["invented"],checks
-    ai_click(reason,'1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла')
+    proposal='1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла'
+    p.evaluate("result => {window.stage391AiResult=result}",proposal)
+    p.locator(reason).click()
+    p.locator("#stage391ReasonAIReview").wait_for(state="visible",timeout=12000)
+    assert p.evaluate("() => state.steps[0].reason")==before, "AI overwrote before approval"
+    p.locator("#stage391ReasonAIReview [data-ai-preview-action='apply']").click()
+    p.locator("#stage391ReasonAIReview").wait_for(state="detached",timeout=12000)
     reason_now=p.evaluate("() => state.steps[0].reason")
-    assert reason_now=="1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла",reason_now
+    assert reason_now==proposal,reason_now
 
     result=p.evaluate("""() => {
       autoScoreChecklist();
@@ -102,7 +107,7 @@ def ai_fields(p):
       return {score:score.score,comment:score.comment,invalid:invalid===null,
               valid:valid?.field,reason:state.steps[0].reason};
     }""")
-    assert result["score"]==1 and "ссылка не обязательна" in result["comment"],result
+    assert result["score"]==1 and "смысл проверяет технолог" in result["comment"],result
     assert result["invalid"] and result["valid"]=="reason",result
 
     # Protect AI fact-based bulk proposals from a mixed valid+invalid selection.
