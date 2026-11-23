@@ -100,6 +100,8 @@ jobs:
           print('CODEFLOW_SUMMARY_STATS',json.dumps({k:stats.get(k) for k in ('files','functions','connections','dead','loc')},ensure_ascii=False))
           print('CODEFLOW_AIASK_EDGES',json.dumps(result['aiAsk_call_edges'][:8],ensure_ascii=False))
           print('CODEFLOW_ONLY',json.dumps(result['codeflow_only_samples'][:6],ensure_ascii=False))
+          for i in range(0, len(result['codeflow_edges']), 40):
+              print('CODEFLOW_EDGE_BLOCK_' + str(i//40) + '=' + json.dumps(result['codeflow_edges'][i:i+40],separators=(',',':'),ensure_ascii=False))
           PY
       - name: Store comparison as separate temporary artifact
         if: always()
