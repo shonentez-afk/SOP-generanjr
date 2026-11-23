@@ -37,7 +37,6 @@ REQUIRED={
     "src/modules/frv/stage34-study-io.js",
     "src/modules/frv/stage35-study-ai.js",
     "src/modules/frv/stage35-study.js",
-    "src/modules/frv/stage35-library.js",
     "src/modules/frv/stage35-analytics.js",
     "src/modules/frv/stage34-xlsx.js",
     "src/modules/frv/stage34-measurements.js",
