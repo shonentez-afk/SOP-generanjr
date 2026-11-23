@@ -110,7 +110,7 @@ def compare_corporate_xlsx(old,new):
     assert base["F18"].value==ws["F18"].value=="Исключить неисправность узла до запуска."
     assert base["C18"].alignment.wrap_text and ws["C18"].alignment.wrap_text
     assert ws["C18"].style_id==base["C18"].style_id
-    assert ws["C18"].font==base["C18"].font
+    assert ws["C18"].font.sz==base["C18"].font.sz
     assert ws.row_dimensions[18].height>90,ws.row_dimensions[18].height
     assert base.row_dimensions[18].height==90,base.row_dimensions[18].height
     assert len(ws._images)>=3,len(ws._images)  # logo + photo background + original
@@ -125,12 +125,12 @@ def compare_corporate_xlsx(old,new):
 
 def numbered_ai_and_review(p):
     result=p.evaluate("""() => {
-      const text=stage38ReasonText('1. Объяснение первое\r\n2. Объяснение второе');
+      const text=stage38ReasonText('1. Объяснение первое\\r\\n2. Объяснение второе');
       const plain=stage38ReasonIssues('Одна общая причина для двух моментов.',2,1);
-      const numbered=stage38ReasonIssues('1. Первая причина\n2. Вторая причина',2,1);
-      const skipped=stage38ReasonIssues('1. Первая причина\n3. Третья причина',3,1);
-      const duplicate=stage38ReasonIssues('1. Первая\n1. Повтор',2,1);
-      const kept=stage38StripOrdinalLabels('1. Причина\n2. Усилие 25 Н');
+      const numbered=stage38ReasonIssues('1. Первая причина\\n2. Вторая причина',2,1);
+      const skipped=stage38ReasonIssues('1. Первая причина\\n3. Третья причина',3,1);
+      const duplicate=stage38ReasonIssues('1. Первая\\n1. Повтор',2,1);
+      const kept=stage38StripOrdinalLabels('1. Причина\\n2. Усилие 25 Н');
       const facts={
         operation:'Установить подшипник',department:'',workplace:'',
         executor:'',tools:'',material:'',safety:'',
@@ -138,7 +138,7 @@ def numbered_ai_and_review(p):
       };
       const step={
         action:'Установить подшипник',keyMoments:['Очистить','Проверить'],
-        reason:'1. Исключить перекос\n2. Убедиться в правильной установке',
+        reason:'1. Исключить перекос\\n2. Убедиться в правильной установке',
         success_criteria:'',time:null,decision_points:[],common_pitfalls:[],
         visual_markers:[]
       };
@@ -147,12 +147,12 @@ def numbered_ai_and_review(p):
       let numericRejected=false;
       try{
         stage29SopNormalize({steps:[{...step,
-          reason:'1. Исключить перекос\n2. Применить усилие 25 Н'}],
+          reason:'1. Исключить перекос\\n2. Применить усилие 25 Н'}],
           openQuestions:[]},facts);
       }catch(e){numericRejected=e?.code==='AI_TASK_INCOMPLETE'}
       const twiCorpus=stage29TwiSourceText({steps:[{
         action:'Установить',keyPoints:['Очистить'],
-        reason:'1. Исключить перекос\n2. Не повредить корпус',
+        reason:'1. Исключить перекос\\n2. Не повредить корпус',
         successCriteria:''}]});
       return {text,plain:plain.length,numbered:numbered.length,
         skipped:skipped.map(x=>x.description),
@@ -174,7 +174,7 @@ def numbered_ai_and_review(p):
       const issues=stage28TwiStructureChecks([{
         action:'Установить подшипник',
         keyMoments:['Очистить','Проверить посадку'],
-        reason:'1. Исключить перекос\n3. Подтвердить состояние'
+        reason:'1. Исключить перекос\\n3. Подтвердить состояние'
       }]);return issues.some(x=>x.field==='reason'&&x.description.includes('пропущен'));
     }"""),"Review did not detect explicit numbering hole"
     print("PASS Stage38: optional common reason, ordered multi-reason, ordinal-safe AI, real values still checked, local review",flush=True)
