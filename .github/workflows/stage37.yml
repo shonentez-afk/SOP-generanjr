@@ -1,0 +1,107 @@
+name: Stage37 desktop audit and seven-tab screenshots
+on:
+  push:
+    branches: [feature/stage37-data-loss-guard-audit-guide-20261123]
+    paths:
+      - 'src/modules/documents/stage37-data-loss-safety.js'
+      - 'src/app/stage37-*'
+      - 'tools/build_stage37.py'
+      - 'tests/test_stage37.py'
+      - 'qa/stage37_desktop_audit_browser.py'
+      - 'docs/STAGE37*'
+      - 'docs/START_NEW_CHAT_RU.md'
+      - '.github/workflows/stage37.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage37-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Linux full regression and desktop screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen Stage36.1 and build new HTML
+        run: |
+          python tools/build_stage36_1.py --verify-release --verify-static
+          python tools/build_stage37.py --verify-static
+          python tools/build_stage37.py
+          python tools/build_stage37.py --verify-release --verify-static
+      - name: Full historical and new unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Install Chrome and workbook verification
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: All 7 tabs and historical Chrome/XLSX regression
+        run: python qa/stage37_desktop_audit_browser.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage37-desktop-audit-linux
+          path: |
+            releases/stage37-desktop-audit-browser-candidate.html
+            docs/img/stage37-*.png
+            artifacts/stage36-1-twi-print.xlsx
+          if-no-files-found: error
+          retention-days: 30
+  windows:
+    name: Windows Chrome, TWI print, photo and SOP compatibility
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build Stage37
+        run: python tools/build_stage37.py
+      - name: Install Chrome and workbook verification
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Full Chrome desktop and XLSX test
+        run: python qa/stage37_desktop_audit_browser.py
+      - name: Historical Windows ExcelJS and photo test
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage37-desktop-audit-browser-candidate.html'; m.main()"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage37-desktop-audit-windows
+          path: |
+            releases/stage37-desktop-audit-browser-candidate.html
+            docs/img/stage37-*.png
+          if-no-files-found: error
+  publish:
+    name: Publish only after BOTH Linux and Windows pass
+    needs: [linux,windows]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage37-data-loss-guard-audit-guide-20261123'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: stage37-desktop-audit-linux
+          path: .
+      - name: Commit tested HTML and authentic browser screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage37-data-loss-guard-audit-guide-20261123
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch moved; avoid publishing stale generated artifacts"
+            exit 0
+          fi
+          git add releases/stage37-desktop-audit-browser-candidate.html
+          git add docs/img/stage37-*.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage37 verified HTML plus seven authentic Chrome screens"
+            git push origin HEAD:feature/stage37-data-loss-guard-audit-guide-20261123
+          fi

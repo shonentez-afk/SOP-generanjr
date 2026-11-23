@@ -1,3 +1,16 @@
+## АКТУАЛЬНО: Stage37 — защитная проверка UX, кандидат; основная Stage36.1 сохранена (23.11.2026)
+
+- **Принято пользователем и в `main`:** Stage36.1, PR #32 merged, печатный TWI JI XLSX. Отправная база `510914ada31cdcbcb9f9fc6731500822af7c7e0c` + handoff обновление `9e5f9a63c5231ed4ecee01e0c8fce4993cd399bc`. Не принимать Stage37 без отдельной проверки на ПК.
+- **Новая ветка:** `feature/stage37-data-loss-guard-audit-guide-20261123`, модуль `src/modules/documents/stage37-data-loss-safety.js`, манифест `src/app/stage37-parts.json` (65 модулей; прежние 64 неизменны), сборщик `tools/build_stage37.py`, UI `src/app/stage37-between-vendor-icons.html`.
+- **Исправлены реальные риски:** (1) `saveDraft` не переписывает найденный черновик до явного решения; повреждённый можно скачать как текст; (2) перед открытием другого СОП сравниваются сохранённые данные, включая TWI, и запрашивается подтверждение; (3) «Новый документ» предупреждает даже для названия без шагов; (4) указана версия Stage37 в шапке и исправлена ложная подсказка про Wikimedia (ISO 7010 уже локальные).
+- **Полная CI:** [GitHub Actions #45100074508](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45100074508) — **Linux PASS, Windows PASS, 103/103 unit**, Chrome `file://`, полный Stage36.1/36/35/34/33/32 регресс, настоящий XLSX/фото/ISO, защитные сценарии; 7 скриншотов всех вкладок сделаны реальным Chrome.
+- **HTML Stage37 для проверки пользователя:** `releases/stage37-desktop-audit-browser-candidate.html` (после CI публикации), SHA-256 исходного build `ac45fbcd93e2a6f5dbf87d85f299400954e768190c2e9f981a12db3a6319ecd2`. Путь загрузки: [Stage37 в рабочей ветке](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage37-data-loss-guard-audit-guide-20261123/releases/stage37-desktop-audit-browser-candidate.html).
+- **Полное руководство с 7 реальными скриншотами:** [docs/USER_GUIDE_STAGE37_RU.md](USER_GUIDE_STAGE37_RU.md), файлы `docs/img/stage37-*.png`. [Аудит и ограничения](STAGE37_DESKTOP_AUDIT_RU.md).
+- **Вне доказанной QA:** печать на реальном принтере, производственная оценка Yandex AI и работа сетевой папки между двумя физическими ПК. Не объявлять это пройденным.
+- **Правило разработки:** не менять принятую логику, локальные библиотеки ExcelJS/ISO, прокси Yandex, редактор фото, СОП/TWI/ФРВ. Слияние Stage37 в `main` только после того, как пользователь проверит новую HTML.
+
+---
+
 ## АКТУАЛЬНО: Stage36.1 ПРИНЯТА пользователем и слита в main (23.11.2026)
 
 - Пользователь подтвердил: **«работает и сохраняет»**, то есть печатный TWI JI корректно скачивается в XLSX на его ПК.
