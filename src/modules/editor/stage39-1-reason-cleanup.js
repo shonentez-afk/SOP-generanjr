@@ -69,8 +69,21 @@ function stage391ShowReasonCleanup(stepId){
   const overlay=stage391CleanupElement('div',
     'fixed inset-0 z-[1000] bg-slate-900/60 flex items-center justify-center p-4');
   overlay.id='stage391CleanupOverlay';
+  // Standalone HTML must not depend on a Tailwind build containing arbitrary
+  // max-height/fixed classes. These explicit styles also work on Windows.
+  Object.assign(overlay.style,{
+    position:'fixed',inset:'0',zIndex:'99999',
+    display:'flex',alignItems:'center',justifyContent:'center',
+    padding:'16px',boxSizing:'border-box',overflow:'auto',
+    background:'rgba(15,23,42,0.65)'
+  });
   const dialog=stage391CleanupElement('section',
-    'bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5');
+    'bg-white rounded-xl shadow-2xl w-full max-w-4xl p-5');
+  Object.assign(dialog.style,{
+    width:'100%',maxWidth:'900px',maxHeight:'calc(100vh - 32px)',
+    overflowY:'auto',overflowX:'hidden',boxSizing:'border-box',
+    backgroundColor:'#fff',borderRadius:'12px'
+  });
   dialog.setAttribute('role','dialog');
   dialog.setAttribute('aria-modal','true');
   dialog.setAttribute('aria-labelledby','stage391CleanupTitle');
@@ -81,7 +94,7 @@ function stage391ShowReasonCleanup(stepId){
   dialog.appendChild(stage391CleanupElement('p','text-sm text-slate-600 mt-2',
     'Найдено повторов: '+preview.changed+
     (preview.skipped?' · Строк без точного совпадения: '+preview.skipped:'')+
-    '. Эти строки будут оставлены без изменений.'));
+    '. Строки без точного совпадения останутся без изменений.'));
   const compare=stage391CleanupElement('div','grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4');
   const makePanel=(label,value)=>{
     const panel=stage391CleanupElement('div','min-w-0');
@@ -89,7 +102,10 @@ function stage391ShowReasonCleanup(stepId){
     const content=stage391CleanupElement('pre',
       'whitespace-pre-wrap break-words text-sm bg-slate-50 border border-slate-200 p-3 rounded-lg min-h-24',
       value);
-    content.style.fontFamily='inherit';
+    Object.assign(content.style,{
+      fontFamily:'inherit',whiteSpace:'pre-wrap',overflowWrap:'anywhere',
+      maxWidth:'100%',boxSizing:'border-box'
+    });
     panel.appendChild(content);
     return panel;
   };
