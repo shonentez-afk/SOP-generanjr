@@ -50,7 +50,7 @@ class Stage391Contracts(unittest.TestCase):
         self.assertIn("async function stage391AcceptedReasonFill("+accepted_fn,f)
         base=new.read("src/modules/ai/stage38-base-prompts.js")
         rollback=new.read("src/modules/ai/stage39-1-base-prompts.js")
-        reason=lambda s:s.split("\\n reason:`",1)[1].split("\\n photoHint:",1)[0]
+        reason=lambda s:s.split(" reason:`",1)[1].split(" photoHint:",1)[0]
         self.assertEqual(reason(base),reason(rollback))
         self.assertIn("stage391ValidateKeyPointProposal",f)
         self.assertIn("selectedKeyPointIndex",f)
