@@ -128,13 +128,13 @@ function setTab(tab){currentTab=tab;for(const b of document.querySelectorAll(".t
 $("docview").hidden=tab!=="overview"&&tab!=="ai";$("depsview").hidden=tab!=="dependencies";$("likeview").hidden=tab!=="likec4";
 $("quick").hidden=tab!=="overview";
 $("description").textContent=tab==="overview"?"Общая схема: нажмите на компонент для просмотра связей и файлов.":tab==="ai"?"Подробная карта: входные данные каждого ИИ-запроса, ответы, валидация, применение.":tab==="dependencies"?"Выберите JS-модуль, чтобы видеть его входящие и исходящие статические вызовы.":"Восемь уровней LikeC4: исходная модель сохранена отдельно и редактируется как код.";
-if(tab==="overview"||tab==="ai")loadFrame(tab);else if(tab==="dependencies")renderExplorer();
+if(tab==="overview"||tab==="ai"){const frame=$("viewer");if(frame.dataset.loadedTab!==tab)loadFrame(tab)}else if(tab==="dependencies")renderExplorer();
 if(location.hash!=="#"+tab)history.replaceState(null,"","#"+tab)}
-function loadFrame(tab){const frame=$("viewer");frame.srcdoc=tab==="overview"?MODEL.overview:MODEL.ai;
+function loadFrame(tab){const frame=$("viewer");frame.dataset.loadedTab=tab;frame.srcdoc=tab==="overview"?MODEL.overview:MODEL.ai;
 frame.addEventListener("load",function(){try{const d=frame.contentDocument;if(!d)return;
 for(const a of d.querySelectorAll("a[href]")){const href=a.getAttribute("href")||"";if(href.includes("sop-stage39-ai-interactive.html"))a.addEventListener("click",function(evt){evt.preventDefault();setTab("ai")});else if(href.includes("sop-stage39-interactive.html"))a.addEventListener("click",function(evt){evt.preventDefault();setTab("overview")})}
 }catch(err){}},{once:true})}
-function pickOverview(id){if(currentTab!=="overview")setTab("overview");try{const frame=$("viewer");const win=frame.contentWindow;if(win&&typeof win.select==="function"){win.select(id);const el=frame.contentDocument.querySelector('.node[data-id="'+id+'"]');el&&el.scrollIntoView({behavior:"smooth",block:"center",inline:"center"})}}catch(err){}}
+function pickOverview(id){const frame=$("viewer");const selectNode=()=>{try{const win=frame.contentWindow;if(win&&typeof win.select==="function"){win.select(id);const el=frame.contentDocument.querySelector('.node[data-id="'+id+'"]');el&&el.scrollIntoView({behavior:"smooth",block:"center",inline:"center"})}}catch(err){}};if(currentTab!=="overview"||frame.dataset.loadedTab!=="overview"){frame.addEventListener("load",selectNode,{once:true});setTab("overview")}else if(frame.contentDocument?.readyState==="complete")selectNode();else frame.addEventListener("load",selectNode,{once:true})}
 function linkTo(p,line){return ROOT+encodeURI(p)+(line?"#L"+line:"")}
 function depButton(edge,dir){const other=dir==="in"?edge.from:edge.to;return '<button class="dep" data-other="'+e(other)+'" data-edge="'+e(edge.from+"|"+edge.to)+'"><b>'+e(fname(other))+'</b><small>'+e(groupLabels[other.split("/")[2]]||other.split("/")[2])+' · '+edge.callSites+' ссылок на функции</small></button>'}
 function renderMenu(){const list=GRAPH.nodes.filter(n=>(group==="all"||n.group===group)&&(!query||n.path.toLowerCase().includes(query)));$("results").textContent="Показано файлов: "+list.length+"/"+GRAPH.nodes.length;
@@ -163,7 +163,7 @@ $("search").addEventListener("input",x=>{query=x.target.value.toLowerCase();rend
 $("group").addEventListener("change",x=>{group=x.target.value;renderMenu()});
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
 document.querySelectorAll("[data-focus]").forEach(b=>b.addEventListener("click",()=>pickOverview(b.dataset.focus)));
-document.querySelectorAll("[data-c4view]").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.c4view;if(v==="ai"){setTab("ai");return}if(v==="landscape"){setTab("overview");return}const id={modules:"runtime",sop:"sop",twi:"twi",frv:"frv",storage:"library",excel:"sopXlsx"}[v];if(id){setTab("overview");const f=$("viewer");f.addEventListener("load",()=>pickOverview(id),{once:true})}}));
+document.querySelectorAll("[data-c4view]").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.c4view;if(v==="ai"){setTab("ai");return}if(v==="landscape"){setTab("overview");return}const id={modules:"runtime",sop:"sop",twi:"twi",frv:"frv",storage:"library",excel:"sopXlsx"}[v];if(id){pickOverview(id)}}));
 const h=location.hash.slice(1);setTab(["overview","ai","dependencies","likec4"].includes(h)?h:"overview");
 }
 init();
