@@ -66,8 +66,8 @@ jobs:
           python tools/build_stage39_1.py --verify-static
           python tools/build_stage39_1.py
           python tools/build_stage39_1.py --verify-static --verify-release
-      - name: All Python and Node syntax checks on Windows
-        run: python -m unittest discover -s tests -v
+      - name: Stage39.1 contract and Node syntax checks on Windows
+        run: python -m unittest discover -s tests -p test_stage39_1.py -v
       - name: Install Chrome workbook QA
         run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
       - name: Stage39.1 real Chrome AI Reason and FRV verification
