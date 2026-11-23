@@ -1,0 +1,36 @@
+name: Stage41 architecture Chrome review
+on:
+  push:
+    branches:
+      - docs/stage41-architecture-eval-20261123
+    paths:
+      - .github/workflows/stage41-architecture-chrome.yml
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout architecture documentation
+        uses: actions/checkout@v4
+        with:
+          ref: docs/archify-stage39-architecture-20261123
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Playwright (browser is preinstalled on GitHub runner)
+        run: python -m pip install 'playwright>=1.50,<2'
+      - name: Test offline Stage41 architecture in real Chrome and capture screenshots
+        env:
+          ARCHITECTURE_SHOTS: ${{ runner.temp }}/architecture-shots
+        run: python docs/diagrams/qa/stage41-architecture-browser.py
+      - name: Save screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage41-architecture-chrome-screenshots
+          path: ${{ runner.temp }}/architecture-shots/
+          retention-days: 7
+          if-no-files-found: warn
