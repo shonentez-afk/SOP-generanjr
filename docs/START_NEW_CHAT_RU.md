@@ -1,3 +1,14 @@
+## РЕЗУЛЬТАТ Stage38: CI PASS, пользовательская приёмка пока НЕТ (23.11.2026)
+
+- **Принятая основная версия:** Stage37 в `main`. Новая Stage38 только в `feature/stage38-numbered-reasons-corporate-xlsx-20261123`, [PR #34 DRAFT](https://github.com/shonentez-afk/SOP-generanjr/pull/34).
+- **Проверки Stage38:** [GitHub Actions #45108006229](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45108006229) — Linux PASS, Windows PASS, **106/106 unit**, реальный Chrome `file://`, полная регрессия Stage37 и ниже. openpyxl подтвердил неизменность геометрии, формул, фото, стилей и листов корпорационного СОП XLSX по сравнению со Stage37. Нумерованные причины остались в одной ячейке; высота строки 190 вместо прежнего ограничения 90.
+- **Проверенный HTML:** [Stage38 для скачивания](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage38-numbered-reasons-corporate-xlsx-20261123/releases/stage38-numbered-reasons-corporate-xlsx-browser-candidate.html), SHA256 `b022ad49cab44395a45d28b0c8624525f5992e1220a975b7516b83461996ba1c`.
+- **Реализация:** 66 модулей: 7 изменённых модулей перенесены в **отдельные Stage38-копии**, оригиналы Stage19–37 остаются побайтово неизменными (исторические тесты PASS); один новый `src/modules/quality/stage38-reasons.js`. Структура `steps[].reason` не изменена, причины остаются одной свободной строкой, их можно нумеровать внутри поля; TWI JI XLSX также сохраняет строки. Новые промпты не меняют настройки/транспорт Yandex.
+- **Следующий шаг:** пользователь открывает новую HTML в Chrome/Edge и проверяет печать реального корпоративского XLSX с несколькими причинами (сначала сохранить резервную копию библиотеки). **Не сливать с `main` без подтверждения пользователя.**
+- [Подробный контракт и тесты](STAGE38_NUMBERED_REASONS_XLSX_RU.md).
+
+---
+
 ## АКТУАЛЬНО: Stage38 — нумерованные причины в корпоративском шаблоне, новая ветка, НЕ ПРИНЯТА (23.11.2026)
 
 - Принятая версия **Stage37 в main**, PR #33 merged, подтверждение «все работает». Не менять основную версию до CI и приёмки.
