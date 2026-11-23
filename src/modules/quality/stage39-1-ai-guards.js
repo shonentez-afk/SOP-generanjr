@@ -62,6 +62,10 @@ function stage391ValidateReasonProposal(previous,candidate,step,sourceOverride){
   }
   const unconfirmed=stage29HasUnconfirmedNumber(
     stage38StripOrdinalLabels(value),sourceOverride??stage391FactCorpus(step),0);
+  const whyProblems=stage391TwiReasonQualityIssues(value,step,
+    sourceOverride??stage391TwiSourceFacts(step),previous).filter(x=>x.blockAI);
+  if(whyProblems.length)
+    return {ok:false,message:'ИИ предложил некорректное объяснение: '+whyProblems[0].message};
   if(unconfirmed.length)
     return {ok:false,message:'ИИ предложил неподтверждённые числовые параметры: '+unconfirmed.join(', ')+'.'};
   return {ok:true,value};
@@ -93,3 +97,105 @@ function stage391ValidateTextProposal(candidate,step,sourceOverride){
     return {ok:false,message:'ИИ предложил неподтверждённые числовые параметры: '+extras.join(', ')+'.'};
   return {ok:true,value};
 }
+
+// TWI JI WHAT / HOW / WHY quality: fail closed only for obvious AI mistakes.
+// Subjective or weakly supported concerns are advisory, never an automatic
+// rewrite of user-authored SOP content or FRV observations.
+function stage391TwiPlain(text){
+  return String(text||'').toLocaleLowerCase('ru')
+    .replace(/^\s*\d{1,2}[.)]\s*/u,'')
+    .replace(/[^\p{L}\p{N}]+/gu,' ').replace(/\s+/g,' ').trim();
+}
+function stage391TwiSourceFacts(step){
+  const m=state.meta||{};
+  return [state.description,m.operation,m.safety,m.tools,m.material,
+    step?.action,...(Array.isArray(step?.keyMoments)?step.keyMoments:[]),
+    step?.successCriteria,...(step?.decisionPoints||[])].map(x=>String(x||'')).join('\n');
+}
+function stage391TwiReasonQualityIssues(reason,step,evidence='',previous=''){
+  const points=(Array.isArray(step?.keyMoments)?step.keyMoments:[])
+    .map(stage391TwiPlain).filter(Boolean);
+  const action=stage391TwiPlain(step?.action);
+  const source=stage391TwiPlain(evidence||stage391TwiSourceFacts(step));
+  const before=stage391TwiPlain(previous);
+  const issues=[];
+  const hazards=[
+    ['перегрев','перегрев'],['возгоран','возгорание'],
+    ['поражен','поражение током'],['взрыв','взрыв'],
+    ['ожог','ожог'],['заклиниван','заклинивание'],
+    ['поломк','поломка'],['травм','травма'],
+    ['снижени точност','снижение точности']
+  ];
+  const lines=String(reason||'').replace(/\r\n?/g,'\n').split('\n');
+  for(let i=0;i<lines.length;i++){
+    if(!lines[i].trim())continue;
+    const value=stage391TwiPlain(lines[i]);
+    if(!value)continue;
+    const echo=points.some(p=>p.length>=22&&(
+      value===p||value.startsWith(p+' ')||value.startsWith(p+' необходимо')||
+      value.startsWith(p+' для')||value.startsWith(p+' чтобы')
+    ))||action.length>=22&&(value===action||value.startsWith(action+' для'));
+    if(echo){
+      issues.push({line:i+1,kind:'repeated_key_point',
+        message:'Причина повторяет ключевой момент или действие вместо ответа «почему».',
+        blockAI:true});
+    }
+    const vague=(
+      /^(?:это\s+)?(?:необходимо|нужно|требуется|важно)\s+для\s+(?:обеспечени|выполнени|соблюдени)/u.test(value)||
+      /^(?:для\s+)?(?:обеспечени|повышени)\s+(?:качества|безопасности|эффективности|правильности|точности)\s+(?:работы|выполнения|операции)?$/u.test(value)||
+      /^(?:для\s+)?(?:проверки|контроля)\s+(?:работы|функционирования)\s+(?:инструмента|оборудования)?(?:\s+перед\s+началом\s+работы)?$/u.test(value)||
+      /^(?:чтобы\s+)?(?:правильно|безопасно|качественно)\s+выполнить\s+(?:работу|операцию|действие)$/u.test(value)
+    );
+    if(vague&&!echo){
+      issues.push({line:i+1,kind:'generic_why',
+        message:'В причине только общая цель («для качества/безопасности»), без конкретного объяснения.',
+        blockAI:true});
+    }
+    // Existing manually-entered risks are not invalidated retroactively.
+    // AI must not introduce a NEW physical consequence not grounded in source.
+    for(const [token,label] of hazards){
+      if(value.includes(token)&&!source.includes(token)&&!before.includes(token)){
+        issues.push({line:i+1,kind:'unconfirmed_consequence',
+          message:'Последствие «'+label+'» не подтверждено описанием операции; уточните у технолога.',
+          blockAI:true});
+        break;
+      }
+    }
+  }
+  return issues;
+}
+// Advisory local review: preserve existing text, numbering and the user's
+// right to record a justified reason even if an automated heuristic flags it.
+const stage391PreviousTwiStructureChecks=stage28TwiStructureChecks;
+stage28TwiStructureChecks=function stage391TwiStructureWithWhy(steps){
+  const issues=stage391PreviousTwiStructureChecks(steps);
+  (Array.isArray(steps)?steps:[]).forEach((step,index)=>{
+    const why=stage391TwiReasonQualityIssues(step?.reason,step);
+    for(const problem of why.slice(0,3)){
+      issues.push({stepId:index+1,field:'reason',severity:'info',
+        type:'incomplete',status:'open',fixValue:null,thread:[],
+        description:'Проверьте причину, строка '+problem.line+': '+problem.message,
+        suggestion:'Причина TWI отвечает «ПОЧЕМУ» конкретный приём важен. Уточните факт у технолога, не повторяйте КМ и не придумывайте последствия.'});
+    }
+  });
+  return issues;
+};
+// Generation retains every source step and original Reasons Why. When the AI
+// produces a weak or speculative explanation, ask a question rather than
+// inventing a reason or rejecting the full otherwise-valid SOP draft.
+const stage391PreviousSopNormalize=stage29SopNormalize;
+stage29SopNormalize=function stage391NormalizeWithReasonReview(sop,input){
+  const result=stage391PreviousSopNormalize(sop,input);
+  const source=[input?.userDescription,input?.operation,input?.safety,
+    input?.tools,input?.material].map(x=>String(x||'')).join('\n');
+  const questions=Array.isArray(result.sop.openQuestions)?result.sop.openQuestions:[];
+  (result.sop.steps||[]).forEach((step,i)=>{
+    const concerns=stage391TwiReasonQualityIssues(step.reason,step,source);
+    if(concerns.length){
+      questions.push('Шаг '+(i+1)+': уточните WHY ключевого момента. '+
+        concerns[0].message);
+    }
+  });
+  result.sop.openQuestions=[...new Set(questions)].slice(0,15);
+  return result;
+};
