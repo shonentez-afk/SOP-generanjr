@@ -109,8 +109,19 @@ def compare_corporate_xlsx(old,new):
     assert geometry(base)==geometry(ws),(geometry(base),geometry(ws))
     assert base["C18"].value==ws["C18"].value==NUMBERED
     assert base["F18"].value==ws["F18"].value=="Исключить неисправность узла до запуска."
-    assert base["C18"].alignment.wrap_text and ws["C18"].alignment.wrap_text
-    assert ws["C18"].style_id==base["C18"].style_id
+    # One intentional format change: Reasons are flush left and top-aligned.
+    # Compare unrelated style pieces to ensure company formatting is untouched.
+    for ref in ("C18","F18","J18"):
+        current=ws[ref]
+        original=base[ref]
+        assert current.alignment.horizontal=="left",(ref,current.alignment)
+        assert current.alignment.vertical=="top",(ref,current.alignment)
+        assert current.alignment.wrap_text is True,(ref,current.alignment)
+        assert original.alignment.horizontal=="center",(ref,original.alignment)
+        assert current._style.fontId==original._style.fontId,ref
+        assert current._style.fillId==original._style.fillId,ref
+        assert current._style.borderId==original._style.borderId,ref
+        assert current._style.numFmtId==original._style.numFmtId,ref
     assert ws["C18"].font.sz==base["C18"].font.sz
     assert ws.row_dimensions[18].height>90,ws.row_dimensions[18].height
     assert base.row_dimensions[18].height==90,base.row_dimensions[18].height
