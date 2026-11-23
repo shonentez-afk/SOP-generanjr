@@ -84,7 +84,7 @@ def localize_overview(source: str) -> str:
         '<footer>Локальная схема принятой Stage41 · '
         '<a href="../constructor/Stage41.html" target="_blank">Открыть конструктор</a> · '
         '<a href="../index.html">К началу архива</a> · '
-        '<a href="../diagrams/archify/sop-stage41.architecture.json">'
+        '<a href="../viewer/diagrams/archify/sop-stage41.architecture.json.html">'
         'JSON архитектуры</a></footer>',
         text, count=1, flags=re.DOTALL,
     )
@@ -158,6 +158,15 @@ def localize_unified(source: str) -> str:
         'в одном архиве. <a href="../index.html">На главную</a>. '
         'ИИ-запросы в схемах — примеры структуры, а не реальные данные производства.</footer>',
         text, count=1, flags=re.DOTALL)
+    # Make structured model/data links readable in a browser instead of downloading unknown extensions.
+    for raw in (
+        "likec4/model.c4", "likec4/views.c4",
+        "data/stage41-ast-evidence.json", "data/stage41-codeflow-graph.json",
+    ):
+        text = text.replace(
+            'href="../diagrams/' + raw + '"',
+            'href="../viewer/diagrams/' + raw + '.html"',
+        )
     text = scrub_external_brand(text)
     if not re.search(r'href="\.\./constructor/Stage41\.html"', text):
         raise AssertionError("missing offline application link")
@@ -208,6 +217,21 @@ def write_viewers(root: Path) -> dict[str, int]:
         store_text(dest, source_html(relative, text, raw_rel, map_rel))
         numbers["files"] += 1
         numbers["lines"] += len(text.splitlines())
+    # Browser-friendly, line-addressable viewers for editable architecture files too.
+    for src in (root / "diagrams").rglob("*"):
+        if not src.is_file() or src.suffix.lower() not in VIEW_EXTENSIONS:
+            continue
+        try:
+            contents = src.read_text("utf-8")
+        except UnicodeDecodeError:
+            continue
+        relative = src.relative_to(root).as_posix()
+        dest = root / "viewer" / (relative + ".html")
+        raw_link = os.path.relpath(src, dest.parent).replace(os.sep, "/")
+        map_link = os.path.relpath(root / "maps" / "stage41-unified.html", dest.parent).replace(os.sep, "/")
+        store_text(dest, source_html(relative, contents, raw_link, map_link))
+        numbers["files"] += 1
+        numbers["lines"] += len(contents.splitlines())
     return numbers
 
 def home_html(manifest: list[str]) -> str:
@@ -225,22 +249,22 @@ h1{{font-size:clamp(28px,4vw,48px);line-height:1.16;letter-spacing:-.03em;margin
 p{{color:var(--muted);max-width:850px}}h2{{font-size:19px}}.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}}
 .card{{background:var(--panel);border:1px solid var(--line);padding:20px;border-radius:16px;display:flex;flex-direction:column;gap:11px}}
 .card p{{margin:0;flex:1}}.action{{background:#1d574c;color:#ddfff7;border:1px solid #72dabc;border-radius:10px;padding:11px 15px;display:inline-block;text-decoration:none;font-weight:700}}
-.action:hover{{background:#287565}}.secondary{{background:#123f60;border-color:#5f9cc9}}.fine{{font-size:13px;color:#b8cadb}}
+.action:hover{{background:#287565}}.help{{max-width:1000px;background:#123349;border-left:3px solid #72dabc;padding:12px 17px;border-radius:9px;color:#dcf2ff}}.secondary{{background:#123f60;border-color:#5f9cc9}}.fine{{font-size:13px;color:#b8cadb}}
 a{{color:#8dd3ff}}li{{margin-bottom:8px}}
 .badge{{display:inline-block;padding:4px 10px;border:1px solid #416c82;border-radius:99px;margin:3px;color:#cbe3f1;font-size:12px}}
 hr{{border:0;border-top:1px solid var(--line);margin:30px 0}}
 </style></head><body>
 <header><small>Полный автономный комплект · Stage41</small><h1>Конструктор СОП, исходники и карты — вместе</h1>
-<p>Этот комплект работает с локальными файлами. Из него можно открыть принятую сборку конструктора, изучить взаимосвязи функций, перейти из схемы к конкретной строке исходного кода и получить исходники для дальнейшей разработки.</p></header><main>
+<p>Этот комплект работает с локальными файлами. Из него можно открыть принятую сборку конструктора, изучить взаимосвязи функций, перейти из схемы к конкретной строке исходного кода и получить исходники для дальнейшей разработки.</p><p class="help"><strong>Важно:</strong> сначала полностью распакуйте ZIP. Открывайте <b>SOP-Stage41/index.html</b> из папки рядом с каталогами <b>maps</b>, <b>constructor</b>, <b>viewer</b> и <b>source</b>. Если открыть только этот HTML из предпросмотра архива или отдельно скопировать файл, кнопки не найдут соседние страницы.</p></header><main>
 <div class="cards">
 <div class="card"><h2>Интерактивная архитектура</h2><p>73 активных модуля · 367 межфайловых связей · подробные схемы СОП, TWI, ФРВ и ИИ · доказательства вызовов в AST.</p>
 <a class="action" href="maps/stage41-unified.html">Открыть карту программы</a></div>
 <div class="card"><h2>Конструктор СОП Stage41</h2><p>Принятая версия приложения в одном HTML. Локальная сборка, редактор фотографий, СОП, TWI, ФРВ, печатные XLSX и библиотека документов.</p>
 <a class="action" href="constructor/Stage41.html">Запустить конструктор</a></div>
 <div class="card"><h2>Исходные файлы</h2><p>Каталог исходников, сборочные скрипты, настройки прокси, тесты. HTML-просмотрщики с номерами строк и прямыми переходами из карты.</p>
-<a class="action secondary" href="source/src/app/stage41-parts.json">Посмотреть манифест Stage41</a></div>
+<a class="action secondary" href="viewer/src/app/stage41-parts.json.html">Посмотреть манифест Stage41</a></div>
 <div class="card"><h2>Исходники блок-схем</h2><p>LikeC4 .c4, Archify JSON, граф CodeFlow и синтаксическое подтверждение связей. Можно анализировать без сетевого подключения.</p>
-<a class="action secondary" href="diagrams/likec4/model.c4">Открыть модель LikeC4</a></div>
+<a class="action secondary" href="viewer/diagrams/likec4/model.c4.html">Открыть модель LikeC4</a></div>
 </div>
 <hr><h2>Как работать с комплектом</h2>
 <ol><li>Распакуйте ZIP полностью в одну папку: не переносите карту отдельно от каталога viewer и source.</li>
@@ -339,7 +363,7 @@ def main() -> None:
     store_text(bundle/"index.html",home_html(manifest))
     store_text(bundle/"README_OFFLINE.txt",
         "SOP-generanjr Stage41 / portable offline archive\n\n"
-        "1. Unzip the whole package.\n2. Open index.html in Chrome/Edge.\n"
+        "1. Unzip the whole package (do not preview index.html inside ZIP).\n2. Open index.html in Chrome/Edge from the extracted SOP-Stage41 folder.\n"
         "3. Open the architecture explorer or standalone constructor from the home page.\n"
         "4. Source links open local HTML viewers with numbered lines; raw source files are adjacent under source/.\n"
         "5. Network access is required only when using the constructor's remote AI proxy.\n"

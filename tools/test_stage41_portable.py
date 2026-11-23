@@ -22,9 +22,27 @@ with sync_playwright() as p:
 
     page.goto((ROOT/"index.html").as_uri(),wait_until="load")
     assert "Stage41" in page.title()
-    assert page.locator('a[href="maps/stage41-unified.html"]').count()==1
-    assert page.locator('a[href="constructor/Stage41.html"]').count()==1
+    for href in (
+        "maps/stage41-unified.html", "constructor/Stage41.html",
+        "viewer/src/app/stage41-parts.json.html", "viewer/diagrams/likec4/model.c4.html",
+    ):
+        assert page.locator('a[href="'+href+'"]').count()==1,href
     page.screenshot(path=str(OUT/"01-home.png"),full_page=True)
+
+    # Test actual clicks, not merely the presence of href attributes.
+    page.locator('a[href="viewer/src/app/stage41-parts.json.html"]').click()
+    assert "stage41-parts.json" in page.title()
+    assert page.locator(".line").count() > 4
+    page.go_back(wait_until="load")
+    page.locator('a[href="viewer/diagrams/likec4/model.c4.html"]').click()
+    assert "model.c4" in page.title()
+    assert page.locator(".line").count() > 4
+    page.go_back(wait_until="load")
+    app_from_home=ctx.new_page()
+    app_from_home.goto((ROOT/"index.html").as_uri(),wait_until="load")
+    app_from_home.locator('a[href="constructor/Stage41.html"]').click()
+    assert app_from_home.locator("#generateSopBtn").count()==1
+    app_from_home.close()
 
     page.locator('a[href="maps/stage41-unified.html"]').click()
     assert "Stage41" in page.title(),page.title()
@@ -39,12 +57,26 @@ with sync_playwright() as p:
     local_refs=links.evaluate_all("(items)=>items.map(x=>x.getAttribute('href')).filter(x=>x&&x.includes('../viewer/'))")
     assert len(local_refs)>0,"Overview did not link to local source viewer"
     assert all("http" not in x for x in local_refs)
+    with page.expect_popup() as source_popup:
+        frame.locator('#details a[href*="../viewer/"]').first.click()
+    source_page=source_popup.value
+    source_page.wait_for_load_state("load")
+    assert source_page.url.startswith("file://"),source_page.url
+    assert source_page.locator(".line").count()>0
+    source_page.close()
     page.screenshot(path=str(OUT/"02-overview-local-links.png"),full_page=True)
 
     page.locator('[data-tab="ai"]').click()
     frame.locator("body").wait_for()
     assert "Stage41" in frame.locator("body").inner_text()
     assert frame.locator('a[href*="../viewer/"]').count()>=1
+    with page.expect_popup() as ai_popup:
+        frame.locator('a[href*="../viewer/"]').first.click()
+    ai_source=ai_popup.value
+    ai_source.wait_for_load_state("load")
+    assert ai_source.url.startswith("file://"),ai_source.url
+    assert ai_source.locator(".line").count()>0
+    ai_source.close()
     page.screenshot(path=str(OUT/"03-ai-local-links.png"),full_page=True)
 
     page.locator('[data-tab="deps"]').click()
@@ -60,6 +92,13 @@ with sync_playwright() as p:
         page.locator("#incoming .dep").first.click()
     assert page.locator("#detail tbody tr").count()>0
     assert page.locator("#detail a[href*='../viewer/']").count()>0
+    with page.expect_popup() as dep_popup:
+        page.locator("#detail a[href*='../viewer/']").first.click()
+    dep_source=dep_popup.value
+    dep_source.wait_for_load_state("load")
+    assert dep_source.url.startswith("file://"),dep_source.url
+    assert dep_source.locator(".line").count()>0
+    dep_source.close()
     page.screenshot(path=str(OUT/"04-dependencies.png"),full_page=True)
 
     source=(ROOT/"viewer"/"src"/"modules"/"ai"/"stage41-quality.js.html")
@@ -74,7 +113,7 @@ with sync_playwright() as p:
 
     page.locator('[data-tab="c4"]').click()
     assert page.locator("#c4Cards .card").count()==8
-    assert page.locator("#c4Panel a[href='../diagrams/likec4/model.c4']").count()==1
+    assert page.locator("#c4Panel a[href='../viewer/diagrams/likec4/model.c4.html']").count()==1
     page.locator('#c4Cards [data-view="2"]').click()
     assert page.locator("#iframePanel").is_visible()
     page.screenshot(path=str(OUT/"06-c4-level.png"),full_page=True)
