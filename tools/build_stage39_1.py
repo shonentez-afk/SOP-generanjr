@@ -31,6 +31,7 @@ EXTRA={
   "src/modules/quality/stage38-reasons.js":"src/modules/quality/stage39-1-ai-guards.js",
   "src/modules/ai/stage27-analogs-history.js":"src/modules/app/stage39-1-identity.js",
 }
+NEW_MODULE="src/modules/editor/stage39-1-reason-cleanup.js"
 def read(path):
     return (ROOT/path).read_text(encoding="utf-8")
 
@@ -44,7 +45,9 @@ def build() -> str:
         expected.append(REPLACEMENTS.get(src,src))
         if src in EXTRA:
             expected.append(EXTRA[src])
-    assert len(modules)==67 and len(expected)==69 and len(set(expected))==69
+            if EXTRA[src]=="src/modules/app/stage39-1-identity.js":
+                expected.append(NEW_MODULE)
+    assert len(modules)==67 and len(expected)==70 and len(set(expected))==70
     assert spec["modules"]==expected,"Unexpected module or execution order"
     assert spec["baseRelease"]==old["outputRelease"]
     assert spec["outputRelease"]==OUT.relative_to(ROOT).as_posix()
@@ -59,7 +62,7 @@ def verify_static(html=None):
     old=json.loads(PREVIOUS.read_text(encoding="utf-8"))
     baseline=BASELINE.read_text(encoding="utf-8")
     # Ensure baseline actually matches its original 67 modules, and that only
-    # the 9 approved source substitutions and two added modules differ.
+    # the 9 approved source substitutions and three added modules differ.
     assert modular.build_from_manifest(old)==baseline,"Accepted Stage39 baseline changed"
     expected=baseline
     for old_path,new_path in REPLACEMENTS.items():
@@ -69,7 +72,10 @@ def verify_static(html=None):
     for after_path,extra_path in EXTRA.items():
         marker=read(after_path)
         assert expected.count(marker)==1,after_path
-        expected=expected.replace(marker,marker+read(extra_path),1)
+        addition=read(extra_path)
+        if extra_path=="src/modules/app/stage39-1-identity.js":
+            addition+=read(NEW_MODULE)
+        expected=expected.replace(marker,marker+addition,1)
     assert result==expected,"Unexpected standalone HTML change against accepted Stage39"
 
 
