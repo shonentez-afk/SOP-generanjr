@@ -25,6 +25,9 @@ const tasks = JSON.parse(between(pack.ai, taskBlob)).tasks;
 assert.equal(tasks.length, 16);
 assert.equal(tasks.filter(t => t.status === 'not_in_ui').length, 1);
 assert.equal(pack.graph.summary.activeModules, 67);
+assert.equal(pack.codeflowOnly.length, 77);
+const originalPairs=new Set(pack.graph.edges.map(e=>e.from+'|'+e.to));
+assert.ok(pack.codeflowOnly.every(e=>e.codeflowOnly===true&&!originalPairs.has(e.from+'|'+e.to)));
 assert.equal(pack.graph.summary.moduleEdges, 258);
 assert.equal(pack.graph.summary.recognizedCrossFileCallSites, 995);
 assert.deepEqual(pack.graph.summary, callgraph.summary);
@@ -49,7 +52,7 @@ function fakeElement() {
     addEventListener() {}
   };
 }
-const ids = 'viewer stats search group filelist results modulename modulepath modulechips centername openfile incoming outgoing edgeDetails quick description docview depsview likeview';
+const ids = 'viewer stats search group filelist results modulename modulepath modulechips centername openfile incoming outgoing edgeDetails quick description docview depsview likeview toggleCodeFlow hotspots';
 const el = new Map(ids.split(' ').map(id => [id, fakeElement()]));
 const tabControls = ['overview', 'ai', 'dependencies', 'likec4'].map(tab => ({
   dataset: { tab }, classList: { toggle() {} }, addEventListener() {}
@@ -59,6 +62,9 @@ const viewControls = ['landscape','modules','sop','ai','twi','frv','storage','ex
   el.dataset.c4view = view;
   return el;
 });
+const toggle=el.get('toggleCodeFlow');
+let toggleCallback=null;
+toggle.addEventListener=(kind,cb)=>{if(kind==='click')toggleCallback=cb};
 const frame = el.get('viewer');
 let loads = 0;
 const selected = [];
@@ -78,8 +84,8 @@ const document = {
 const location = { hash: '' };
 const history = { replaceState(_a, _b, hash) { location.hash = hash; } };
 const vm = { document, location, history };
-runInNewContext(jsSource(html) + '\n;globalThis.__api = {setTab,pickOverview};', vm);
-const { setTab, pickOverview } = vm.__api;
+runInNewContext(jsSource(html) + '\n;globalThis.__api = {setTab,pickOverview,visibleEdges};', vm);
+const { setTab, pickOverview, visibleEdges } = vm.__api;
 assert.equal(loads, 1, 'initial overview should be loaded once');
 setTab('overview');
 assert.equal(loads, 1, 'same tab must not reload an iframe');
@@ -97,4 +103,11 @@ assert.ok(selected.includes('frv'), 'delayed AI -> FRV selection failed');
 pickOverview('twi');
 assert.equal(loads, 3);
 assert.ok(selected.includes('twi'));
-console.log('PASS: 67 modules / 258 edges / 995 references, 16 AI tasks, 3 JS scripts, navigation smoke');
+setTab('dependencies');
+assert.equal(visibleEdges().length,258);
+assert.equal(typeof toggleCallback,'function');
+toggleCallback();
+assert.equal(visibleEdges().length,335);
+toggleCallback();
+assert.equal(visibleEdges().length,258);
+console.log('PASS: 67 modules / 258 baseline edges + 77 CodeFlow-only / 995 references, 16 AI tasks, 3 JS scripts, navigation & toggle smoke');
