@@ -38,7 +38,7 @@ DIAGRAM_JSON = [
     "sop-stage41.architecture.json", "sop-stage41-ai.dataflow.json"
 ]
 BRAND_PATTERN = re.compile("github", re.IGNORECASE)
-PRIVATE_PROXY_URL = re.compile(r"https?://functions\\.yandexcloud\\.net/[A-Za-z0-9_-]+", re.IGNORECASE)
+PRIVATE_PROXY_URL = re.compile(r"https?://functions\.yandexcloud\.net/[A-Za-z0-9_-]+", re.IGNORECASE)
 def redact_private_proxy(value: str) -> str:
     return PRIVATE_PROXY_URL.sub("PROXY_URL_REMOVED", value)
 
@@ -343,7 +343,7 @@ def main() -> None:
     # One current working copy of the executable, no historical releases.
     original = (app / APP_RELEASE).read_text("utf-8")
     constructor = scrub_external_brand(original)
-    constructor, replaced = re.subn(r"const\\s+AI_PROXY_BASE\\s*=\\s*['\\\"][^'\\\"]+['\\\"]", "const AI_PROXY_BASE=''", constructor)
+    constructor, replaced = re.subn(r"const AI_PROXY_BASE='[^']*'", "const AI_PROXY_BASE=''", constructor)
     if replaced != 1:
         raise AssertionError("Could not remove exactly one embedded proxy URL")
     if PRIVATE_PROXY_URL.search(constructor):
