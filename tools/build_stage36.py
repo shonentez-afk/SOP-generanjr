@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage36: reproducible one-file Chrome/Edge file:// release, preserving accepted Stage31."""
+"""Stage36: isolated one-file release based on accepted Stage35."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -11,7 +11,7 @@ sys.path.insert(0,str(ROOT/"tools"))
 import build_stage19 as modular
 
 MANIFEST=ROOT/"src/app/stage36-parts.json"
-BASELINE=ROOT/"releases/stage36-library-safety-browser-candidate.html"
+BASELINE=ROOT/"releases/stage35-frv-ux-functional-audit-browser-candidate.html"
 OUT=ROOT/"releases/stage36-library-safety-browser-candidate.html"
 REQUIRED={
     "src/modules/ai/stage27-core.js",
