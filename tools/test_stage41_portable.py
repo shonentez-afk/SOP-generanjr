@@ -10,6 +10,10 @@ ROOT=Path(sys.argv[1]).resolve()
 OUT=Path(sys.argv[2]).resolve() if len(sys.argv)>2 else Path(os.environ.get("RUNNER_TEMP","/tmp"))/"portable-captures"
 OUT.mkdir(parents=True,exist_ok=True)
 assert (ROOT/"index.html").is_file() and (ROOT/"constructor"/"Stage41.html").is_file()
+assert not (ROOT/"source"/"proxy").exists()
+for item in ROOT.rglob("*"):
+    if item.is_file():
+        assert b"functions.yandexcloud.net/" not in item.read_bytes(),item
 errors=[]
 external=[]
 

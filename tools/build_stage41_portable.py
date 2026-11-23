@@ -24,7 +24,7 @@ PACKAGE_NAME = "SOP-Stage41-Full-Offline.zip"
 APP_RELEASE = "releases/stage41-ai-quality-20261123.html"
 DISPLAY_NAME = "Конструктор СОП — Stage41"
 ACTIVE_MANIFEST = "src/app/stage41-parts.json"
-SOURCES = ("src", "tools", "proxy", "tests", "qa")
+SOURCES = ("src", "tools", "tests", "qa")
 VIEW_EXTENSIONS = {
     ".js", ".jsx", ".ts", ".mjs", ".py", ".json", ".html", ".css", ".c4",
     ".md", ".txt", ".yml", ".yaml", ".sh", ".ps1", ".bat", ".cmd", ".svg", ".xml"
@@ -38,6 +38,10 @@ DIAGRAM_JSON = [
     "sop-stage41.architecture.json", "sop-stage41-ai.dataflow.json"
 ]
 BRAND_PATTERN = re.compile("github", re.IGNORECASE)
+PRIVATE_PROXY_URL = re.compile(r"https?://functions\\.yandexcloud\\.net/[A-Za-z0-9_-]+", re.IGNORECASE)
+def redact_private_proxy(value: str) -> str:
+    return PRIVATE_PROXY_URL.sub("PROXY_URL_REMOVED", value)
+
 
 def ensure_count(text: str, needle: str, context: str, count: int = 1) -> None:
     actual = text.count(needle)
@@ -47,7 +51,7 @@ def ensure_count(text: str, needle: str, context: str, count: int = 1) -> None:
 def scrub_external_brand(text: str) -> str:
     # The only permitted editing of copied source files is neutralization of
     # brand references; algorithms, whitespace and line numbers remain untouched.
-    return BRAND_PATTERN.sub("offline", text)
+    return redact_private_proxy(BRAND_PATTERN.sub("offline", text))
 
 def store_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -272,7 +276,7 @@ hr{{border:0;border-top:1px solid var(--line);margin:30px 0}}
 <li>В карте выберите подсистему или модуль, нажмите на имя функции: откроется локальная копия исходного файла с подсветкой нужной строки.</li>
 <li>Для рабочего приложения нажмите <strong>Запустить конструктор</strong> на этой странице или ссылку из карты.</li>
 </ol>
-<p class="fine">Для ИИ-функций конструктора требуется действующая настройка облачного прокси и сетевое соединение; просмотр схем и исходников сети не требует. Исходные файлы приложения скопированы из принятой Stage41, а интерфейс архивных карт не отправляет запросов вовне.</p>
+<p class="fine">В распространяемой копии личный адрес ИИ-прокси удалён; ИИ-запросы недоступны. СОП, TWI, ФРВ, карты и исходники доступны локально. Исходные файлы приложения скопированы из принятой Stage41, а интерфейс архивных карт не отправляет запросов вовне.</p>
 <div><span class="badge">Stage41</span><span class="badge">{len(manifest)} активных JS-модуля</span><span class="badge">Офлайн-карта</span><span class="badge">Исходники внутри ZIP</span></div>
 <p class="fine">{html.escape(pills)}</p></main>
 <footer class="fine">Единый переносимый комплект. Схемы статические по отношению к принятой версии приложения; они не анализируют изменения исходников в реальном времени.</footer>
@@ -306,7 +310,7 @@ def scan_links(root: Path, manifest: list[str]) -> dict[str,int]:
             missed.append("missing active source " + module)
         if not (root / "viewer" / (module + ".html")).is_file():
             missed.append("missing active viewer " + module)
-    for extra in ("proxy/index.py","tools/build_stage41.py","docs/START_NEW_CHAT_RU.md"):
+    for extra in ("tools/build_stage41.py","docs/START_NEW_CHAT_RU.md"):
         if not (root / "viewer" / (extra + ".html")).is_file():
             missed.append("missing reference viewer " + extra)
     if missed:
@@ -339,6 +343,11 @@ def main() -> None:
     # One current working copy of the executable, no historical releases.
     original = (app / APP_RELEASE).read_text("utf-8")
     constructor = scrub_external_brand(original)
+    constructor, replaced = re.subn(r"const\\s+AI_PROXY_BASE\\s*=\\s*['\\\"][^'\\\"]+['\\\"]", "const AI_PROXY_BASE=''", constructor)
+    if replaced != 1:
+        raise AssertionError("Could not remove exactly one embedded proxy URL")
+    if PRIVATE_PROXY_URL.search(constructor):
+        raise AssertionError("Private proxy endpoint remains in constructor")
     store_text(bundle/"constructor"/"Stage41.html",constructor)
     if len(constructor)<900_000:
         raise AssertionError("Stand-alone Stage41 seems incomplete")
@@ -366,7 +375,7 @@ def main() -> None:
         "1. Unzip the whole package (do not preview index.html inside ZIP).\n2. Open index.html in Chrome/Edge from the extracted SOP-Stage41 folder.\n"
         "3. Open the architecture explorer or standalone constructor from the home page.\n"
         "4. Source links open local HTML viewers with numbered lines; raw source files are adjacent under source/.\n"
-        "5. Network access is required only when using the constructor's remote AI proxy.\n"
+        "5. The owner's private AI proxy endpoint is removed from this archive; AI requests are unavailable.\n"
         "6. LikeC4 and Archify editable source definitions are in diagrams/.\n"
     )
     checks = scan_links(bundle,manifest)
@@ -382,6 +391,11 @@ def main() -> None:
             forbidden.append(path.relative_to(bundle).as_posix())
     if forbidden:
         raise AssertionError("External platform references remain: " + repr(forbidden[:20]))
+    for path in bundle.rglob("*"):
+        if path.is_file() and b"functions.yandexcloud.net/" in path.read_bytes():
+            raise AssertionError("Private endpoint remains in " + str(path.relative_to(bundle)))
+    if (bundle / "source" / "proxy").exists():
+        raise AssertionError("Server-side proxy code included in public archive")
     checks["viewer_files"] = viewer_count["files"]
     checks["viewer_lines"] = viewer_count["lines"]
     checks["sanitized_source_files"] = len(substitutions)
