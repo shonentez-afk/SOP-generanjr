@@ -71,7 +71,7 @@ function stage29SopNormalize(sop,input){
   // Tighten placeholders and duplicate Key Points without inventing content.
   for(const step of steps){
     step.action=stage29Text(step.action,1600);
-    step.reason=stage38ReasonText(step.reason,2000);
+    step.reason=stage29Text(step.reason,2000);
     step.success_criteria=stage29Text(step.success_criteria,2000);
     step.keyMoments=[...new Map((step.keyMoments||[]).map(x=>stage29Text(x,900))
       .filter(Boolean).map(x=>[x.toLocaleLowerCase('ru'),x])).values()].slice(0,3);
@@ -89,8 +89,7 @@ function stage29SopNormalize(sop,input){
   for(let i=0;i<steps.length;i++){
     const s=steps[i];
     for(const field of ['action','reason','success_criteria']){
-      const candidate=field==='reason'?stage38StripOrdinalLabels(s[field]):s[field];
-      const extras=stage29HasUnconfirmedNumber(candidate,source,0);
+      const extras=stage29HasUnconfirmedNumber(s[field],source,0);
       if(extras.length)claims.push('шаг '+(i+1)+' / '+field+': '+extras.join(', '));
     }
     for(const field of ['keyMoments','decision_points','common_pitfalls','visual_markers']){
@@ -140,7 +139,7 @@ function stage29SopNormalize(sop,input){
 function stage29TwiSourceText(src){
   return [src.operation,src.executor,src.workplace,src.safety,
     ...(src.steps||[]).flatMap(s=>[
-      s.action,...(s.keyPoints||[]),stage38StripOrdinalLabels(s.reason),s.successCriteria,
+      s.action,...(s.keyPoints||[]),s.reason,s.successCriteria,
       ...(s.decisionPoints||[])
     ])].map(String).join('\n');
 }
@@ -189,7 +188,7 @@ function stage29TwiNormalize(plan,source,{repeat=false}={}){
     const kp=(Array.isArray(s.keyPoints)?s.keyPoints:[]).map(x=>stage29Text(x,600)).filter(Boolean);
     if(kp.length)points.push(number+'. '+action+': '+kp.join('; '));
     if(kp.length&&stage29Text(s.reason))
-      reasons.push(number+'. '+action+':\n'+stage38ReasonText(s.reason,800));
+      reasons.push(number+'. '+action+': '+stage29Text(s.reason,800));
     const result=stage29Text(s.successCriteria);
     if(result)criteria.push(number+'. '+result);
   }
