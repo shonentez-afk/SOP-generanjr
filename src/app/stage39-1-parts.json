@@ -26,7 +26,7 @@
     "src/modules/core/stage19-config.js",
     "src/modules/shared/stage19-ui-helpers.js",
     "src/modules/safety/stage19-icons-logo.js",
-    "src/modules/ai/stage38-base-prompts.js",
+    "src/modules/ai/stage39-1-base-prompts.js",
     "src/modules/ai/stage26-errors.js",
     "src/modules/ai/stage26-transport.js",
     "src/modules/review/stage39-1-safe-fixes.js",
