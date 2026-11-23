@@ -1,3 +1,15 @@
+## АКТУАЛЬНО: Stage36.1 ПРИНЯТА пользователем и слита в main (23.11.2026)
+
+- Пользователь подтвердил: **«работает и сохраняет»**, то есть печатный TWI JI корректно скачивается в XLSX на его ПК.
+- [PR #32](https://github.com/shonentez-afk/SOP-generanjr/pull/32) **MERGED** в `main`, merge commit `510914ada31cdcbcb9f9fc6731500822af7c7e0c`. Основная рабочая версия теперь **Stage36.1**.
+- [Actions #45095219965](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45095219965) и [PR CI #45095225644](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45095225644) — итоговый SHA ветки `5ab25df3b76e9dc96f203081c82342a5bad0171c`, Linux/Windows PASS, 100/100 unit и фактический браузерный экспорт XLSX с проверкой содержимого, двух листов TWI JI, формата A4, длинных текстов и предупреждений.
+- [Скачать принятую Stage36.1 из main](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/main/releases/stage36-1-twi-print-xlsx-browser-candidate.html). Кнопка **«⬇ Скачать TWI (.xlsx)»** рядом с **«Сформировать план TWI»** во вкладке TWI. XLSX: карта разбора работы Important Steps / Key Points / Reasons + отдельный лист четырёх этапов обучения. Печать A4.
+- **Не возвращаться к прежним кандидатам Stage34.1/35/36 для новых проверок**: они не содержат новую функцию TWI XLSX. Принятый Stage36 защищает данные библиотек СОП/ФРВ.
+- **Далее**: Stage37 — окончательный UX/функциональный аудит, проверка печати и полное руководство по актуальной версии со скриншотами. Не менять принятые генерацию СОП/TWI, AI-прокси, ФРВ, фото, экспорт Excel без тестов.
+- Документация Stage36.1: [docs/STAGE36_1_TWI_PRINT_XLSX_RU.md](STAGE36_1_TWI_PRINT_XLSX_RU.md).
+
+---
+
 ## АКТУАЛЬНО: Stage36.1 — печатный TWI JI XLSX, CI PASS, ждёт приёмки пользователя (23.11.2026)
 
 - **Основной принятый релиз:** Stage36 в `main`: пользователь подтвердил «работает», PR #31 слит, merge `02bd2381291be6593448083b6116b031637df24c`. Библиотеки СОП/ФРВ, фото и все функции Stage35 сохранены.
