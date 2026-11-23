@@ -156,30 +156,51 @@ aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
     // several numbered WHYs remain valid when distinct facts require them.
     // Existing numbered reasons are never silently collapsed.
     const instruction='\n'+AI_DATA_BOUNDARY+
-      '\nРаботай только с Reason Why. По умолчанию предпочитай ОДНУ краткую общую '+
-      'причину без номера, ЕСЛИ она действительно объясняет все критичные Key Points. '+
-      'Если есть несколько разных подтверждённых обоснований, верни строки 1., 2. и т. д. '+
+      '\nЗАДАНИЕ: составь Reason Why как краткую технологическую ЦЕЛЬ уже описанного '+
+      'критического приёма. По умолчанию предпочитай ОДНУ краткую общую причину '+
+      'без номера, если она объясняет все Key Points и не теряет разных известных обоснований. '+
+      'При действительно разных подтверждённых причинах используй 1., 2., 3. '+
       'в одном поле. Число причин не обязано совпадать с числом КМ. '+
-      'Не повторяй тексты действий/Key Points. Не придумывай нормативы, травмы, '+
-      'перегрев, допуски или числовые параметры. '+
-      'Не скрывай уникальные причины из исходного текста: если их невозможно '+
-      'сохранить в одной общей формулировке, предложи несколько. '+
-      'Ответ — ТОЛЬКО текст причины, без заголовка, пояснений и Markdown.';
+      'Пример на основе фактов: если КМ проверяет наличие видимых повреждений инструмента, '+
+      'цель — «Позволяет выявить видимые повреждения до использования». '+
+      'Не заменяй эту цель цитатами документов, указанием обратиться к инструкциям '+
+      'или последствиями, не вытекающими из фактов операции. '+
+      'Предыдущая причина — неподтверждённый черновик, не источник фактов. '+
+      'Не копируй её нормативные ссылки или предположения. '+
+      'Если данных недостаточно даже для такой цели, верни ровно NEEDS_REASON_FACTS. '+
+      'Ответ — только готовый текст WHY без заголовков, пояснений и Markdown.';
     const context='DATA BEGIN\n'+JSON.stringify({
       operation:state.meta?.operation||'',
       description:state.description||'',
       action:step.action||'',
       allKeyPoints:(step.keyMoments||[]).filter(Boolean),
-      currentReason:String(source),
+      currentReason:stage391ReasonAIDraftForContext(source),
+      reasonDraftIsVerified:false,
       formatPreference:'Одна общая причина, если она охватывает все КМ; иначе разные нумерованные'
     })+'\nDATA END';
-    const raw=await aiAsk(AI_SYS.reason+instruction,context,{
-      model:currentModel,maxTokens:550,task:'edit_reason'
-    });
-    if(!aiGuardCanApply(guard))return;
-    const answer=cleanAIFieldResult(raw,'reason');
-    const inspection=stage391ReasonAIInspect(source,answer,step);
-    if(!inspection.ok){toast(inspection.message,'warning');return;}
+    // One bounded retry for typical hallucinated consequences or references.
+    // Never repair claims by guessing: the model must return a new grounded WHY.
+    let inspection=null;
+    for(let attempt=0;attempt<2;attempt++){
+      const correction=attempt===0?'':(
+        '\nПРЕДЫДУЩИЙ ОТВЕТ НЕ ПРОШЁЛ ПРОВЕРКУ: он не объяснил WHY '+
+        'из предоставленных фактов. Дай конкретную цель описанного КМ, '+
+        'не ссылайся на нормы, внешние документы и неподтверждённые последствия. '+
+        'Если оснований нет, ответь NEEDS_REASON_FACTS.'
+      );
+      const raw=await aiAsk(AI_SYS.reason+instruction+correction,context,{
+        model:currentModel,maxTokens:550,task:'edit_reason'
+      });
+      if(!aiGuardCanApply(guard))return;
+      const answer=cleanAIFieldResult(raw,'reason');
+      inspection=stage391ReasonAIInspect(source,answer,step);
+      if(inspection.ok||/^NEEDS_REASON_FACTS$/iu.test(answer))break;
+    }
+    if(!inspection?.ok){
+      toast('ИИ не смог подтвердить причину. Исходное поле сохранено. '+
+        (inspection?.message||'Уточните технологическую цель у специалиста.'),'warning');
+      return;
+    }
     const choice=await stage391ReasonAIReviewModal(inspection,step);
     if(choice!=='apply')return;
     if(!aiGuardCanApply(guard))return;
