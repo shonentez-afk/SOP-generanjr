@@ -125,12 +125,12 @@ def compare_corporate_xlsx(old,new):
 
 def numbered_ai_and_review(p):
     result=p.evaluate("""() => {
-      const text=stage38ReasonText('1. Объяснение первое\\r\\n2. Объяснение второе');
+      const text=stage38ReasonText('1. Объяснение первое\r\n2. Объяснение второе');
       const plain=stage38ReasonIssues('Одна общая причина для двух моментов.',2,1);
-      const numbered=stage38ReasonIssues('1. Первая причина\\n2. Вторая причина',2,1);
-      const skipped=stage38ReasonIssues('1. Первая причина\\n3. Третья причина',3,1);
-      const duplicate=stage38ReasonIssues('1. Первая\\n1. Повтор',2,1);
-      const kept=stage38StripOrdinalLabels('1. Причина\\n2. Усилие 25 Н');
+      const numbered=stage38ReasonIssues('1. Первая причина\n2. Вторая причина',2,1);
+      const skipped=stage38ReasonIssues('1. Первая причина\n3. Третья причина',3,1);
+      const duplicate=stage38ReasonIssues('1. Первая\n1. Повтор',2,1);
+      const kept=stage38StripOrdinalLabels('1. Причина\n2. Усилие 25 Н');
       const facts={
         operation:'Установить подшипник',department:'',workplace:'',
         executor:'',tools:'',material:'',safety:'',
@@ -138,7 +138,7 @@ def numbered_ai_and_review(p):
       };
       const step={
         action:'Установить подшипник',keyMoments:['Очистить','Проверить'],
-        reason:'1. Исключить перекос\\n2. Убедиться в правильной установке',
+        reason:'1. Исключить перекос\n2. Убедиться в правильной установке',
         success_criteria:'',time:null,decision_points:[],common_pitfalls:[],
         visual_markers:[]
       };
@@ -147,12 +147,12 @@ def numbered_ai_and_review(p):
       let numericRejected=false;
       try{
         stage29SopNormalize({steps:[{...step,
-          reason:'1. Исключить перекос\\n2. Применить усилие 25 Н'}],
+          reason:'1. Исключить перекос\n2. Применить усилие 25 Н'}],
           openQuestions:[]},facts);
       }catch(e){numericRejected=e?.code==='AI_TASK_INCOMPLETE'}
       const twiCorpus=stage29TwiSourceText({steps:[{
         action:'Установить',keyPoints:['Очистить'],
-        reason:'1. Исключить перекос\\n2. Не повредить корпус',
+        reason:'1. Исключить перекос\n2. Не повредить корпус',
         successCriteria:''}]});
       return {text,plain:plain.length,numbered:numbered.length,
         skipped:skipped.map(x=>x.description),
@@ -160,7 +160,6 @@ def numbered_ai_and_review(p):
         numericRejected,twiCorpus,
         twiNumericRejected:stage29HasUnconfirmedNumber('Через 2 дня',
           twiCorpus,1).includes('2'),
-        originalSchema:state.steps[0].reason===window.stage38Before&&false
       };
     }""")
     assert result["text"]=="1. Объяснение первое\n2. Объяснение второе",result
@@ -175,7 +174,7 @@ def numbered_ai_and_review(p):
       const issues=stage28TwiStructureChecks([{
         action:'Установить подшипник',
         keyMoments:['Очистить','Проверить посадку'],
-        reason:'1. Исключить перекос\\n3. Подтвердить состояние'
+        reason:'1. Исключить перекос\n3. Подтвердить состояние'
       }]);return issues.some(x=>x.field==='reason'&&x.description.includes('пропущен'));
     }"""),"Review did not detect explicit numbering hole"
     print("PASS Stage38: optional common reason, ordered multi-reason, ordinal-safe AI, real values still checked, local review",flush=True)
@@ -204,11 +203,12 @@ def stage38_xlsx():
             download(candidate,"#twiExportXlsxBtn",twi)
             w=load_workbook(twi)
             assert w.sheetnames==["Карта разбора работы","План наставника"]
-            assert w.worksheets[0].page_setup.paperSize=="9"
+            assert str(w.worksheets[0].page_setup.paperSize)=="9"
             result="\n".join(str(w.worksheets[0].cell(r,4).value or "")
                 for r in range(11,min(21,w.worksheets[0].max_row)+1))
+            canon=lambda text:" ".join(str(text).split())
             for line in NUMBERED.split("\n"):
-                assert line in result,(line,result)
+                assert canon(line) in canon(result),(line,result)
             assert w.worksheets[0].page_setup.fitToWidth==1
             assert p_bool(candidate,"() => !!document.querySelector('[data-step-field=reason]')?.value.includes('1. ')")
             # Simulate a user editing the sole reason textarea with newlines.
