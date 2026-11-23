@@ -1,3 +1,15 @@
+## АКТУАЛЬНО: Stage36.1 — печатный TWI JI XLSX, CI PASS, ждёт приёмки пользователя (23.11.2026)
+
+- **Основной принятый релиз:** Stage36 в `main`: пользователь подтвердил «работает», PR #31 слит, merge `02bd2381291be6593448083b6116b031637df24c`. Библиотеки СОП/ФРВ, фото и все функции Stage35 сохранены.
+- **Новый кандидат Stage36.1:** `feature/stage36-1-twi-print-xlsx-20261123`, [PR #32 DRAFT](https://github.com/shonentez-afk/SOP-generanjr/pull/32); **НЕ В MAIN** до ручной проверки пользователя.
+- **Что добавлено:** в прежней вкладке TWI кнопка **«⬇ Скачать TWI (.xlsx)»**. Автономный XLSX с двумя печатными листами: 1) Job Breakdown Sheet — Important Steps/Key Points/Reasons Why из текущего СОП; 2) план наставника по четырём этапам TWI JI из сохранённого TWI. Настройки A4 альбомный/книжный, область печати и повтор заголовков, длинные тексты без обрезки, реквизиты, подписи; предупреждения на устаревший или неполный TWI, без выдумывания фактов.
+- **Границы:** не менялись локальные ExcelJS/ISO, экспорт СОП и фотографии, TWI генерация от ИИ Yandex, ФРВ, сетевое хранение. Экспорт не изменяет источник и не делает AI-вызовы.
+- **CI и QA:** [Actions #45095016959](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45095016959) — Linux/Windows PASS, **100/100 unit**, настоящий Chrome `file://` экспорт и проверка XLSX openpyxl, длинного текста, print areas, repeat titles, опубликованного СОП, полная Stage36/35/34/33/32 регрессия.
+- **Скачать сборку для пользовательской проверки:** [Stage36.1 HTML](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage36-1-twi-print-xlsx-20261123/releases/stage36-1-twi-print-xlsx-browser-candidate.html), SHA256 `ce21cc5aa6c5ed2c5936946dd10d9deb3b6ee4939d4c8460f5fdacbe739d8038`. Файлы: `src/modules/twi/stage36-1-print-xlsx.js`, `src/app/stage36-1-parts.json` (64 модуля), `tools/build_stage36_1.py`, `qa/stage36_1_twi_print_browser.py`; [подробная документация](../docs/STAGE36_1_TWI_PRINT_XLSX_RU.md).
+- **Следующий шаг:** пользователь открывает новую HTML на ПК, формирует TWI из СОП и проверяет `Скачать TWI (.xlsx)` в реальном Microsoft Excel/предварительном просмотре печати. Только после «работает» объединить PR #32 в `main`. Затем Stage37 — комплексная приёмка и руководство с реальными скриншотами.
+
+---
+
 ## ОБНОВЛЕНИЕ Stage36: CI PASS, ПОЛЬЗОВАТЕЛЬСКАЯ ПРИЁМКА ЕЩЁ НЕТ (23.11.2026)
 
 - Ветка `feature/stage36-library-backup-conflict-safety-20261123`, [PR #31](https://github.com/shonentez-afk/SOP-generanjr/pull/31) DRAFT. [GitHub Actions #45093610144](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45093610144) — **Linux/Windows PASS, 98/98 unit, реальный Chrome file://**, новая защита JSON библиотеки/фото/ФРВ и параллельных вкладок.
