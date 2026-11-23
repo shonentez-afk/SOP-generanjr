@@ -88,6 +88,11 @@ jobs:
             echo "Branch advanced; skip stale publish"
             exit 0
           fi
+          if [ -f stage39-step-management-browser-candidate.html ]; then
+            mkdir -p releases
+            mv stage39-step-management-browser-candidate.html releases/
+          fi
+          test -s releases/stage39-step-management-browser-candidate.html
           git add releases/stage39-step-management-browser-candidate.html
           if ! git diff --cached --quiet; then
             git commit -m "Build: Stage39 Chrome/Windows/Linux verified standalone"
