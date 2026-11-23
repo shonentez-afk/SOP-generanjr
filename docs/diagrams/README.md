@@ -1,4 +1,26 @@
-# Архитектура SOP-generanjr Stage39 (Archify-compatible)
+# Архитектура SOP-generanjr — актуальная Stage41 и архив Stage39
+
+## Актуальная схема: принятая Stage41 (23.11.2026)
+
+**Главный файл: [Единая интерактивная карта Stage41](sop-stage41-unified.html).** Один автономный HTML для Chrome/Edge: общая архитектура, подробные запросы/ответы ИИ, **73 модуля / 367 зависимостей** с AST-свидетельствами и фильтрами, переходы к 8 представлениям LikeC4. Открывается локально без сервера и без сетевых JavaScript-библиотек. Ссылки на строки исходников ведут в GitHub.
+
+**Основание:** принятая пользователем Stage41 в `main@fc1c06a034a52e8218b49bd87483adbd900c3ae4`; 73 активных файла в `src/app/stage41-parts.json`. После Stage39.1/Stage40/Stage41 изменились ИИ-промпты, обработка ✨ «Причина», проверка и отображение предлагаемых исправлений. Поэтому **файлы Stage39 ниже исторические и не описывают актуальную сборку**.
+
+- [Stage41 — полный проверочный отчёт](STAGE41_ARCHITECTURE_AUDIT_RU.md) · [Файл для нового чата](START_NEW_CHAT_RU.md).
+- [Общая схема Stage41](sop-stage41-interactive.html) · [Карта запросов ИИ Stage41](sop-stage41-ai-interactive.html).
+- [CodeFlow Stage41: 367 рёбер](stage41-codeflow-graph.json) · [Acorn AST: свидетельства и строки](stage41-ast-evidence.json).
+- [LikeC4 Stage41: модель](likec4-stage41/model.c4) · [8 представлений](likec4-stage41/views.c4). **Официальный LikeC4 1.61.0 build PASS**, [GitHub Actions](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45153248838), [архив собранного сайта](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45153248838/artifacts/14807472270) (временный, до 30.11.2026).
+- [Archify Stage41: архитектура](sop-stage41.architecture.json) · [AI Dataflow](sop-stage41-ai.dataflow.json). Официальный `archify finalize` **не запускался**; исходные JSON сохранены.
+- **CodeFlow PASS** [run #45153304550](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45153304550): 73 файла, 551 функция, 687 записей связей, 367 уникальных связей файлов.
+- **GitNexus PASS с ограничениями** [run #45153124322](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45153124322): 2 279 узлов, 7 956 связей, 98 кластеров, 184 потока; полнотекстовый FTS недоступен. Это другой вид графа, его числа не равны межфайловым связям.
+- **Acorn AST PASS** [run #45154665601](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45154665601): 324 межфайловые связи с прямым вызовом, 17 только со ссылкой на функцию, 26 без подтверждения данным AST. Один старый файл разобран толерантным парсером и явно обозначен. **AST не доказывает runtime-исполнение.**
+- **Настоящий Chrome PASS** [run #45155334105](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45155334105): 4 раздела, поиск 73 модулей, AST-фильтры, детали связей и переходы LikeC4. [Скриншоты Chrome](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45155334105/artifacts/14807887737) — временный архив до 30.11.2026.
+
+**Незакрыто:** визуальная приёмка официального *многокомпонентного* сайта LikeC4 отдельно от автономного HTML; выборочная проверка 26 спорных связей для будущих изменений; официальный Archify finalize при необходимости. Рабочий конструктор, `src/`, `proxy/`, `releases/`, Excel и `main` не менялись. Документация хранится в Draft [PR #37](https://github.com/shonentez-afk/SOP-generanjr/pull/37); экспериментальные CI-workflows — в отдельной ветке.
+
+---
+
+## Архив: схемы Stage39 (историческая база)
 
 Снимок исходников: `main@4cf1a467e912984cb98d6dc969ab10eb685f458b` (23.11.2026).
 
