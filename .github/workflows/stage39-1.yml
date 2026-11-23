@@ -129,9 +129,11 @@ jobs:
           cp "$source_file" releases/stage39-1-ai-reasons-frv-browser-candidate.html
           cp "$source_file" releases/stage39-1-manual-km-cleanup-20261123.html
           cp "$source_file" releases/stage39-1-preview-buttons-fixed-20261123.html
+          cp "$source_file" releases/stage39-1-reason-ai-preview-20261123.html
           cmp releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-manual-km-cleanup-20261123.html
           cmp releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-preview-buttons-fixed-20261123.html
-          git add releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-manual-km-cleanup-20261123.html releases/stage39-1-preview-buttons-fixed-20261123.html
+          cmp releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-reason-ai-preview-20261123.html
+          git add releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-manual-km-cleanup-20261123.html releases/stage39-1-preview-buttons-fixed-20261123.html releases/stage39-1-reason-ai-preview-20261123.html
           if ! git diff --cached --quiet; then
             git commit -m "Build: Stage39.1 verified Chrome Linux Windows AI FRV XLSX"
             git push origin HEAD:feature/stage39-1-ai-reasons-frv-20261123
