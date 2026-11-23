@@ -19,7 +19,7 @@ class Stage391Contracts(unittest.TestCase):
         old=json.loads(new.PREVIOUS.read_text(encoding="utf-8"))
         cur=json.loads(new.MANIFEST.read_text(encoding="utf-8"))
         self.assertEqual(len(old["modules"]),67)
-        self.assertEqual(len(cur["modules"]),70)
+        self.assertEqual(len(cur["modules"]),71)
         self.assertTrue(set(new.REPLACEMENTS).issubset(set(old["modules"])))
         for unchanged in ("src/modules/excel/stage38-export.js",
                           "src/modules/twi/stage38-print-xlsx.js",
@@ -28,7 +28,7 @@ class Stage391Contracts(unittest.TestCase):
             self.assertIn(unchanged,cur["modules"])
 
     def test_changed_js_syntax(self):
-        for p in [*new.REPLACEMENTS.values(),*new.EXTRA.values(),new.NEW_MODULE]:
+        for p in [*new.REPLACEMENTS.values(),*new.EXTRA.values(),new.NEW_MODULE,new.AI_REASON_MODULE]:
             result=subprocess.run(["node","--check","-"],input=new.read(p),
                                   text=True,encoding='utf-8',capture_output=True)
             self.assertEqual(result.returncode,0,p+": "+result.stderr)
@@ -50,6 +50,18 @@ class Stage391Contracts(unittest.TestCase):
         self.assertIn("JSON.stringify([current.action,current.keyMoments])!==fingerprint",cleaner)
         self.assertNotIn("aiAsk(",cleaner)
         self.assertNotIn("stage29SopNormalize(",cleaner)
+        ai_review=new.read(new.AI_REASON_MODULE)
+        self.assertIn("stage391ReasonAIInspect",ai_review)
+        self.assertIn("stage391ValidateReasonProposal",ai_review)
+        self.assertIn("stage391CleanupReason(proposed,step)",ai_review)
+        self.assertIn("stage391ReasonAIReviewModal",ai_review)
+        self.assertIn("aiGuardCanApply(guard)",ai_review)
+        self.assertIn("applyFn(fresh.value)",ai_review)
+        self.assertIn("formatPreference:",ai_review)
+        self.assertIn("changedCount?'':String(previous||'')",ai_review)
+        self.assertIn("Приказ",ai_review)
+        self.assertIn("смысл проверяет технолог",checklist)
+        self.assertEqual(new.AI_REASON_MODULE,"src/modules/ai/stage39-1-reason-proposal.js")
         self.assertIn("stage391AcceptedReasonFill",f)
         self.assertIn("if(type==='reason')return stage391AcceptedReasonFill(btn,type,source,applyFn);",f)
         self.assertNotIn("stage391StarReasonOnly",f)
