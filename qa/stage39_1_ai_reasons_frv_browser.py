@@ -72,8 +72,8 @@ def ai_fields(p):
     assert '2. Защитить' in ctx,ctx
     assert p.evaluate("() => state.steps[0].keyMoments[0]")=="Проверить отсутствие перекоса"
     before=p.evaluate("() => state.steps[0].reason")
-    # The same validator now protects mentor/FRV AND ✨ Reason proposals;
-    # the individual ✨ does not write before user approval.
+    # The same validator still protects mentor/FRV and the ✨ Reason.
+    # A validated ✨ result now replaces the field directly.
     checks=p.evaluate("""() => {
       const step=state.steps[0];
       const badOrder=stage391ValidateReasonProposal(step.reason,
@@ -86,12 +86,14 @@ def ai_fields(p):
     proposal='1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла'
     p.evaluate("result => {window.stage391AiResult=result}",proposal)
     p.locator(reason).click()
-    p.locator("#stage391ReasonAIReview").wait_for(state="visible",timeout=12000)
-    assert p.evaluate("() => state.steps[0].reason")==before, "AI overwrote before approval"
-    p.locator("#stage391ReasonAIReview [data-ai-preview-action='apply']").click()
-    p.locator("#stage391ReasonAIReview").wait_for(state="detached",timeout=12000)
+    p.wait_for_function("""selector =>
+      document.querySelector(selector)&&
+      !document.querySelector(selector).disabled&&
+      document.querySelector(selector).textContent==='✨'""",arg=reason,timeout=12000)
+    assert p.locator("#stage391ReasonAIReview").count()==0
+    assert p.locator("button[data-stage391-cleanup]").count()==0
     reason_now=p.evaluate("() => state.steps[0].reason")
-    assert reason_now==proposal,reason_now
+    assert reason_now==proposal,(before,reason_now)
 
     result=p.evaluate("""() => {
       autoScoreChecklist();
