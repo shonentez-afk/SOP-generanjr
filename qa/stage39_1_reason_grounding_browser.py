@@ -87,6 +87,32 @@ def main():
             assert proposed["reason"]=="",proposed
             assert all(proposed[k] for k in ("asked","liveSame","actionSame","kmSame")),proposed
 
+            # Mixed numbered WHY: remove ONLY the unsupported normative line.
+            # The useful second Reason survives and is re-numbered within the
+            # same corporate field, without touching the already open SOP.
+            mixed=page.evaluate("""() => {
+              const s=state.steps[0],original=JSON.stringify(state.steps);
+              const draft={steps:[{
+                action:s.action,keyMoments:[...s.keyMoments],
+                reason:'1. '+s.reason+'\\n2. Позволяет выявить видимые повреждения корпуса до использования.',
+                success_criteria:'',time:null,
+                decision_points:[],common_pitfalls:[],visual_markers:[]
+              }],openQuestions:[]};
+              const out=stage29SopNormalize(draft,{
+                userDescription:state.description,operation:s.action,
+                department:'',workplace:'',executor:'',tools:'',material:'',safety:''
+              });
+              return {
+                reason:out.sop.steps[0].reason,
+                requested:out.sop.openQuestions.some(q=>q.includes('норматив или инструкцию вместо WHY')),
+                preserved:JSON.stringify(state.steps)===original
+              };
+            }""")
+            assert mixed["reason"]==(
+                "1. Позволяет выявить видимые повреждения корпуса до использования."
+            ),mixed
+            assert mixed["requested"] and mixed["preserved"],mixed
+
             def start(replies,preview):
                 page.evaluate("r => {window.s391WhyTest.calls=[];window.s391WhyTest.responses=r}",replies)
                 page.locator(selector).click()
