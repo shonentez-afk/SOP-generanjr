@@ -70,7 +70,7 @@ class Stage38ReasonContract(unittest.TestCase):
           "wb.addWorksheet('ФРВ'",
           "wb.addWorksheet('Чек-лист",
           "const vSpans=[[3,5],[6,9],[10,12]]",
-          "const aSpans=[[3,4,5],[6,8,9],[10,11,12]]",
+          "aSpans=[[3,4,5],[6,8,9],[10,11,12]]",
           "M(r,2,r,2,'Причина'",
           "M(r,c1,r,c2,s?(s.reason||''):'',",
           "const expectedStepPhotos=await ensureStepImagesForExport(",
