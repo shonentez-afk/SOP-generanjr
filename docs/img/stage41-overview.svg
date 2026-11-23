@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="450" viewBox="0 0 1280 450" role="img" aria-labelledby="title desc">
+  <title id="title">SOP-generanjr Stage41 — обзор контуров приложения</title>
+  <desc id="desc">Описание процесса ведёт к СОП, проверке ИИ и XLSX. Из СОП создаётся TWI и его XLSX. Анализ ФРВ ведётся самостоятельно.</desc>
+  <rect width="1280" height="450" rx="24" fill="#0b172a"/>
+  <rect x="16" y="16" width="1248" height="418" rx="20" fill="#10223a" stroke="#274362" stroke-width="2"/>
+  <text x="49" y="68" font-family="Arial, sans-serif" font-size="31" font-weight="700" fill="#eef6ff">SOP-generanjr</text>
+  <text x="49" y="99" font-family="Arial, sans-serif" font-size="17" fill="#9bc2dd">Stage41 · Стандартная работа · TWI JI · ФРВ · Документы</text>
+  <rect x="46" y="143" width="255" height="98" rx="13" fill="#173650" stroke="#4782a5" stroke-width="2"/>
+  <text x="64" y="178" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#ffffff">Исходные факты</text>
+  <text x="64" y="205" font-family="Arial, sans-serif" font-size="15" fill="#b9d1e4">Описание операции,</text>
+  <text x="64" y="224" font-family="Arial, sans-serif" font-size="15" fill="#b9d1e4">условия и параметры</text>
+  <path d="M305 191h42" fill="none" stroke="#6ce0c7" stroke-width="4" stroke-linecap="round"/>
+  <path d="m335 181 14 10-14 10" fill="none" stroke="#6ce0c7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="352" y="143" width="277" height="98" rx="13" fill="#15524d" stroke="#6ce0c7" stroke-width="2"/>
+  <text x="372" y="178" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#ffffff">Конструктор СОП</text>
+  <text x="372" y="206" font-family="Arial, sans-serif" font-size="15" fill="#cffcf0">Действия · КМ · Причины</text>
+  <text x="372" y="225" font-family="Arial, sans-serif" font-size="15" fill="#cffcf0">Фото · Критерии результата</text>
+  <path d="M633 191h40" fill="none" stroke="#6ce0c7" stroke-width="4" stroke-linecap="round"/>
+  <path d="m661 181 14 10-14 10" fill="none" stroke="#6ce0c7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="678" y="143" width="269" height="98" rx="13" fill="#183d60" stroke="#5faeeb" stroke-width="2"/>
+  <text x="698" y="178" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#ffffff">Полная проверка</text>
+  <text x="698" y="206" font-family="Arial, sans-serif" font-size="15" fill="#d7e8ff">Наставник · ИИ · Источник</text>
+  <text x="698" y="225" font-family="Arial, sans-serif" font-size="15" fill="#d7e8ff">Сейчас / После применения</text>
+  <path d="M951 191h36" fill="none" stroke="#6ce0c7" stroke-width="4" stroke-linecap="round"/>
+  <path d="m974 181 14 10-14 10" fill="none" stroke="#6ce0c7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="993" y="143" width="241" height="98" rx="13" fill="#264a65" stroke="#9cd8fe" stroke-width="2"/>
+  <text x="1014" y="177" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#ffffff">СОП XLSX</text>
+  <text x="1014" y="206" font-family="Arial, sans-serif" font-size="15" fill="#d8e9f4">3 листа · ExcelJS</text>
+  <text x="1014" y="225" font-family="Arial, sans-serif" font-size="15" fill="#d8e9f4">Печать и фотографии</text>
+  <path d="M487 244v37h93" fill="none" stroke="#6ce0c7" stroke-width="3" stroke-linecap="round"/>
+  <path d="m569 271 13 10-13 10" fill="none" stroke="#6ce0c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="585" y="278" width="361" height="68" rx="11" fill="#274458" stroke="#5eb5b6" stroke-width="2"/>
+  <text x="603" y="308" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">TWI Job Instruction</text>
+  <text x="603" y="330" font-family="Arial, sans-serif" font-size="14" fill="#cfedf0">4 этапа обучения · Только из СОП</text>
+  <path d="M949 313h38" fill="none" stroke="#6ce0c7" stroke-width="3" stroke-linecap="round"/>
+  <path d="m976 304 13 9-13 9" fill="none" stroke="#6ce0c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="993" y="278" width="241" height="68" rx="11" fill="#34455c" stroke="#a8c8ea" stroke-width="2"/>
+  <text x="1012" y="306" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">TWI XLSX</text>
+  <text x="1012" y="331" font-family="Arial, sans-serif" font-size="14" fill="#dfebf7">2 листа · Для инструктажа</text>
+  <rect x="46" y="282" width="492" height="65" rx="11" fill="#483b58" stroke="#bd9de8" stroke-width="2"/>
+  <text x="65" y="310" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">Анализ ФРВ — отдельный сценарий</text>
+  <text x="65" y="333" font-family="Arial, sans-serif" font-size="14" fill="#e0d7ef">Исследования · Циклы · Время · Архив · Отчёт</text>
+  <text x="48" y="402" font-family="Arial, sans-serif" font-size="15" fill="#a8c1d7">Один автономный HTML на ПК · Локальные фото и справочники · ИИ через Yandex Cloud proxy</text>
+</svg>
