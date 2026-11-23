@@ -1,0 +1,1702 @@
+{
+  "schema_version": 1,
+  "source": "CodeFlow official shared headless analyzer (without browser TreeSitter WASM)",
+  "tool_repo": "https://github.com/braedonsaunders/codeflow",
+  "tool_revision": "b70af01cfd1a1cec4b02075b124fdd1ec8cc33be",
+  "run_url": "https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45149999992",
+  "target_revision": "4cf1a467e912984cb98d6dc969ab10eb685f458b",
+  "manifest": "src/app/stage39-parts.json",
+  "scope": "67 active JS files",
+  "caveat": "Module edge discovery, not verified runtime execution. CodeFlow headless fallback parser; extra edges need source confirmation. Direction caller -> function definition.",
+  "stats": {
+    "files": 67,
+    "functions": 511,
+    "raw_connections": 636,
+    "loc": 8949,
+    "heuristic_dead_function_count": 21
+  },
+  "comparison": {
+    "codeflow_file_edges": 335,
+    "lexical_file_edges": 258,
+    "both": 258,
+    "codeflow_only": 77,
+    "lexical_only": 0
+  },
+  "edges": [
+    {
+      "caller": "src/modules/ai/stage22-context-guard.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage22-context-guard.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage22-field-editor.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage22-field-editor.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage22-field-editor.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage22-field-editor.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage22-field-editor.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/review/stage23-safe-fixes.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-protocol.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-protocol.js",
+      "definition": "src/modules/review/stage23-safe-fixes.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage23-protocol.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage24-task-response.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage24-task-response.js",
+      "definition": "src/modules/review/stage23-safe-fixes.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage25-preview.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage26-transport.js",
+      "definition": "src/modules/ai/stage26-errors.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage26-transport.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage27-intelligence.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-core.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-core.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-intelligence.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/ai/stage27-intelligence.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/review/stage19-checklist.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage28-review-task.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage22-field-editor.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage38-quality-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/ai/stage38-quality-core.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage28-review-task.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage29-generate-sop.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/demo/stage19-demo.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/excel/stage19-import.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/excel/stage38-export.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/preview/stage19-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage27-analogs-history.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage27-intelligence.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage28-review-task.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/core/stage19-step-shape.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/core/stage20-export-snapshot.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/demo/stage19-demo.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/demo/stage19-demo.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/core/stage19-step-shape.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/excel/stage38-export.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/review/stage23-safe-fixes.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/app/stage19-bootstrap.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/core/stage19-step-shape.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/twi/stage24-merge.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/ai/stage22-field-editor.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/ai/stage29-generate-sop.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/frv/stage34-sop-frv-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/photos/stage31-illustration-editor.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-export-setup.js",
+      "definition": "src/modules/core/stage19-step-shape.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-export-setup.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/excel/stage19-export-setup.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/core/stage20-export-snapshot.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/excel/stage19-export-setup.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/frv/stage34-sop-frv-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/photos/stage20-photo-read.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage26-proposals.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage26-proposals.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage26-proposals.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-measurements.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-measurements.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-sop-frv-guard.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-sop-frv-guard.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-sop-frv-guard.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage35-analytics.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/frv/stage35-study-ai.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/frv/stage26-proposals.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-ai.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-model.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-model.js",
+      "definition": "src/modules/frv/stage35-analytics.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-model.js",
+      "definition": "src/modules/frv/stage35-study-ai.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-model.js",
+      "definition": "src/modules/frv/stage35-study.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-model.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study-model.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/frv/stage35-analytics.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/frv/stage35-study-ai.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-study.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/frv/stage35-study-model.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/photos/stage30-history.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/preview/stage19-preview.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/preview/stage19-preview.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/preview/stage19-preview.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/quality/stage38-reasons.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage19-checklist.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage23-safe-fixes.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage23-safe-fixes.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/ai/stage23-dispute.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/ai/stage28-review-task.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/review/stage23-safe-fixes.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/review/stage38-review-core.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/safety/stage19-icons-logo.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/safety/stage19-icons-logo.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/app/stage19-bootstrap.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage24-preview.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/twi/stage24-preview.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/twi/stage24-preview.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage38-quality-core.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/twi/stage24-merge.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/twi/stage24-preview.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/excel/stage19-export-setup.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "also_in_lexical_graph": false
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/twi/stage24-merge.js",
+      "also_in_lexical_graph": true
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "also_in_lexical_graph": false
+    }
+  ]
+}
