@@ -28,7 +28,7 @@ jobs:
       - name: Checkout architecture docs to compare with prior graph
         uses: actions/checkout@v4
         with:
-          ref: docs/archify-stage41-architecture-20261123
+          ref: docs/archify-stage39-architecture-20261123
           path: architecture
           persist-credentials: false
       - uses: actions/setup-node@v4
