@@ -1,0 +1,111 @@
+name: Stage41 full portable offline archive (sources, maps, constructor)
+on:
+  push:
+    branches:
+      - docs/stage41-portable-offline-archive-20261123
+    paths:
+      - .github/workflows/stage41-portable-offline.yml
+      - tools/build_stage41_portable.py
+      - tools/test_stage41_portable.py
+permissions:
+  contents: write
+concurrency:
+  group: stage41-portable-offline-archive
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: Build complete local archive and test in Chrome
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout packaging scripts
+        uses: actions/checkout@v4
+        with:
+          path: packer
+          persist-credentials: false
+      - name: Checkout accepted Stage41 application snapshot
+        uses: actions/checkout@v4
+        with:
+          path: app
+          ref: 93bb9edb1a8c924a5274a728d47286eca4e34a2e
+          persist-credentials: false
+      - name: Checkout verified Stage41 architecture
+        uses: actions/checkout@v4
+        with:
+          path: architecture
+          ref: docs/archify-stage39-architecture-20261123
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assemble archive with fully local source links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python packer/tools/build_stage41_portable.py \
+            --app "$GITHUB_WORKSPACE/app" \
+            --diagrams "$GITHUB_WORKSPACE/architecture/docs/diagrams" \
+            --workspace "$RUNNER_TEMP/portable-work" \
+            --output "$RUNNER_TEMP/SOP-Stage41-Full-Offline.zip"
+          sha256sum "$RUNNER_TEMP/SOP-Stage41-Full-Offline.zip" | tee "$RUNNER_TEMP/SOP-Stage41-Full-Offline.sha256"
+          test -s "$RUNNER_TEMP/SOP-Stage41-Full-Offline.zip"
+      - name: Check all local pages and executable constructor in real Chrome
+        shell: bash
+        env:
+          PYTHONUTF8: '1'
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python packer/tools/test_stage41_portable.py \
+            "$RUNNER_TEMP/portable-work/SOP-Stage41" \
+            "$RUNNER_TEMP/portable-chrome-screenshots"
+      - name: Upload ready-to-use archive
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SOP-Stage41-Full-Offline
+          path: |
+            ${{ runner.temp }}/SOP-Stage41-Full-Offline.zip
+            ${{ runner.temp }}/SOP-Stage41-Full-Offline.sha256
+          retention-days: 30
+          if-no-files-found: error
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stage41-Portable-Local-Chrome-QA
+          path: ${{ runner.temp }}/portable-chrome-screenshots/
+          retention-days: 7
+          if-no-files-found: warn
+
+  publish:
+    name: Save the portable ZIP in a separate long-lived branch
+    runs-on: ubuntu-latest
+    needs: package
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: docs/stage41-portable-offline-archive-20261123
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: SOP-Stage41-Full-Offline
+          path: ./published-input
+      - name: Save archive and checksum outside production folders
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p offline-releases
+          cp published-input/SOP-Stage41-Full-Offline.zip offline-releases/
+          cp published-input/SOP-Stage41-Full-Offline.sha256 offline-releases/
+          unzip -t offline-releases/SOP-Stage41-Full-Offline.zip | tail -1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add offline-releases/SOP-Stage41-Full-Offline.zip offline-releases/SOP-Stage41-Full-Offline.sha256
+          if ! git diff --cached --quiet; then
+            git commit -m "Bundle: persist verified Stage41 offline constructor architecture and sources"
+            git push origin HEAD:docs/stage41-portable-offline-archive-20261123
+          fi
