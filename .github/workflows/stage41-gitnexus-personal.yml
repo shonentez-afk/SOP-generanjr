@@ -28,7 +28,7 @@ jobs:
           import json, os, pathlib, shutil
           root=pathlib.Path.cwd()
           paths=json.loads((root/'src/app/stage41-parts.json').read_text('utf-8'))['modules']
-          assert len(paths)==73 and len(set(paths))==67, f'Expected 73 modules, found {len(paths)}'
+          assert len(paths)==73 and len(set(paths))==73, f'Expected 73 modules, found {len(paths)}'
           dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'sop-stage41-personal-trial'
           for path in paths:
               src=root/path
@@ -36,7 +36,7 @@ jobs:
               target=dest/path
               target.parent.mkdir(parents=True,exist_ok=True)
               shutil.copy2(src,target)
-          (dest/'README.md').write_text('Isolated personal experiment: exactly 67 Stage41 JS sources; no production configuration.\n')
+          (dest/'README.md').write_text('Isolated personal experiment: exactly 73 Stage41 JS sources; no production configuration.\n')
           print('COPIED_ACTIVE_MODULES',len(paths),flush=True)
           PY
           cd "$TRIAL_ROOT"
