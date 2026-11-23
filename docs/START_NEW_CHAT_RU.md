@@ -1,3 +1,11 @@
+## ОБНОВЛЕНИЕ Stage36: CI PASS, ПОЛЬЗОВАТЕЛЬСКАЯ ПРИЁМКА ЕЩЁ НЕТ (23.11.2026)
+
+- Ветка `feature/stage36-library-backup-conflict-safety-20261123`, [PR #31](https://github.com/shonentez-afk/SOP-generanjr/pull/31) DRAFT. [GitHub Actions #45093610144](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45093610144) — **Linux/Windows PASS, 98/98 unit, реальный Chrome file://**, новая защита JSON библиотеки/фото/ФРВ и параллельных вкладок.
+- [Скачать проверенный HTML Stage36](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage36-library-backup-conflict-safety-20261123/releases/stage36-library-safety-browser-candidate.html), сборка SHA-256 `ea1a1b5529548c2f6593627234d159a59f645b280f3752561548ba5059ef48a6`.
+- **Не объединять в main до проверки пользователем**. Stage35 остаётся принятой основной версией, Stage37 не начат.
+
+---
+
 ## АКТУАЛЬНО: Stage36 — новый кандидат в отдельной ветке, НЕ ПРИНЯТ (23.11.2026)
 
 - **Принятая рабочая версия:** Stage35 в `main`, PR #30 merged; 96/96 unit и Chrome Linux/Windows PASS. Ничего из Stage36 в main пока не включено.
