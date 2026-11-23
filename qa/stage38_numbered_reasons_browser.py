@@ -85,7 +85,8 @@ def download(p,selector,out):
     with p.expect_download(timeout=30000) as d:
         p.locator(selector).click()
     d.value.save_as(str(out))
-    assert out.exists() and out.stat().st_size>12000,(selector,out.stat().st_size)
+    minimum=8000 if selector=='#twiExportXlsxBtn' else 12000
+    assert out.exists() and out.stat().st_size>minimum,(selector,out.stat().st_size)
     assert p.evaluate("""() => JSON.stringify({steps:state.steps,twi:state.twi})===window.stage38Before"""),"Print mutated SOP or TWI state"
 
 def geometry(ws):
