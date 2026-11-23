@@ -37,7 +37,7 @@ jobs:
         run: python qa/stage39_1_ai_reasons_frv_browser.py
       - name: Stage39 structural actions and complete Stage37 regression on new HTML
         run: |
-          python -c "import importlib.util; s=importlib.util.spec_from_file_location('qa39','qa/stage39_step_management_browser.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
+          python -c "import sys;sys.path.insert(0,'qa');import importlib.util; s=importlib.util.spec_from_file_location('qa39','qa/stage39_step_management_browser.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
       - uses: actions/upload-artifact@v4
         with:
           name: stage39-1-linux
@@ -72,7 +72,7 @@ jobs:
         run: python qa/stage39_1_ai_reasons_frv_browser.py
       - name: Stage39 actions plus old browser regression
         run: |
-          python -c "import importlib.util; s=importlib.util.spec_from_file_location('qa39','qa/stage39_step_management_browser.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
+          python -c "import sys;sys.path.insert(0,'qa');import importlib.util; s=importlib.util.spec_from_file_location('qa39','qa/stage39_step_management_browser.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
       - name: Windows photo/ISO/ExcelJS original export smoke
         run: |
           python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
