@@ -165,7 +165,7 @@ def document_guard_and_gallery(p):
       renderSteps();renderFrv();renderChecklist();renderTwi();renderFrvStudy();
     }""")
     assert p.locator("#sopVersionLabel").count()==1
-    assert "Stage37" in p.locator("#sopVersionLabel").inner_text()
+    assert any(v in p.locator("#sopVersionLabel").inner_text() for v in ("Stage37","Stage38"))
     # Wait until the normal transient "Opened" toast has faded, so that
     # documentation screenshots show the complete toolbar and AI indicator.
     p.wait_for_timeout(3900)
