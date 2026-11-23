@@ -424,13 +424,13 @@ async function generateExcel(){
       ws.getRow(r).height=clamp(kmLines*13+8,34,220);r++;
 
       M(r,2,r,2,'Причина',{fill:GRAY,font:{size:8,color:{argb:GRAYTXT}},alignment:{textRotation:90,horizontal:'center',vertical:'middle'}});
+      let rsLines=1;
       for(let k=0;k<3;k++){
         const [c1,c2]=vSpans[k],s=g[k];
         M(r,c1,r,c2,s?(s.reason||''):'',{font:{size:11,color:{argb:GRAYTXT}},alignment:C});
+        rsLines=Math.max(rsLines,textLines(s?.reason||'',30));
       }
-      // Only the reason-row height may grow: merged corporate cells, images,
-      // three worksheets and formula locations remain unchanged.
-      ws.getRow(r).height=stage38CorporateReasonHeight(g,30);r++;
+      ws.getRow(r).height=clamp(rsLines*13+8,26,90);r++;
     }
     if(timeCellRefs.length)ws.getCell(5,7).value={formula:timeCellRefs.join('+')};
     r++;
