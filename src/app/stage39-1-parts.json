@@ -92,6 +92,7 @@
     "src/modules/ai/stage27-analogs-history.js",
     "src/modules/app/stage39-1-identity.js",
     "src/modules/editor/stage39-1-reason-cleanup.js",
+    "src/modules/ai/stage39-1-reason-proposal.js",
     "src/modules/app/stage28-ui.js"
   ]
 }
