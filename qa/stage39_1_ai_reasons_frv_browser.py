@@ -72,10 +72,18 @@ def ai_fields(p):
     assert '2. Защитить' in ctx,ctx
     assert p.evaluate("() => state.steps[0].keyMoments[0]")=="Проверить отсутствие перекоса"
     before=p.evaluate("() => state.steps[0].reason")
-    ai_click(reason,'1. Обеспечить качество\n3. Усилить контроль')
-    assert p.evaluate("() => state.steps[0].reason")==before,"Bad numbering changed SOP"
-    ai_click(reason,'1. Усилие 999 Н\n2. Исключить загрязнение')
-    assert p.evaluate("() => state.steps[0].reason")==before,"Unsupported facts changed SOP"
+    # Stage39.1 validator remains active for mentor, FRV and fact-driven AI
+    # proposals. Only the ✨ Reason button is deliberately rolled back to
+    # accepted Stage39, so it no longer calls the proposed-reason guard.
+    checks=p.evaluate("""() => {
+      const step=state.steps[0];
+      const badOrder=stage391ValidateReasonProposal(step.reason,
+        '1. Обеспечить качество\\n3. Усилить контроль',step);
+      const invented=stage391ValidateReasonProposal(step.reason,
+        '1. Усилие 999 Н\\n2. Исключить загрязнение',step);
+      return {badOrder:!badOrder.ok,invented:!invented.ok};
+    }""")
+    assert checks["badOrder"] and checks["invented"],checks
     ai_click(reason,'1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла')
     reason_now=p.evaluate("() => state.steps[0].reason")
     assert reason_now=="1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла",reason_now
