@@ -56,6 +56,10 @@ async function aiFillField(btn,type,source,applyFn){
       const check=stage391ValidateKeyPointProposal(result,step);
       if(!check.ok){toast(check.message,'warning');return;}
       safe=check.value;
+    }else if(step&&type==='action'){
+      const check=stage391ValidateTextProposal(result,step);
+      if(!check.ok){toast(check.message,'warning');return;}
+      safe=check.value;
     }
     applyFn(safe);
     renderSteps();stateChanged();
