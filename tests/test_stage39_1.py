@@ -60,6 +60,11 @@ class Stage391Contracts(unittest.TestCase):
         self.assertIn("formatPreference:",ai_review)
         self.assertIn("changedCount?'':String(previous||'')",ai_review)
         self.assertIn("Приказ",ai_review)
+        self.assertIn("stage391ReasonAIIsReferenceInsteadOfWhy",ai_review)
+        self.assertIn("stage391ReasonAIDraftForContext(source)",ai_review)
+        self.assertIn("sourceEvidence=stage391TwiSourceFacts(step)",ai_review)
+        self.assertIn("for(let attempt=0;attempt<2;attempt++)",ai_review)
+        self.assertIn("NEEDS_REASON_FACTS",ai_review)
         self.assertIn("смысл проверяет технолог",checklist)
         self.assertEqual(new.AI_REASON_MODULE,"src/modules/ai/stage39-1-reason-proposal.js")
         self.assertIn("stage391AcceptedReasonFill",f)
@@ -72,7 +77,15 @@ class Stage391Contracts(unittest.TestCase):
         base=new.read("src/modules/ai/stage38-base-prompts.js")
         rollback=new.read("src/modules/ai/stage39-1-base-prompts.js")
         reason=lambda s:s.split(" reason:`",1)[1].split(" photoHint:",1)[0]
-        self.assertEqual(reason(base),reason(rollback))
+        generation=lambda s:s.split(" generate:`",1)[1].split(" reason:`",1)[0]
+        # Accepted Stage39 remains untouched. Stage39.1 intentionally stops
+        # supplying a lengthy normative reference list to these two tasks.
+        self.assertNotEqual(reason(base),reason(rollback))
+        self.assertNotIn("${NORM_BASE}",reason(rollback))
+        self.assertNotIn("${NORM_BASE}",generation(rollback))
+        self.assertIn("NEEDS_REASON_FACTS",reason(rollback))
+        self.assertIn("openQuestions",generation(rollback))
+        self.assertIn("${NORM_BASE}",rollback)  # Other AI tasks unchanged.
         self.assertIn("stage391ValidateKeyPointProposal",f)
         self.assertIn("selectedKeyPointIndex",f)
         self.assertIn("allKeyPoints",f)
