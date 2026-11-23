@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Make isolated directory of 67 active JavaScript files
+      - name: Make isolated directory of 73 active JavaScript files
         shell: bash
         run: |
           set -euo pipefail
@@ -46,7 +46,7 @@ jobs:
           root=pathlib.Path(os.environ['SOURCE'])
           manifest=json.loads((root/'src/app/stage41-parts.json').read_text())
           paths=manifest['modules']
-          assert len(paths)==73 and len(set(paths))==67
+          assert len(paths)==73 and len(set(paths))==73
           dest=pathlib.Path(os.environ['DEST'])
           for name in paths:
               p=root/name
@@ -54,7 +54,7 @@ jobs:
               t=dest/name
               t.parent.mkdir(parents=True,exist_ok=True)
               shutil.copy2(p,t)
-          print('STAGE39_ACTIVE_JS',len(paths))
+          print('STAGE41_ACTIVE_JS',len(paths))
           PY
       - name: Run actual CodeFlow headless analysis (shared browser analyzer)
         shell: bash
