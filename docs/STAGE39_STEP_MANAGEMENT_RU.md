@@ -1,5 +1,7 @@
 # Stage39 — удобное и безопасное управление шагами СОП
 
+> **Статус на 23.11.2026:** Stage39 принята пользователем («работает»), PR #35 объединён в `main` (merge `9fc93c3d5fb0086dd8a51d05cf0244c2ae13b5ef`), GitHub Actions Linux/Windows PASS. Ниже сохранены первоначальный контракт и план проверки, включая историческое условие «не сливать», которое уже выполнено. [Принятый HTML в main](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/main/releases/stage39-step-management-browser-candidate.html).
+
 Дата: 23.11.2026. База — **принятая Stage38 в main**. Новые функции находятся в отдельной ветке `feature/stage39-step-management-20261123`, **до пользовательской проверки не сливать**.
 
 ## Действия в существующей карточке шага
