@@ -21,7 +21,9 @@ function stage391ReasonAIInspect(previous,proposed,step){
   // New normative claims are not substantiated by the system reference list.
   // Only references actually present in the user's document/context count.
   const facts=stage391FactCorpus(step).toLocaleLowerCase('ru');
-  const namedNorms=value.match(/ГОСТ(?:\s+[\w.\/-]+)?|ISO\s*\d*|ПТЭЭП|СанПиН(?:\s*[\d.]+)?|СНиП|СТО\s*[\w.\/-]*|Приказ\s*[№N]?\s*\d+/giu)||[];
+  // Unicode word boundaries: never mistake "состояние" for a "СТО"
+  // standard or an ordinary word containing "ГОСТ" for a normative claim.
+  const namedNorms=value.match(/(?<![\p{L}\p{N}])(?:ГОСТ(?:\s+[A-Za-zА-Яа-я0-9.\/-]+)?|ISO\s*\d+|ПТЭЭП|СанПиН(?:\s*[\d.]+)?|СНиП|СТО\s+(?:№\s*)?[A-ZА-Я0-9][\w.\/-]*|Приказ\s*[№N]?\s*\d+)(?![\p{L}\p{N}])/giu)||[];
   for(const norm of namedNorms){
     const tag=norm.trim().toLocaleLowerCase('ru');
     if(!facts.includes(tag))
