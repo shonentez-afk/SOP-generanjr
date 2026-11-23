@@ -192,6 +192,7 @@ function stage28TwiStructureChecks(steps){
         description:'Объяснение «Почему важно» дословно повторяет действие или ключевой момент',
         suggestion:'Проверьте, поясняет ли текст причину, а не только повторяет порядок действий.'});
     }
+    issues.push(...stage38ReasonIssues(reason,km.length,stepId));
     if(action.length>12&&criterion.length>12&&norm(action)===norm(criterion)){
       issues.push({stepId,field:'successCriteria',severity:'info',
         type:'incomplete',status:'open',fixValue:null,thread:[],
