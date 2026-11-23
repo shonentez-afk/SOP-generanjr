@@ -103,7 +103,7 @@ def geometry(ws):
 def compare_corporate_xlsx(old,new):
     prev=load_workbook(old)
     updated=load_workbook(new)
-    assert prev.sheetnames==updated.sheetnames==["СОП","ФРВ","Чек-лист"],updated.sheetnames
+    assert prev.sheetnames==updated.sheetnames==["СОП","ФРВ","Чек-лист оценки СОП"],updated.sheetnames
     ws=updated["СОП"];base=prev["СОП"]
     assert geometry(base)==geometry(ws),(geometry(base),geometry(ws))
     assert base["C18"].value==ws["C18"].value==NUMBERED
@@ -114,7 +114,7 @@ def compare_corporate_xlsx(old,new):
     assert ws.row_dimensions[18].height>90,ws.row_dimensions[18].height
     assert base.row_dimensions[18].height==90,base.row_dimensions[18].height
     assert len(ws._images)>=3,len(ws._images)  # logo + photo background + original
-    for sheet in ("ФРВ","Чек-лист"):
+    for sheet in ("ФРВ","Чек-лист оценки СОП"):
         assert prev[sheet].max_row==updated[sheet].max_row
         assert prev[sheet].max_column==updated[sheet].max_column
         assert {str(m) for m in prev[sheet].merged_cells.ranges}=={
