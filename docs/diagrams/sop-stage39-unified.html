@@ -69,6 +69,14 @@ footer{color:#89a8c0;border-top:1px solid var(--br);padding:16px 4vw 30px;font-s
   <section id="depsview" hidden>
     <div class="stats" id="stats"></div>
     <div id="hotspots" class="cardlist" aria-label="Наиболее связанные модули"></div>
+    <div class="details" style="margin:10px 0 15px"><h3>Проверка GitNexus 1.6.12 — реальная индексация PASS</h3>
+  <p class="muted">Изолированная копия 67 активных файлов Stage39: <strong>2 123 узла · 7 538 рёбер · 90 кластеров · 172 потока</strong>. Это граф функций и других сущностей, а 258 связей выше — граф между файлами. Цифры относятся к разным уровням и напрямую не сравниваются.</p>
+  <p class="muted">Анализ влияния <code>aiAsk()</code> определил 33 потенциально затронутые сущности и 15 процессов. Это <strong>не обнаруженные ошибки</strong>. FTS-поиск GitNexus не заработал (расширение LadybugDB вернуло HTTP 404); точечные <code>context</code> и <code>impact</code> работают.</p>
+  <button class="action" type="button" data-gitnexus-jump="src/modules/ai/stage26-transport.js">Показать модуль aiAsk</button>
+  <button class="action" type="button" data-gitnexus-jump="src/modules/ai/stage28-review-task.js">Показать контроль СОП</button>
+  <a class="link" target="_blank" rel="noopener" href="https://github.com/shonentez-afk/SOP-generanjr/blob/docs/archify-stage39-architecture-20261123/docs/diagrams/GITNEXUS_PERSONAL_STAGE39_AUDIT_RU.md">Полный отчёт GitNexus</a>
+</div>
+
     <p class="muted">Граф получен статическим чтением 67 файлов из манифеста Stage39. Это <b>потенциальные прямые вызовы функций</b>, а не трассировка исполнения. Выберите модуль для интерактивной карты его зависимостей.</p>
     <div class="browser">
       <aside class="side">
@@ -167,6 +175,7 @@ document.querySelectorAll("[data-focus]").forEach(b=>b.addEventListener("click",
 const hotspots=[...GRAPH.nodes].sort((a,b)=>b.staticIncoming-a.staticIncoming).slice(0,3);
 $("hotspots").innerHTML=hotspots.map((n,i)=>'<div class="card"><div class="eyebrow">Часто используемый модуль · '+(i+1)+'</div><h3>'+e(fname(n.path))+'</h3><p>'+n.staticIncoming+' файлов с найденными вызовами к нему. Это не оценка дефектности.</p><button class="action" data-hotspot="'+e(n.path)+'">Показать зависимости</button></div>').join("");
 document.querySelectorAll("[data-hotspot]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.hotspot;group="all";$("group").value="all";query="";$("search").value="";setTab("dependencies")}));
+document.querySelectorAll("[data-gitnexus-jump]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.gitnexusJump;group="all";$("group").value="all";query="";$("search").value="";setTab("dependencies")}));
 document.querySelectorAll("[data-c4view]").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.c4view;if(v==="ai"){setTab("ai");return}if(v==="landscape"){setTab("overview");return}const id={modules:"runtime",sop:"sop",twi:"twi",frv:"frv",storage:"library",excel:"sopXlsx"}[v];if(id){pickOverview(id)}}));
 const h=location.hash.slice(1);setTab(["overview","ai","dependencies","likec4"].includes(h)?h:"overview");
 }
