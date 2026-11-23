@@ -30,7 +30,7 @@ class Stage391Contracts(unittest.TestCase):
     def test_changed_js_syntax(self):
         for p in [*new.REPLACEMENTS.values(),*new.EXTRA.values()]:
             result=subprocess.run(["node","--check","-"],input=new.read(p),
-                                  text=True,capture_output=True)
+                                  text=True,encoding='utf-8',capture_output=True)
             self.assertEqual(result.returncode,0,p+": "+result.stderr)
 
     def test_data_safety_contract(self):
