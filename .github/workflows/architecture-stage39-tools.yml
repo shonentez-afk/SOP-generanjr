@@ -152,3 +152,18 @@ jobs:
             ${{ runner.temp }}/likec4-build.log
           if-no-files-found: warn
           retention-days: 7
+
+  unified-map-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout current architecture documentation
+        uses: actions/checkout@v4
+        with:
+          ref: docs/archify-stage39-architecture-20261123
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify self-contained architecture map and CodeFlow layer
+        run: node docs/diagrams/qa/verify-unified-map.mjs
