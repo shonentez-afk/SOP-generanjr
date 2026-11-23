@@ -1,0 +1,95 @@
+name: Stage39 SOP step management with photo-safe undo
+on:
+  push:
+    branches: [feature/stage39-step-management-20261123]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage39-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Linux Stage39 structure, Chrome photos and Stage37 regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify accepted Stage38 is unchanged; assemble Stage39
+        run: |
+          test -s releases/stage38-numbered-reasons-corporate-xlsx-browser-candidate.html
+          python tools/build_stage39.py --verify-static
+          python tools/build_stage39.py
+          python tools/build_stage39.py --verify-static --verify-release
+      - name: Current and historical Python/Node tests
+        run: python -m unittest discover -s tests -v
+      - name: Install offline Chrome test dependencies
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: Real Chrome step operations and complete historical UI regression
+        run: python qa/stage39_step_management_browser.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage39-linux
+          path: releases/stage39-step-management-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+  windows:
+    name: Windows Stage39, complete regression and Excel photo integrity
+    runs-on: windows-latest
+    timeout-minutes: 55
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assemble standalone Stage39
+        run: |
+          python tools/build_stage39.py --verify-static
+          python tools/build_stage39.py
+      - name: Install offline Chrome test dependencies
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Chrome Stage39 actions and historical UI/FRV/TWI regression
+        run: python qa/stage39_step_management_browser.py
+      - name: Original Windows XLSX/photo/ISO smoke test on Stage39
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-step-management-browser-candidate.html'; m.main()"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage39-windows
+          path: releases/stage39-step-management-browser-candidate.html
+          if-no-files-found: error
+          retention-days: 30
+  publish:
+    name: Publish Stage39 only after BOTH platforms pass
+    needs: [linux,windows]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage39-step-management-20261123'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: stage39-linux
+          path: .
+      - name: Commit verified standalone candidate
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage39-step-management-20261123
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; skip stale publish"
+            exit 0
+          fi
+          git add releases/stage39-step-management-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage39 Chrome/Windows/Linux verified standalone"
+            git push origin HEAD:feature/stage39-step-management-20261123
+          fi
