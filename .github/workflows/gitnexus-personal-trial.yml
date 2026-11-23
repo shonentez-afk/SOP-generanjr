@@ -51,14 +51,17 @@ jobs:
           set -euo pipefail
           node --version
           npm --version
+          npm install -g npm@10 --no-audit --no-fund
+          npm --version
           npm install -g gitnexus@1.6.12 --no-audit --no-fund
           gitnexus --version
+          gitnexus analyze --help | head -n 45
       - name: Index the isolated snapshot (offline AI, no repo integrations)
         shell: bash
         run: |
           set -euo pipefail
           cd "$TRIAL_ROOT"
-          gitnexus analyze --index-only --skip-embeddings --skip-skills --skip-agents-md --workers 2 2>&1 | tee "$RUNNER_TEMP/gitnexus-analyze.log"
+          gitnexus analyze --index-only --workers 2 2>&1 | tee "$RUNNER_TEMP/gitnexus-analyze.log"
           gitnexus status 2>&1 | tee "$RUNNER_TEMP/gitnexus-status.log"
       - name: Query call graph and key symbols
         if: success()
