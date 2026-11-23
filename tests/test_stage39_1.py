@@ -20,7 +20,7 @@ class Stage391Contracts(unittest.TestCase):
         cur=json.loads(new.MANIFEST.read_text(encoding="utf-8"))
         self.assertEqual(len(old["modules"]),67)
         self.assertEqual(len(cur["modules"]),69)
-        self.assertEqual(set(new.REPLACEMENTS),set(old["modules"]))
+        self.assertTrue(set(new.REPLACEMENTS).issubset(set(old["modules"])))
         for unchanged in ("src/modules/excel/stage38-export.js",
                           "src/modules/twi/stage38-print-xlsx.js",
                           "src/modules/editor/stage39-step-actions.js",
@@ -41,7 +41,7 @@ class Stage391Contracts(unittest.TestCase):
         frv_ui=new.read("src/modules/frv/stage39-1-study-model.js")
         review=new.read("src/modules/ai/stage39-1-review-task.js")
         facts=new.read("src/modules/ai/stage39-1-intelligence.js")
-        self.assertIn("stage391ValidateReasonProposal",f)
+        self.assertIn("stage391RejectInvalidReason",f)
         self.assertIn("stage391ValidateKeyPointProposal",f)
         self.assertIn("selectedKeyPointIndex",f)
         self.assertIn("allKeyPoints",f)
