@@ -97,7 +97,11 @@ def main():
 
             # Published/archive document protection from Stage39.1 remains.
             page.evaluate("() => {state.documentManager.status='Опубликован'; applyDocumentLock()}")
-            run_star(new_reason)
+            page.evaluate("""async () => {
+              const b=document.querySelector('[data-ai="reason"]');
+              await aiFillField(b,'reason',state.steps[0].reason,
+                value=>{state.steps[0].reason=value});
+            }""")
             assert page.evaluate("() => state.steps[0].reason")==before
             assert not errors,errors
             print("PASS: ✨ Reason restored to exact Stage39 behavior, old AI prompt/context "+
