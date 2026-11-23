@@ -70,7 +70,54 @@ def main():
             assert "Проверить резиновый наконечник" not in after
             assert "Проверить корпус" not in after
             assert after.count("\n")==2
+            # Reproduce the user's narrow screenshot and higher desktop zoom.
+            # The Apply button must have a real blue background and BOTH
+            # actions must remain inside the viewport (not white-on-white,
+            # behind the scrollbar, or clipped below the window).
+            def verify_dialog_buttons(width,height):
+                page.set_viewport_size({"width":width,"height":height})
+                metrics=page.evaluate("""() => {
+                  const ids=['stage391CleanupCancel','stage391CleanupApply'];
+                  const buttons=ids.map(id=>{
+                    const b=document.getElementById(id);
+                    const r=b.getBoundingClientRect();
+                    const css=getComputedStyle(b);
+                    return {
+                      id,visible:css.display!=='none'&&css.visibility!=='hidden'&&
+                        css.opacity!=='0'&&r.width>=65&&r.height>=36,
+                      within:r.left>=0&&r.right<=innerWidth+1&&
+                        r.top>=0&&r.bottom<=innerHeight+1,
+                      background:css.backgroundColor,color:css.color,
+                      height:r.height
+                    };
+                  });
+                  const footer=document.querySelector('#stage391CleanupOverlay footer');
+                  const dialog=document.querySelector('#stage391CleanupOverlay [role="dialog"]');
+                  const scroll=dialog.children[1],scrollBox=scroll.getBoundingClientRect();
+                  const footerBox=footer.getBoundingClientRect();
+                  const dialogBox=dialog.getBoundingClientRect();
+                  return {buttons,footerWithin:footerBox.bottom<=innerHeight+1,
+                    dialogWithin:dialogBox.top>=0&&dialogBox.bottom<=innerHeight+1,
+                    scrollHeight:scroll.scrollHeight,clientHeight:scroll.clientHeight,
+                    scrollInside:scrollBox.top>=dialogBox.top&&
+                      scrollBox.bottom<=footerBox.top+1};
+                }""")
+                assert all(b["visible"] and b["within"] for b in metrics["buttons"]),metrics
+                assert metrics["buttons"][1]["background"]=="rgb(37, 99, 235)",metrics
+                assert metrics["buttons"][1]["color"]=="rgb(255, 255, 255)",metrics
+                assert metrics["footerWithin"] and metrics["dialogWithin"] and metrics["scrollInside"],metrics
+                return metrics
+
+            verify_dialog_buttons(950,446)
+            compact=verify_dialog_buttons(620,320)
+            assert compact["clientHeight"]>0,compact
+            # Scroll the contents. The footer must not move off-screen.
+            page.evaluate("""() => {
+              document.querySelector('#stage391CleanupOverlay [role="dialog"]').children[1].scrollTop=9999;
+            }""")
+            verify_dialog_buttons(620,320)
             page.locator("#stage391CleanupCancel").click()
+            page.set_viewport_size({"width":1540,"height":980})
             assert page.locator("#stage391CleanupOverlay").count()==0
             assert page.evaluate("() => state.steps[0].reason")==ids["initial"]
 
@@ -151,7 +198,7 @@ def main():
             assert page.locator(selector).is_disabled()
             assert page.evaluate("() => state.steps[0].reason")==good
             assert not errors,errors
-            print("PASS Stage39.1 manual KM cleanup: user preview, Cancel/Escape, "+
+            print("PASS Stage39.1 manual KM cleanup: blue Apply visible at 950x446 and 620x320, user preview, Cancel/Escape, "+
                   "explicit Apply, numbered Reasons, exact-only match, stale-data guard, "+
                   "partial match, FRV intact, readonly lock, old ✨ unchanged",flush=True)
         finally:
