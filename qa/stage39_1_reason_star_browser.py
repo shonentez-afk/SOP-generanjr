@@ -51,7 +51,19 @@ def main():
                 page.evaluate("r => {window.reasonStarFixture.response=r}",reply)
                 page.locator(button).click()
                 if expect_preview:
-                    page.locator(overlay).wait_for(state="visible",timeout=15000)
+                    try:
+                        page.locator(overlay).wait_for(state="visible",timeout=5000)
+                    except Exception:
+                        debug=page.evaluate("""s => ({
+                          reason:state.steps[0]?.reason,
+                          buttonText:document.querySelector(s)?.textContent,
+                          popup:!!document.querySelector('#stage391ReasonAIReview'),
+                          modals:[...document.querySelectorAll('[role="dialog"]')].map(x=>x.id),
+                          callCount:window.reasonStarFixture?.calls?.length,
+                          htmlEnd:document.body.innerText.slice(-950)
+                        })""",button)
+                        print("AI Reason preview missing:",debug,flush=True)
+                        raise
                     assert page.locator(overlay+" [data-ai-preview-action='apply']").count()==1
                     assert page.locator(overlay+" [data-ai-preview-action='cancel']").count()==1
                 else:
