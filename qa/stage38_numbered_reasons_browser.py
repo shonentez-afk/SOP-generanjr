@@ -212,6 +212,9 @@ def stage38_xlsx():
                 assert canon(line) in canon(result),(line,result)
             assert w.worksheets[0].page_setup.fitToWidth==1
             assert p_bool(candidate,"() => !!document.querySelector('[data-step-field=reason]')?.value.includes('1. ')")
+            # Return to editor after TWI export: hidden tab fields cannot be
+            # filled by Playwright as a real user.
+            candidate.locator('[data-tab="editor"]').click()
             # Simulate a user editing the sole reason textarea with newlines.
             candidate.locator('textarea[data-step-field="reason"]').first.fill(
                 "1. Предотвратить повреждение\n2. Обеспечить качество")
