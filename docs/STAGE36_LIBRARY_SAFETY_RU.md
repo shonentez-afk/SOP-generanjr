@@ -2,6 +2,14 @@
 
 Дата начала: 23.11.2026. База: принятая Stage35 в main (PR #30 merged, 96/96 тестов, Linux/Windows PASS).
 
+## Автоматическая приёмка Stage36 — PASS (23.11.2026)
+
+- [GitHub Actions #45093610144](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45093610144): **Linux PASS / Windows PASS**.
+- **98/98 модульных тестов** (Linux), полный Chrome `file://`: сквозная регрессия Stage35/34.1/33/32.2, XLSX-фото, TWI, Яндекс ИИ-модули без изменения транспорта.
+- Новый реальный браузерный тест Stage36 PASS: общий SHA-256 JSON, фото с аннотациями, повторный импорт без дублей, конфликтный импорт как отдельные копии, две вкладки и восстановление конфликтующих правок без перезаписи исходного исследования.
+- Реплицируемая сборка `releases/stage36-library-safety-browser-candidate.html`, SHA256 `ea1a1b5529548c2f6593627234d159a59f645b280f3752561548ba5059ef48a6`. [Скачать проверенный кандидат](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage36-library-backup-conflict-safety-20261123/releases/stage36-library-safety-browser-candidate.html).
+- **Приёмка пользователем на реальном ПК ещё не подтверждена. PR #31 остаётся DRAFT, main сохраняет Stage35.**
+
 ## Что реализовано в отдельной ветке
 
 - Единая резервная копия JSON: **все сохранённые** документы СОП (включая версии, исходные/отрисованные фото и разметку) плюс отдельные исследования ФРВ, в том числе архивные.
@@ -23,11 +31,11 @@
 ## Сборка и проверки
 
 - Ветка: `feature/stage36-library-backup-conflict-safety-20261123`.
-- PR и статусы CI — после фактического запуска, до ручного принятия кандидат не объединять с main.
+- [PR #31](https://github.com/shonentez-afk/SOP-generanjr/pull/31) draft; CI PASS, ручная приёмка ожидается, в main не объединять.
 - HTML: `releases/stage36-library-safety-browser-candidate.html`, сборщик `tools/build_stage36.py`.
 - Манифест `src/app/stage36-parts.json`, 63 модуля (замена одного и добавление одного к Stage35).
 - Тесты `tests/test_stage36.py`, `qa/stage36_browser_smoke.py`, GitHub Actions `.github/workflows/stage36.yml`; новая QA покрывает целостность фото, повторный импорт, конфликты копий, параллельные вкладки и наследует Stage35/Stage34/Stage33/Stage32 проверки.
-- Не указывать PASS и не давать ссылку на кандидат, пока его не соберёт и не подтвердит CI.
+- CI завершена PASS, кандидат опубликован для проверки пользователем.
 
 ## Следующий Stage37
 
