@@ -32,6 +32,7 @@ EXTRA={
   "src/modules/ai/stage27-analogs-history.js":"src/modules/app/stage39-1-identity.js",
 }
 NEW_MODULE="src/modules/editor/stage39-1-reason-cleanup.js"
+AI_REASON_MODULE="src/modules/ai/stage39-1-reason-proposal.js"
 def read(path):
     return (ROOT/path).read_text(encoding="utf-8")
 
@@ -47,7 +48,8 @@ def build() -> str:
             expected.append(EXTRA[src])
             if EXTRA[src]=="src/modules/app/stage39-1-identity.js":
                 expected.append(NEW_MODULE)
-    assert len(modules)==67 and len(expected)==70 and len(set(expected))==70
+                expected.append(AI_REASON_MODULE)
+    assert len(modules)==67 and len(expected)==71 and len(set(expected))==71
     assert spec["modules"]==expected,"Unexpected module or execution order"
     assert spec["baseRelease"]==old["outputRelease"]
     assert spec["outputRelease"]==OUT.relative_to(ROOT).as_posix()
@@ -62,7 +64,7 @@ def verify_static(html=None):
     old=json.loads(PREVIOUS.read_text(encoding="utf-8"))
     baseline=BASELINE.read_text(encoding="utf-8")
     # Ensure baseline actually matches its original 67 modules, and that only
-    # the 9 approved source substitutions and three added modules differ.
+    # the 9 approved source substitutions and four added modules differ.
     assert modular.build_from_manifest(old)==baseline,"Accepted Stage39 baseline changed"
     expected=baseline
     for old_path,new_path in REPLACEMENTS.items():
@@ -74,7 +76,7 @@ def verify_static(html=None):
         assert expected.count(marker)==1,after_path
         addition=read(extra_path)
         if extra_path=="src/modules/app/stage39-1-identity.js":
-            addition+=read(NEW_MODULE)
+            addition+=read(NEW_MODULE)+read(AI_REASON_MODULE)
         expected=expected.replace(marker,marker+addition,1)
     assert result==expected,"Unexpected standalone HTML change against accepted Stage39"
 
