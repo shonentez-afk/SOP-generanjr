@@ -60,7 +60,7 @@ def ai_fields(p):
         p.wait_for_function("""selector =>
           document.querySelector(selector)&&
           !document.querySelector(selector).disabled&&
-          document.querySelector(selector).textContent==='✨'""",selector)
+          document.querySelector(selector).textContent==='✨'""",arg=selector)
     ai_click(km,'Проверить зазор 888 мм')
     assert p.evaluate("() => state.steps[0].keyMoments[0]")=="Проверить посадку"
     ai_click(km,'Проверить отсутствие перекоса')
@@ -69,11 +69,11 @@ def ai_fields(p):
     assert '2. Защитить' in ctx,ctx
     assert p.evaluate("() => state.steps[0].keyMoments[0]")=="Проверить отсутствие перекоса"
     before=p.evaluate("() => state.steps[0].reason")
-    ai_click(reason,'1. Обеспечить качество\\n3. Усилить контроль')
+    ai_click(reason,'1. Обеспечить качество\n3. Усилить контроль')
     assert p.evaluate("() => state.steps[0].reason")==before,"Bad numbering changed SOP"
-    ai_click(reason,'1. Усилие 999 Н\\n2. Исключить загрязнение')
+    ai_click(reason,'1. Усилие 999 Н\n2. Исключить загрязнение')
     assert p.evaluate("() => state.steps[0].reason")==before,"Unsupported facts changed SOP"
-    ai_click(reason,'1. Предотвратить перекос при посадке\\n2. Исключить загрязнение узла')
+    ai_click(reason,'1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла')
     reason_now=p.evaluate("() => state.steps[0].reason")
     assert reason_now=="1. Предотвратить перекос при посадке\n2. Исключить загрязнение узла",reason_now
 
