@@ -8858,7 +8858,7 @@ async function generateExcel(){
       M(r,2,r,2,'Причина',{fill:GRAY,font:{size:8,color:{argb:GRAYTXT}},alignment:{textRotation:90,horizontal:'center',vertical:'middle'}});
       for(let k=0;k<3;k++){
         const [c1,c2]=vSpans[k],s=g[k];
-        M(r,c1,r,c2,s?(s.reason||''):'',{font:{size:11,color:{argb:GRAYTXT}},alignment:C});
+        M(r,c1,r,c2,s?(s.reason||''):'',{font:{size:11,color:{argb:GRAYTXT}},alignment:T});
       }
       // Only the reason-row height may grow: merged corporate cells, images,
       // three worksheets and formula locations remain unchanged.
