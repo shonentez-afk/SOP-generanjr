@@ -185,10 +185,23 @@ stage28TwiStructureChecks=function stage391TwiStructureWithWhy(steps){
 // inventing a reason or rejecting the full otherwise-valid SOP draft.
 const stage391PreviousSopNormalize=stage29SopNormalize;
 stage29SopNormalize=function stage391NormalizeWithReasonReview(sop,input){
+  // This is only the generated PROPOSAL, never state.steps. A reference to a
+  // rule or a request to consult documentation is not a causal Reason Why.
+  // Remove that non-WHY text before the numeric source gate, otherwise the
+  // model's invented order number can incorrectly reject the whole valid SOP.
+  const normOnly=[];
+  (Array.isArray(sop?.steps)?sop.steps:[]).forEach((step,i)=>{
+    if(stage391ReasonAIIsReferenceInsteadOfWhy(step.reason)){
+      step.reason='';
+      normOnly.push(i+1);
+    }
+  });
   const result=stage391PreviousSopNormalize(sop,input);
   const source=[input?.userDescription,input?.operation,input?.safety,
     input?.tools,input?.material].map(x=>String(x||'')).join('\n');
   const questions=Array.isArray(result.sop.openQuestions)?result.sop.openQuestions:[];
+  for(const n of normOnly)questions.push('Шаг '+n+
+    ': ИИ указал норматив или инструкцию вместо WHY. Уточните фактическое обоснование ключевого момента.');
   (result.sop.steps||[]).forEach((step,i)=>{
     const concerns=stage391TwiReasonQualityIssues(step.reason,step,source);
     if(concerns.length){
