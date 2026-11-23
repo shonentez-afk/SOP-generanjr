@@ -61,6 +61,32 @@ def main():
             assert "ПТЭЭП" not in before["edit"],"Reason prompt still supplies normative list"
             assert not before["direct"]["ok"],before["direct"]
 
+            # Unsupported normative-only output in a newly generated SOP
+            # is an unanswered WHY, not a reason or a fatal whole-SOP error.
+            proposed=page.evaluate("""() => {
+              const step=state.steps[0],saved=JSON.stringify(state.steps);
+              const draft={
+                steps:[{
+                  action:step.action,keyMoments:[...step.keyMoments],reason:step.reason,
+                  success_criteria:'',time:null,
+                  decision_points:[],common_pitfalls:[],visual_markers:[]
+                }],openQuestions:[]
+              };
+              const out=stage29SopNormalize(draft,{
+                userDescription:state.description,operation:step.action,
+                department:'',workplace:'',executor:'',tools:'',material:'',safety:''
+              });
+              return {
+                reason:out.sop.steps[0].reason,
+                asked:out.sop.openQuestions.some(q=>q.includes('норматив или инструкцию вместо WHY')),
+                liveSame:JSON.stringify(state.steps)===saved,
+                actionSame:out.sop.steps[0].action===step.action,
+                kmSame:JSON.stringify(out.sop.steps[0].keyMoments)===JSON.stringify(step.keyMoments)
+              };
+            }""")
+            assert proposed["reason"]=="",proposed
+            assert all(proposed[k] for k in ("asked","liveSame","actionSame","kmSame")),proposed
+
             def start(replies,preview):
                 page.evaluate("r => {window.s391WhyTest.calls=[];window.s391WhyTest.responses=r}",replies)
                 page.locator(selector).click()
