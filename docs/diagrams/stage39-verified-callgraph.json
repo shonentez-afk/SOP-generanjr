@@ -1,0 +1,6559 @@
+{
+  "schema_version": 1,
+  "kind": "lexical-callgraph",
+  "base_revision": "4cf1a467e912984cb98d6dc969ab10eb685f458b",
+  "manifest": "src/app/stage39-parts.json",
+  "scope": "67 files included in Stage39 release; excludes historical source files",
+  "method": "Mask JavaScript comments, quotes and template literals, find top-level function declarations and unqualified cross-file identifiers immediately followed by '('; resolve only unique definitions",
+  "tool_provenance": {
+    "codeflow": "NOT EXECUTED",
+    "gitnexus": "NOT EXECUTED",
+    "analyzer": "Custom scoped lexical scan via GitHub source reads"
+  },
+  "limitations": [
+    "Not a runtime trace and not AST-quality static analysis; counts indicate potential direct call sites, not execution frequencies",
+    "Excludes calls from HTML strings/template interpolation, callbacks referenced without parentheses, property/method calls, dynamic lookup and closure/IIFE definitions",
+    "Top-level scope detection can be imperfect around regular expressions and template syntax",
+    "Identical global function names declared in multiple files are excluded as ambiguous",
+    "Number of calls is a count of static code tokens; verify important links manually before refactoring"
+  ],
+  "summary": {
+    "activeModules": 67,
+    "declarations": 430,
+    "uniqueGlobalFunctions": 430,
+    "ambiguousNames": 0,
+    "moduleEdges": 258,
+    "modulesInCallgraph": 63,
+    "recognizedCrossFileCallSites": 995
+  },
+  "ambiguousNames": [],
+  "nodes": [
+    {
+      "path": "src/modules/core/stage19-config.js",
+      "order": 1,
+      "group": "core",
+      "declarations": 0,
+      "staticOutgoing": 0,
+      "staticIncoming": 0,
+      "inGraph": false
+    },
+    {
+      "path": "src/modules/shared/stage19-ui-helpers.js",
+      "order": 2,
+      "group": "shared",
+      "declarations": 16,
+      "staticOutgoing": 6,
+      "staticIncoming": 46,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/safety/stage19-icons-logo.js",
+      "order": 3,
+      "group": "safety",
+      "declarations": 6,
+      "staticOutgoing": 2,
+      "staticIncoming": 6,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage38-base-prompts.js",
+      "order": 4,
+      "group": "ai",
+      "declarations": 0,
+      "staticOutgoing": 0,
+      "staticIncoming": 0,
+      "inGraph": false
+    },
+    {
+      "path": "src/modules/ai/stage26-errors.js",
+      "order": 5,
+      "group": "ai",
+      "declarations": 2,
+      "staticOutgoing": 0,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage26-transport.js",
+      "order": 6,
+      "group": "ai",
+      "declarations": 7,
+      "staticOutgoing": 2,
+      "staticIncoming": 9,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/review/stage23-safe-fixes.js",
+      "order": 7,
+      "group": "review",
+      "declarations": 2,
+      "staticOutgoing": 2,
+      "staticIncoming": 5,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage23-protocol.js",
+      "order": 8,
+      "group": "ai",
+      "declarations": 5,
+      "staticOutgoing": 3,
+      "staticIncoming": 6,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage24-task-response.js",
+      "order": 9,
+      "group": "ai",
+      "declarations": 4,
+      "staticOutgoing": 2,
+      "staticIncoming": 7,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage22-context-guard.js",
+      "order": 10,
+      "group": "ai",
+      "declarations": 4,
+      "staticOutgoing": 2,
+      "staticIncoming": 6,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/editor/stage38-steps.js",
+      "order": 11,
+      "group": "editor",
+      "declarations": 2,
+      "staticOutgoing": 8,
+      "staticIncoming": 7,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/editor/stage39-step-actions.js",
+      "order": 12,
+      "group": "editor",
+      "declarations": 20,
+      "staticOutgoing": 4,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage22-field-editor.js",
+      "order": 13,
+      "group": "ai",
+      "declarations": 1,
+      "staticOutgoing": 0,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/photos/stage19-idb.js",
+      "order": 14,
+      "group": "photos",
+      "declarations": 7,
+      "staticOutgoing": 0,
+      "staticIncoming": 10,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "order": 15,
+      "group": "shared",
+      "declarations": 1,
+      "staticOutgoing": 0,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/photos/stage19-repository.js",
+      "order": 16,
+      "group": "photos",
+      "declarations": 9,
+      "staticOutgoing": 5,
+      "staticIncoming": 11,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/photos/stage30-history.js",
+      "order": 17,
+      "group": "photos",
+      "declarations": 1,
+      "staticOutgoing": 0,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/photos/stage31-illustration-editor.js",
+      "order": 18,
+      "group": "photos",
+      "declarations": 1,
+      "staticOutgoing": 8,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage34-measurements.js",
+      "order": 19,
+      "group": "frv",
+      "declarations": 5,
+      "staticOutgoing": 2,
+      "staticIncoming": 7,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage34-sop-frv-guard.js",
+      "order": 20,
+      "group": "frv",
+      "declarations": 3,
+      "staticOutgoing": 3,
+      "staticIncoming": 2,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/preview/stage19-preview.js",
+      "order": 21,
+      "group": "preview",
+      "declarations": 2,
+      "staticOutgoing": 3,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/review/stage19-checklist.js",
+      "order": 22,
+      "group": "review",
+      "declarations": 1,
+      "staticOutgoing": 1,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/review/stage26-deterministic.js",
+      "order": 23,
+      "group": "review",
+      "declarations": 8,
+      "staticOutgoing": 3,
+      "staticIncoming": 7,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/review/stage38-review-core.js",
+      "order": 24,
+      "group": "review",
+      "declarations": 16,
+      "staticOutgoing": 0,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/review/stage28-render.js",
+      "order": 25,
+      "group": "review",
+      "declarations": 5,
+      "staticOutgoing": 7,
+      "staticIncoming": 4,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage23-dispute.js",
+      "order": 26,
+      "group": "ai",
+      "declarations": 6,
+      "staticOutgoing": 7,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage28-review-task.js",
+      "order": 27,
+      "group": "ai",
+      "declarations": 7,
+      "staticOutgoing": 12,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage35-study-model.js",
+      "order": 28,
+      "group": "frv",
+      "declarations": 18,
+      "staticOutgoing": 5,
+      "staticIncoming": 7,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage34-study-io.js",
+      "order": 29,
+      "group": "frv",
+      "declarations": 5,
+      "staticOutgoing": 4,
+      "staticIncoming": 4,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage26-proposals.js",
+      "order": 30,
+      "group": "frv",
+      "declarations": 11,
+      "staticOutgoing": 3,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage35-study-ai.js",
+      "order": 31,
+      "group": "frv",
+      "declarations": 7,
+      "staticOutgoing": 8,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage35-study.js",
+      "order": 32,
+      "group": "frv",
+      "declarations": 12,
+      "staticOutgoing": 7,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage36-library.js",
+      "order": 33,
+      "group": "frv",
+      "declarations": 33,
+      "staticOutgoing": 3,
+      "staticIncoming": 6,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/frv/stage35-analytics.js",
+      "order": 34,
+      "group": "frv",
+      "declarations": 1,
+      "staticOutgoing": 0,
+      "staticIncoming": 0,
+      "inGraph": false
+    },
+    {
+      "path": "src/modules/frv/stage34-xlsx.js",
+      "order": 35,
+      "group": "frv",
+      "declarations": 2,
+      "staticOutgoing": 4,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage25-preview.js",
+      "order": 36,
+      "group": "ai",
+      "declarations": 5,
+      "staticOutgoing": 1,
+      "staticIncoming": 5,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage38-quality-core.js",
+      "order": 37,
+      "group": "ai",
+      "declarations": 10,
+      "staticOutgoing": 1,
+      "staticIncoming": 2,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage38-prompts.js",
+      "order": 38,
+      "group": "ai",
+      "declarations": 0,
+      "staticOutgoing": 0,
+      "staticIncoming": 0,
+      "inGraph": false
+    },
+    {
+      "path": "src/modules/quality/stage38-reasons.js",
+      "order": 39,
+      "group": "quality",
+      "declarations": 5,
+      "staticOutgoing": 1,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage29-generate-sop.js",
+      "order": 40,
+      "group": "ai",
+      "declarations": 2,
+      "staticOutgoing": 10,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/core/stage19-step-shape.js",
+      "order": 41,
+      "group": "core",
+      "declarations": 1,
+      "staticOutgoing": 1,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/twi/stage24-merge.js",
+      "order": 42,
+      "group": "twi",
+      "declarations": 9,
+      "staticOutgoing": 0,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/twi/stage24-preview.js",
+      "order": 43,
+      "group": "twi",
+      "declarations": 1,
+      "staticOutgoing": 1,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/twi/stage29-from-sop.js",
+      "order": 44,
+      "group": "twi",
+      "declarations": 6,
+      "staticOutgoing": 8,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/twi/stage38-print-xlsx.js",
+      "order": 45,
+      "group": "twi",
+      "declarations": 13,
+      "staticOutgoing": 3,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage28-review-state.js",
+      "order": 46,
+      "group": "documents",
+      "declarations": 5,
+      "staticOutgoing": 3,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage33-draft.js",
+      "order": 47,
+      "group": "documents",
+      "declarations": 8,
+      "staticOutgoing": 11,
+      "staticIncoming": 27,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage27-db.js",
+      "order": 48,
+      "group": "documents",
+      "declarations": 12,
+      "staticOutgoing": 4,
+      "staticIncoming": 8,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage19-network-io.js",
+      "order": 49,
+      "group": "documents",
+      "declarations": 7,
+      "staticOutgoing": 3,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage19-library-audit.js",
+      "order": 50,
+      "group": "documents",
+      "declarations": 5,
+      "staticOutgoing": 8,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage19-portable-photos.js",
+      "order": 51,
+      "group": "documents",
+      "declarations": 5,
+      "staticOutgoing": 8,
+      "staticIncoming": 4,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage36-backup.js",
+      "order": 52,
+      "group": "documents",
+      "declarations": 19,
+      "staticOutgoing": 6,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage19-network-sync.js",
+      "order": 53,
+      "group": "documents",
+      "declarations": 8,
+      "staticOutgoing": 7,
+      "staticIncoming": 2,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage27-library.js",
+      "order": 54,
+      "group": "documents",
+      "declarations": 2,
+      "staticOutgoing": 5,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/documents/stage37-data-loss-safety.js",
+      "order": 55,
+      "group": "documents",
+      "declarations": 9,
+      "staticOutgoing": 4,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/demo/stage19-demo.js",
+      "order": 56,
+      "group": "demo",
+      "declarations": 1,
+      "staticOutgoing": 2,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/excel/stage19-export-setup.js",
+      "order": 57,
+      "group": "excel",
+      "declarations": 5,
+      "staticOutgoing": 1,
+      "staticIncoming": 3,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "order": 58,
+      "group": "shared",
+      "declarations": 1,
+      "staticOutgoing": 0,
+      "staticIncoming": 4,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/photos/stage20-photo-read.js",
+      "order": 59,
+      "group": "photos",
+      "declarations": 1,
+      "staticOutgoing": 4,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/core/stage20-export-snapshot.js",
+      "order": 60,
+      "group": "core",
+      "declarations": 2,
+      "staticOutgoing": 1,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/excel/stage38-export.js",
+      "order": 61,
+      "group": "excel",
+      "declarations": 10,
+      "staticOutgoing": 11,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/excel/stage19-import.js",
+      "order": 62,
+      "group": "excel",
+      "declarations": 6,
+      "staticOutgoing": 4,
+      "staticIncoming": 1,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/app/stage19-bootstrap.js",
+      "order": 63,
+      "group": "app",
+      "declarations": 6,
+      "staticOutgoing": 16,
+      "staticIncoming": 2,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage27-core.js",
+      "order": 64,
+      "group": "ai",
+      "declarations": 14,
+      "staticOutgoing": 1,
+      "staticIncoming": 6,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage27-intelligence.js",
+      "order": 65,
+      "group": "ai",
+      "declarations": 13,
+      "staticOutgoing": 6,
+      "staticIncoming": 2,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/ai/stage27-analogs-history.js",
+      "order": 66,
+      "group": "ai",
+      "declarations": 8,
+      "staticOutgoing": 10,
+      "staticIncoming": 0,
+      "inGraph": true
+    },
+    {
+      "path": "src/modules/app/stage28-ui.js",
+      "order": 67,
+      "group": "app",
+      "declarations": 1,
+      "staticOutgoing": 1,
+      "staticIncoming": 1,
+      "inGraph": true
+    }
+  ],
+  "edges": [
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 29,
+      "functions": [
+        {
+          "name": "setVal",
+          "ownerLine": 22,
+          "callCount": 17,
+          "callLines": [
+            3,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 10,
+          "callLines": [
+            43,
+            47,
+            64,
+            69,
+            74
+          ]
+        },
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 2,
+          "callLines": [
+            25,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-intelligence.js",
+      "to": "src/modules/ai/stage27-core.js",
+      "callSites": 23,
+      "functions": [
+        {
+          "name": "stage27Text",
+          "ownerLine": 3,
+          "callCount": 6,
+          "callLines": [
+            119,
+            178,
+            201,
+            210,
+            211
+          ]
+        },
+        {
+          "name": "stage27DocumentSignature",
+          "ownerLine": 91,
+          "callCount": 4,
+          "callLines": [
+            155,
+            167,
+            237,
+            247
+          ]
+        },
+        {
+          "name": "stage27DocumentData",
+          "ownerLine": 71,
+          "callCount": 3,
+          "callLines": [
+            70,
+            141,
+            220
+          ]
+        },
+        {
+          "name": "stage27Normalize",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            49,
+            53
+          ]
+        },
+        {
+          "name": "stage27ExportState",
+          "ownerLine": 53,
+          "callCount": 2,
+          "callLines": [
+            56,
+            60
+          ]
+        },
+        {
+          "name": "stage27IsLocked",
+          "ownerLine": 100,
+          "callCount": 2,
+          "callLines": [
+            134,
+            164
+          ]
+        },
+        {
+          "name": "stage27ParseQuestions",
+          "ownerLine": 106,
+          "callCount": 1,
+          "callLines": [
+            86
+          ]
+        },
+        {
+          "name": "stage27ParseProposals",
+          "ownerLine": 125,
+          "callCount": 1,
+          "callLines": [
+            152
+          ]
+        },
+        {
+          "name": "stage27ValidStepId",
+          "ownerLine": 103,
+          "callCount": 1,
+          "callLines": [
+            203
+          ]
+        },
+        {
+          "name": "stage27StepData",
+          "ownerLine": 56,
+          "callCount": 1,
+          "callLines": [
+            256
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 22,
+      "functions": [
+        {
+          "name": "textLines",
+          "ownerLine": 23,
+          "callCount": 9,
+          "callLines": [
+            357,
+            370,
+            373,
+            409,
+            422
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 6,
+          "callLines": [
+            258,
+            365,
+            366,
+            367,
+            539
+          ]
+        },
+        {
+          "name": "clamp",
+          "ownerLine": 8,
+          "callCount": 6,
+          "callLines": [
+            357,
+            370,
+            373,
+            414,
+            424
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            260
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 21,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 12,
+          "callLines": [
+            43,
+            67,
+            125,
+            143,
+            148
+          ]
+        },
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 5,
+          "callLines": [
+            117,
+            118,
+            206,
+            207
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 2,
+          "callLines": [
+            126,
+            212
+          ]
+        },
+        {
+          "name": "createEmptyStep",
+          "ownerLine": 60,
+          "callCount": 1,
+          "callLines": [
+            83
+          ]
+        },
+        {
+          "name": "stateToHtml",
+          "ownerLine": 44,
+          "callCount": 1,
+          "callLines": [
+            193
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-intelligence.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 21,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 21,
+          "callLines": [
+            64,
+            72,
+            112,
+            113,
+            128
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 20,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 15,
+          "callLines": [
+            3,
+            6,
+            193,
+            194,
+            196
+          ]
+        },
+        {
+          "name": "clamp",
+          "ownerLine": 8,
+          "callCount": 5,
+          "callLines": [
+            141,
+            173,
+            186,
+            189
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage19-import.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 20,
+      "functions": [
+        {
+          "name": "setVal",
+          "ownerLine": 22,
+          "callCount": 12,
+          "callLines": [
+            97,
+            100,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "name": "normText",
+          "ownerLine": 6,
+          "callCount": 4,
+          "callLines": [
+            28,
+            224
+          ]
+        },
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 1,
+          "callLines": [
+            7
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            264
+          ]
+        },
+        {
+          "name": "stateToHtml",
+          "ownerLine": 44,
+          "callCount": 1,
+          "callLines": [
+            267
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            269
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 20,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 14,
+          "callLines": [
+            27,
+            34,
+            36,
+            60,
+            61
+          ]
+        },
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 5,
+          "callLines": [
+            157,
+            192,
+            193,
+            194,
+            195
+          ]
+        },
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 1,
+          "callLines": [
+            50
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 18,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 18,
+          "callLines": [
+            48,
+            80,
+            81,
+            102,
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage36-library.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 18,
+      "functions": [
+        {
+          "name": "frvStudyEsc",
+          "ownerLine": 56,
+          "callCount": 7,
+          "callLines": [
+            413,
+            416,
+            417,
+            419,
+            421
+          ]
+        },
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 5,
+          "callLines": [
+            139,
+            154,
+            188,
+            333,
+            449
+          ]
+        },
+        {
+          "name": "renderFrvStudy",
+          "ownerLine": 203,
+          "callCount": 3,
+          "callLines": [
+            275,
+            283,
+            468
+          ]
+        },
+        {
+          "name": "frvStudyEmptyData",
+          "ownerLine": 32,
+          "callCount": 2,
+          "callLines": [
+            233,
+            338
+          ]
+        },
+        {
+          "name": "frvStudyEmptyCycle",
+          "ownerLine": 28,
+          "callCount": 1,
+          "callLines": [
+            248
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/review/stage38-review-core.js",
+      "callSites": 16,
+      "functions": [
+        {
+          "name": "stage28DocumentSignature",
+          "ownerLine": 37,
+          "callCount": 3,
+          "callLines": [
+            44,
+            69,
+            117
+          ]
+        },
+        {
+          "name": "stage28CompareSteps",
+          "ownerLine": 57,
+          "callCount": 2,
+          "callLines": [
+            43,
+            70
+          ]
+        },
+        {
+          "name": "stage28Dedup",
+          "ownerLine": 85,
+          "callCount": 2,
+          "callLines": [
+            120,
+            140
+          ]
+        },
+        {
+          "name": "stage28NormalizeMeta",
+          "ownerLine": 20,
+          "callCount": 2,
+          "callLines": [
+            122,
+            144
+          ]
+        },
+        {
+          "name": "stage28IssueKey",
+          "ownerLine": 79,
+          "callCount": 2,
+          "callLines": [
+            131
+          ]
+        },
+        {
+          "name": "stage28GroundChecks",
+          "ownerLine": 159,
+          "callCount": 1,
+          "callLines": [
+            92
+          ]
+        },
+        {
+          "name": "stage28GroundAIReview",
+          "ownerLine": 141,
+          "callCount": 1,
+          "callLines": [
+            103
+          ]
+        },
+        {
+          "name": "stage28PreserveIssue",
+          "ownerLine": 220,
+          "callCount": 1,
+          "callLines": [
+            132
+          ]
+        },
+        {
+          "name": "stage28MergeIssueLists",
+          "ownerLine": 229,
+          "callCount": 1,
+          "callLines": [
+            137
+          ]
+        },
+        {
+          "name": "stage28EmptyMeta",
+          "ownerLine": 15,
+          "callCount": 1,
+          "callLines": [
+            151
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 16,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 8,
+          "callLines": [
+            3,
+            6,
+            27,
+            67,
+            73
+          ]
+        },
+        {
+          "name": "setVal",
+          "ownerLine": 22,
+          "callCount": 6,
+          "callLines": [
+            54,
+            55,
+            56,
+            57,
+            58
+          ]
+        },
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 1,
+          "callLines": [
+            36
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            63
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage36-library.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 15,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 15,
+          "callLines": [
+            315,
+            323,
+            341,
+            342,
+            356
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 15,
+      "functions": [
+        {
+          "name": "docMetaGet",
+          "ownerLine": 5,
+          "callCount": 7,
+          "callLines": [
+            63,
+            73
+          ]
+        },
+        {
+          "name": "docMetaPut",
+          "ownerLine": 6,
+          "callCount": 4,
+          "callLines": [
+            13,
+            51,
+            52,
+            84
+          ]
+        },
+        {
+          "name": "docDbGetAll",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            10,
+            35
+          ]
+        },
+        {
+          "name": "docDbPut",
+          "ownerLine": 7,
+          "callCount": 2,
+          "callLines": [
+            38,
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/preview/stage19-preview.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 14,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 6,
+          "callLines": [
+            18,
+            20,
+            30,
+            34,
+            42
+          ]
+        },
+        {
+          "name": "textLines",
+          "ownerLine": 23,
+          "callCount": 4,
+          "callLines": [
+            39,
+            42
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            7
+          ]
+        },
+        {
+          "name": "recalcTotalTime",
+          "ownerLine": 59,
+          "callCount": 1,
+          "callLines": [
+            7
+          ]
+        },
+        {
+          "name": "clamp",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            39
+          ]
+        },
+        {
+          "name": "formatDuration",
+          "ownerLine": 24,
+          "callCount": 1,
+          "callLines": [
+            42
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 14,
+      "functions": [
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 7,
+          "callLines": [
+            4,
+            6,
+            10,
+            66,
+            67
+          ]
+        },
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 5,
+          "callLines": [
+            5,
+            66,
+            67
+          ]
+        },
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            64
+          ]
+        },
+        {
+          "name": "initDraft",
+          "ownerLine": 52,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/demo/stage19-demo.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 13,
+      "functions": [
+        {
+          "name": "setVal",
+          "ownerLine": 22,
+          "callCount": 12,
+          "callLines": [
+            4
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage39-step-actions.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 12,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 10,
+          "callLines": [
+            29,
+            31,
+            35,
+            63,
+            88
+          ]
+        },
+        {
+          "name": "createEmptyStep",
+          "ownerLine": 60,
+          "callCount": 2,
+          "callLines": [
+            59,
+            111
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 12,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 8,
+          "callLines": [
+            12,
+            31,
+            32,
+            33,
+            44
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            145,
+            160,
+            172
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            164
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 12,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 11,
+          "callLines": [
+            60,
+            63,
+            75,
+            79,
+            88
+          ]
+        },
+        {
+          "name": "formatDuration",
+          "ownerLine": 24,
+          "callCount": 1,
+          "callLines": [
+            33
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 12,
+      "functions": [
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 4,
+          "callLines": [
+            47,
+            87,
+            125,
+            191
+          ]
+        },
+        {
+          "name": "frvStudyMeasuredDuration",
+          "ownerLine": 49,
+          "callCount": 4,
+          "callLines": [
+            129,
+            183,
+            192,
+            193
+          ]
+        },
+        {
+          "name": "renderFrvStudy",
+          "ownerLine": 203,
+          "callCount": 3,
+          "callLines": [
+            79,
+            115,
+            172
+          ]
+        },
+        {
+          "name": "renderFrvStudyDashboardOnly",
+          "ownerLine": 326,
+          "callCount": 1,
+          "callLines": [
+            238
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 12,
+      "functions": [
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 5,
+          "callLines": [
+            25,
+            124,
+            233,
+            245,
+            249
+          ]
+        },
+        {
+          "name": "renderFrvStudy",
+          "ownerLine": 203,
+          "callCount": 4,
+          "callLines": [
+            65,
+            222,
+            246,
+            251
+          ]
+        },
+        {
+          "name": "frvStudyMeasuredDuration",
+          "ownerLine": 49,
+          "callCount": 1,
+          "callLines": [
+            29
+          ]
+        },
+        {
+          "name": "frvStudyEmptyCycle",
+          "ownerLine": 28,
+          "callCount": 1,
+          "callLines": [
+            245
+          ]
+        },
+        {
+          "name": "frvStudyEmptyObservation",
+          "ownerLine": 20,
+          "callCount": 1,
+          "callLines": [
+            250
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-study-io.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 11,
+      "functions": [
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 4,
+          "callLines": [
+            5,
+            41,
+            98,
+            102
+          ]
+        },
+        {
+          "name": "frvStudyMeasuredDuration",
+          "ownerLine": 49,
+          "callCount": 2,
+          "callLines": [
+            8,
+            56
+          ]
+        },
+        {
+          "name": "frvStudyTotal",
+          "ownerLine": 57,
+          "callCount": 2,
+          "callLines": [
+            57,
+            58
+          ]
+        },
+        {
+          "name": "renderFrvStudyDashboardOnly",
+          "ownerLine": 326,
+          "callCount": 1,
+          "callLines": [
+            29
+          ]
+        },
+        {
+          "name": "frvStudyEsc",
+          "ownerLine": 56,
+          "callCount": 1,
+          "callLines": [
+            35
+          ]
+        },
+        {
+          "name": "frvStudyCycleComplete",
+          "ownerLine": 60,
+          "callCount": 1,
+          "callLines": [
+            57
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 11,
+      "functions": [
+        {
+          "name": "collectDraft",
+          "ownerLine": 1,
+          "callCount": 4,
+          "callLines": [
+            127,
+            147,
+            213
+          ]
+        },
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 3,
+          "callLines": [
+            65,
+            246,
+            251
+          ]
+        },
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 2,
+          "callLines": [
+            193,
+            221
+          ]
+        },
+        {
+          "name": "applyDraft",
+          "ownerLine": 19,
+          "callCount": 1,
+          "callLines": [
+            220
+          ]
+        },
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            235
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage19-repository.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 5,
+          "callLines": [
+            29,
+            40,
+            61,
+            62
+          ]
+        },
+        {
+          "name": "idbPutPhoto",
+          "ownerLine": 5,
+          "callCount": 2,
+          "callLines": [
+            23,
+            80
+          ]
+        },
+        {
+          "name": "photoExtFromBlob",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            23,
+            51
+          ]
+        },
+        {
+          "name": "downscaleToJpeg",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            73
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-model.js",
+      "to": "src/modules/frv/stage36-library.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "frvStudyQueuePersist",
+          "ownerLine": 153,
+          "callCount": 9,
+          "callLines": [
+            173,
+            176,
+            200,
+            237,
+            244
+          ]
+        },
+        {
+          "name": "frv34SetSwitchBusy",
+          "ownerLine": 46,
+          "callCount": 1,
+          "callLines": [
+            307
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/ai/stage22-context-guard.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "aiGuardCanApply",
+          "ownerLine": 62,
+          "callCount": 6,
+          "callLines": [
+            66,
+            100,
+            110,
+            157,
+            166
+          ]
+        },
+        {
+          "name": "aiGuardCapture",
+          "ownerLine": 42,
+          "callCount": 4,
+          "callLines": [
+            49,
+            89,
+            137,
+            197
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/twi/stage24-merge.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "twiCommitProposal",
+          "ownerLine": 76,
+          "callCount": 3,
+          "callLines": [
+            63,
+            68,
+            82
+          ]
+        },
+        {
+          "name": "twiHasGeneratedContent",
+          "ownerLine": 48,
+          "callCount": 2,
+          "callLines": [
+            59,
+            62
+          ]
+        },
+        {
+          "name": "twiSourceSignature",
+          "ownerLine": 35,
+          "callCount": 1,
+          "callLines": [
+            28
+          ]
+        },
+        {
+          "name": "twiManualCount",
+          "ownerLine": 55,
+          "callCount": 1,
+          "callLines": [
+            33
+          ]
+        },
+        {
+          "name": "twiSopInput",
+          "ownerLine": 22,
+          "callCount": 1,
+          "callLines": [
+            53
+          ]
+        },
+        {
+          "name": "twiProposalDiff",
+          "ownerLine": 60,
+          "callCount": 1,
+          "callLines": [
+            61
+          ]
+        },
+        {
+          "name": "twiHasAnyContent",
+          "ownerLine": 51,
+          "callCount": 1,
+          "callLines": [
+            95
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-library.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 8,
+          "callLines": [
+            3,
+            9,
+            16,
+            17,
+            18
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            12
+          ]
+        },
+        {
+          "name": "setVal",
+          "ownerLine": 22,
+          "callCount": 1,
+          "callLines": [
+            29
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-library.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "docMakeId",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            4,
+            31
+          ]
+        },
+        {
+          "name": "docSnapshot",
+          "ownerLine": 13,
+          "callCount": 2,
+          "callLines": [
+            6,
+            30
+          ]
+        },
+        {
+          "name": "docTitle",
+          "ownerLine": 14,
+          "callCount": 2,
+          "callLines": [
+            7,
+            31
+          ]
+        },
+        {
+          "name": "docDbPut",
+          "ownerLine": 7,
+          "callCount": 2,
+          "callLines": [
+            9,
+            32
+          ]
+        },
+        {
+          "name": "docNextSeq",
+          "ownerLine": 12,
+          "callCount": 1,
+          "callLines": [
+            21
+          ]
+        },
+        {
+          "name": "docDbGetAll",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 10,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 5,
+          "callLines": [
+            5,
+            9,
+            10
+          ]
+        },
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 3,
+          "callLines": [
+            4,
+            64
+          ]
+        },
+        {
+          "name": "createEmptyStep",
+          "ownerLine": 60,
+          "callCount": 1,
+          "callLines": [
+            5
+          ]
+        },
+        {
+          "name": "setVal",
+          "ownerLine": 22,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-model.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 9,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 6,
+          "callLines": [
+            173,
+            176,
+            260,
+            268,
+            282
+          ]
+        },
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 3,
+          "callLines": [
+            200,
+            237,
+            244
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/frv/stage36-library.js",
+      "callSites": 9,
+      "functions": [
+        {
+          "name": "frvStudyQueuePersist",
+          "ownerLine": 153,
+          "callCount": 7,
+          "callLines": [
+            65,
+            192,
+            235,
+            239,
+            242
+          ]
+        },
+        {
+          "name": "frvStudyInternalId",
+          "ownerLine": 139,
+          "callCount": 1,
+          "callLines": [
+            101
+          ]
+        },
+        {
+          "name": "frvStudyFlush",
+          "ownerLine": 199,
+          "callCount": 1,
+          "callLines": [
+            141
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 8,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 2,
+          "callLines": [
+            7,
+            10
+          ]
+        },
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 2,
+          "callLines": [
+            16,
+            21
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            21
+          ]
+        },
+        {
+          "name": "recalcTotalTime",
+          "ownerLine": 59,
+          "callCount": 1,
+          "callLines": [
+            4
+          ]
+        },
+        {
+          "name": "formatDuration",
+          "ownerLine": 24,
+          "callCount": 1,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 8,
+      "functions": [
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 4,
+          "callLines": [
+            59,
+            98,
+            152,
+            209
+          ]
+        },
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 4,
+          "callLines": [
+            81,
+            120,
+            174,
+            241
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 8,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 3,
+          "callLines": [
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "name": "photoExtFromBlob",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            13,
+            32,
+            34
+          ]
+        },
+        {
+          "name": "idbPutPhoto",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            34
+          ]
+        },
+        {
+          "name": "idbDeletePhoto",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage36-backup.js",
+      "to": "src/modules/frv/stage36-library.js",
+      "callSites": 8,
+      "functions": [
+        {
+          "name": "frv34StoreAll",
+          "ownerLine": 128,
+          "callCount": 2,
+          "callLines": [
+            35,
+            119
+          ]
+        },
+        {
+          "name": "frv34ValidateStudy",
+          "ownerLine": 205,
+          "callCount": 2,
+          "callLines": [
+            43,
+            100
+          ]
+        },
+        {
+          "name": "frvStudyFlush",
+          "ownerLine": 199,
+          "callCount": 1,
+          "callLines": [
+            33
+          ]
+        },
+        {
+          "name": "frv34StorePut",
+          "ownerLine": 100,
+          "callCount": 1,
+          "callLines": [
+            252
+          ]
+        },
+        {
+          "name": "frv34StoreRemove",
+          "ownerLine": 129,
+          "callCount": 1,
+          "callLines": [
+            274
+          ]
+        },
+        {
+          "name": "frvStudyRefreshLibrary",
+          "ownerLine": 399,
+          "callCount": 1,
+          "callLines": [
+            305
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-intelligence.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 8,
+      "functions": [
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 4,
+          "callLines": [
+            75,
+            142,
+            231,
+            254
+          ]
+        },
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 4,
+          "callLines": [
+            113,
+            160,
+            241,
+            265
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/ai/stage27-core.js",
+      "callSites": 8,
+      "functions": [
+        {
+          "name": "stage27DocumentData",
+          "ownerLine": 71,
+          "callCount": 3,
+          "callLines": [
+            63,
+            177,
+            181
+          ]
+        },
+        {
+          "name": "stage27Text",
+          "ownerLine": 3,
+          "callCount": 2,
+          "callLines": [
+            26,
+            62
+          ]
+        },
+        {
+          "name": "stage27RankAnalogs",
+          "ownerLine": 155,
+          "callCount": 1,
+          "callLines": [
+            30
+          ]
+        },
+        {
+          "name": "stage27IsLocked",
+          "ownerLine": 100,
+          "callCount": 1,
+          "callLines": [
+            60
+          ]
+        },
+        {
+          "name": "stage27DiffSnapshots",
+          "ownerLine": 183,
+          "callCount": 1,
+          "callLines": [
+            182
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 7,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 7,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/frv/stage26-proposals.js",
+      "callSites": 7,
+      "functions": [
+        {
+          "name": "frvAiRowProposal",
+          "ownerLine": 23,
+          "callCount": 1,
+          "callLines": [
+            99
+          ]
+        },
+        {
+          "name": "frvAiRowChanges",
+          "ownerLine": 40,
+          "callCount": 1,
+          "callLines": [
+            101
+          ]
+        },
+        {
+          "name": "frvAiRowDialog",
+          "ownerLine": 76,
+          "callCount": 1,
+          "callLines": [
+            105
+          ]
+        },
+        {
+          "name": "frvAiApplyRow",
+          "ownerLine": 54,
+          "callCount": 1,
+          "callLines": [
+            111
+          ]
+        },
+        {
+          "name": "frvAiNormalizeAnalysis",
+          "ownerLine": 91,
+          "callCount": 1,
+          "callLines": [
+            156
+          ]
+        },
+        {
+          "name": "frvAiAnalysisDialog",
+          "ownerLine": 144,
+          "callCount": 1,
+          "callLines": [
+            162
+          ]
+        },
+        {
+          "name": "frvAiApplyAnalysisRows",
+          "ownerLine": 133,
+          "callCount": 1,
+          "callLines": [
+            170
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 7,
+      "functions": [
+        {
+          "name": "docFormatNumber",
+          "ownerLine": 15,
+          "callCount": 3,
+          "callLines": [
+            7,
+            25
+          ]
+        },
+        {
+          "name": "docMetaPut",
+          "ownerLine": 6,
+          "callCount": 2,
+          "callLines": [
+            55
+          ]
+        },
+        {
+          "name": "docDbOpen",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            4
+          ]
+        },
+        {
+          "name": "docDbGetAll",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/documents/stage19-network-io.js",
+      "callSites": 7,
+      "functions": [
+        {
+          "name": "docEnsureFolderPermission",
+          "ownerLine": 4,
+          "callCount": 5,
+          "callLines": [
+            8,
+            17,
+            30,
+            82,
+            84
+          ]
+        },
+        {
+          "name": "docWriteNetworkFile",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            12
+          ]
+        },
+        {
+          "name": "docGetFolderHandle",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            63
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 7,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 7,
+          "callLines": [
+            31,
+            57,
+            59,
+            82,
+            84
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage26-deterministic.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 6,
+      "functions": [
+        {
+          "name": "normText",
+          "ownerLine": 6,
+          "callCount": 4,
+          "callLines": [
+            61,
+            76,
+            77,
+            78
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            91,
+            100
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 6,
+      "functions": [
+        {
+          "name": "isDeferredIssue",
+          "ownerLine": 81,
+          "callCount": 4,
+          "callLines": [
+            5,
+            6,
+            7,
+            21
+          ]
+        },
+        {
+          "name": "deferIssue",
+          "ownerLine": 82,
+          "callCount": 1,
+          "callLines": [
+            67
+          ]
+        },
+        {
+          "name": "restoreDeferredIssue",
+          "ownerLine": 93,
+          "callCount": 1,
+          "callLines": [
+            68
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage26-proposals.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 6,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 6,
+          "callLines": [
+            70,
+            72,
+            73,
+            147,
+            148
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 6,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            6,
+            45,
+            55
+          ]
+        },
+        {
+          "name": "recalcTotalTime",
+          "ownerLine": 59,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        },
+        {
+          "name": "renderOpenQuestions",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        },
+        {
+          "name": "stateToHtml",
+          "ownerLine": 44,
+          "callCount": 1,
+          "callLines": [
+            41
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/documents/stage19-network-io.js",
+      "callSites": 6,
+      "functions": [
+        {
+          "name": "docEnsureFolderPermission",
+          "ownerLine": 4,
+          "callCount": 2,
+          "callLines": [
+            42,
+            50
+          ]
+        },
+        {
+          "name": "docGetFolderHandle",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        },
+        {
+          "name": "docHasFolderAccess",
+          "ownerLine": 2,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        },
+        {
+          "name": "docSafeFileBase",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            52
+          ]
+        },
+        {
+          "name": "docWriteNetworkFile",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            53
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-measurements.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 3,
+          "callLines": [
+            47,
+            52,
+            55
+          ]
+        },
+        {
+          "name": "formatHMS",
+          "ownerLine": 29,
+          "callCount": 1,
+          "callLines": [
+            28
+          ]
+        },
+        {
+          "name": "formatDuration",
+          "ownerLine": 24,
+          "callCount": 1,
+          "callLines": [
+            56
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-sop-frv-guard.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 5,
+          "callLines": [
+            54,
+            55,
+            56,
+            57,
+            58
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/frv/stage34-study-io.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "frvStudySyncFields",
+          "ownerLine": 101,
+          "callCount": 5,
+          "callLines": [
+            24,
+            123,
+            232,
+            239,
+            242
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage22-context-guard.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "aiGuardCanApply",
+          "ownerLine": 62,
+          "callCount": 3,
+          "callLines": [
+            22,
+            30,
+            79
+          ]
+        },
+        {
+          "name": "aiGuardCapture",
+          "ownerLine": 42,
+          "callCount": 2,
+          "callLines": [
+            7,
+            79
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-io.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "docMetaPut",
+          "ownerLine": 6,
+          "callCount": 3,
+          "callLines": [
+            3
+          ]
+        },
+        {
+          "name": "docMetaGet",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            1
+          ]
+        },
+        {
+          "name": "docFormatNumber",
+          "ownerLine": 15,
+          "callCount": 1,
+          "callLines": [
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 2,
+          "callLines": [
+            15,
+            18
+          ]
+        },
+        {
+          "name": "idbDeletePhoto",
+          "ownerLine": 7,
+          "callCount": 2,
+          "callLines": [
+            22
+          ]
+        },
+        {
+          "name": "idbPutPhoto",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "docMakeId",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            57,
+            61
+          ]
+        },
+        {
+          "name": "docFormatNumber",
+          "ownerLine": 15,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        },
+        {
+          "name": "docDbGet",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            58
+          ]
+        },
+        {
+          "name": "docDbPut",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage36-backup.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 5,
+          "callLines": [
+            62,
+            65,
+            292,
+            309,
+            312
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-core.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 5,
+      "functions": [
+        {
+          "name": "aiTaskSchemaError",
+          "ownerLine": 3,
+          "callCount": 3,
+          "callLines": [
+            108,
+            121,
+            127
+          ]
+        },
+        {
+          "name": "aiReadTaskObject",
+          "ownerLine": 14,
+          "callCount": 2,
+          "callLines": [
+            107,
+            126
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage19-repository.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 4,
+          "callLines": [
+            31,
+            70,
+            81,
+            82
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage26-deterministic.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 2,
+          "callLines": [
+            71
+          ]
+        },
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            89,
+            98
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/review/stage23-safe-fixes.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "reviewGetApplicableFix",
+          "ownerLine": 24,
+          "callCount": 2,
+          "callLines": [
+            24,
+            143
+          ]
+        },
+        {
+          "name": "reviewNormalizeFixValue",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            45,
+            46
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/ai/stage22-context-guard.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "aiGuardCanApply",
+          "ownerLine": 62,
+          "callCount": 2,
+          "callLines": [
+            81,
+            88
+          ]
+        },
+        {
+          "name": "aiGuardCapture",
+          "ownerLine": 42,
+          "callCount": 1,
+          "callLines": [
+            70
+          ]
+        },
+        {
+          "name": "aiGuardMatches",
+          "ownerLine": 52,
+          "callCount": 1,
+          "callLines": [
+            87
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/ai/stage22-context-guard.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "aiGuardCanApply",
+          "ownerLine": 62,
+          "callCount": 2,
+          "callLines": [
+            109,
+            116
+          ]
+        },
+        {
+          "name": "aiGuardCapture",
+          "ownerLine": 42,
+          "callCount": 1,
+          "callLines": [
+            91
+          ]
+        },
+        {
+          "name": "aiGuardMatches",
+          "ownerLine": 52,
+          "callCount": 1,
+          "callLines": [
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage26-proposals.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "aiTaskSchemaError",
+          "ownerLine": 3,
+          "callCount": 4,
+          "callLines": [
+            25,
+            37,
+            93,
+            122
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/frv/stage34-study-io.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "frvStudySyncFields",
+          "ownerLine": 101,
+          "callCount": 4,
+          "callLines": [
+            46,
+            86,
+            124,
+            190
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 4,
+          "callLines": [
+            79,
+            115,
+            172,
+            238
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-ai.js",
+      "to": "src/modules/frv/stage36-library.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "frvStudyQueuePersist",
+          "ownerLine": 153,
+          "callCount": 4,
+          "callLines": [
+            79,
+            115,
+            172,
+            238
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage38-quality-core.js",
+      "to": "src/modules/quality/stage38-reasons.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "stage38ReasonText",
+          "ownerLine": 4,
+          "callCount": 2,
+          "callLines": [
+            74,
+            192
+          ]
+        },
+        {
+          "name": "stage38StripOrdinalLabels",
+          "ownerLine": 13,
+          "callCount": 2,
+          "callLines": [
+            92,
+            143
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 2,
+          "callLines": [
+            19,
+            79
+          ]
+        },
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            74,
+            79
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage24-preview.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 4,
+          "callLines": [
+            18,
+            19,
+            21,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 4,
+          "callLines": [
+            64,
+            69,
+            83,
+            104
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "sanitizeIllustrationAnnotations",
+          "ownerLine": 17,
+          "callCount": 2,
+          "callLines": [
+            15,
+            31
+          ]
+        },
+        {
+          "name": "photoDocumentRecordKey",
+          "ownerLine": 18,
+          "callCount": 1,
+          "callLines": [
+            1
+          ]
+        },
+        {
+          "name": "restoreStepPhotos",
+          "ownerLine": 57,
+          "callCount": 1,
+          "callLines": [
+            71
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage36-backup.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 4,
+      "functions": [
+        {
+          "name": "docDbGetAll",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            34,
+            119
+          ]
+        },
+        {
+          "name": "docDbOpen",
+          "ownerLine": 4,
+          "callCount": 2,
+          "callLines": [
+            217,
+            238
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage26-transport.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            66,
+            98,
+            99
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage39-step-actions.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 2,
+          "callLines": [
+            101,
+            103
+          ]
+        },
+        {
+          "name": "idbDeletePhoto",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            135
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage39-step-actions.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "photoDocumentRecordKey",
+          "ownerLine": 18,
+          "callCount": 1,
+          "callLines": [
+            103
+          ]
+        },
+        {
+          "name": "photoCopyRecordToKey",
+          "ownerLine": 19,
+          "callCount": 1,
+          "callLines": [
+            118
+          ]
+        },
+        {
+          "name": "updateStepPhotoFromRecord",
+          "ownerLine": 45,
+          "callCount": 1,
+          "callLines": [
+            122
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 1,
+          "callLines": [
+            4
+          ]
+        },
+        {
+          "name": "idbPutPhoto",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            294
+          ]
+        },
+        {
+          "name": "photoExtFromBlob",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            294
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-sop-frv-guard.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "frvClassifiedPart",
+          "ownerLine": 4,
+          "callCount": 3,
+          "callLines": [
+            8,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/preview/stage19-preview.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "getFrvMeta",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            45
+          ]
+        },
+        {
+          "name": "computeFrv",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            45
+          ]
+        },
+        {
+          "name": "pctEffect",
+          "ownerLine": 85,
+          "callCount": 1,
+          "callLines": [
+            45
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage26-deterministic.js",
+      "to": "src/modules/review/stage28-render.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "renderReviewResults",
+          "ownerLine": 1,
+          "callCount": 3,
+          "callLines": [
+            90,
+            99,
+            104
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 1,
+          "callLines": [
+            46
+          ]
+        },
+        {
+          "name": "setAIStatus",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            93
+          ]
+        },
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            96
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            111,
+            162
+          ]
+        },
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 1,
+          "callLines": [
+            98
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "cssFor",
+          "ownerLine": 70,
+          "callCount": 2,
+          "callLines": [
+            185,
+            186
+          ]
+        },
+        {
+          "name": "isDeferredIssue",
+          "ownerLine": 81,
+          "callCount": 1,
+          "callLines": [
+            141
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-study-io.js",
+      "to": "src/modules/frv/stage36-library.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "frvStudyQueuePersist",
+          "ownerLine": 153,
+          "callCount": 2,
+          "callLines": [
+            29,
+            118
+          ]
+        },
+        {
+          "name": "frvStudyInternalId",
+          "ownerLine": 139,
+          "callCount": 1,
+          "callLines": [
+            49
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-xlsx.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            11,
+            160,
+            161
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage25-preview.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 3,
+          "callLines": [
+            90,
+            93,
+            117
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/ai/stage22-context-guard.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "aiGuardCanApply",
+          "ownerLine": 62,
+          "callCount": 2,
+          "callLines": [
+            60,
+            77
+          ]
+        },
+        {
+          "name": "aiGuardCapture",
+          "ownerLine": 42,
+          "callCount": 1,
+          "callLines": [
+            54
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/documents/stage28-review-state.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "captureSopReviewState",
+          "ownerLine": 37,
+          "callCount": 1,
+          "callLines": [
+            2
+          ]
+        },
+        {
+          "name": "restoreSopReviewState",
+          "ownerLine": 46,
+          "callCount": 1,
+          "callLines": [
+            37
+          ]
+        },
+        {
+          "name": "renderRestoredSopReviewState",
+          "ownerLine": 58,
+          "callCount": 1,
+          "callLines": [
+            43
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-io.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage36-backup.js",
+      "to": "src/modules/documents/stage19-portable-photos.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "docBuildPortableJson",
+          "ownerLine": 40,
+          "callCount": 2,
+          "callLines": [
+            39,
+            148
+          ]
+        },
+        {
+          "name": "docRestorePortablePhotos",
+          "ownerLine": 20,
+          "callCount": 1,
+          "callLines": [
+            259
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/documents/stage19-portable-photos.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "docRestorePortablePhotos",
+          "ownerLine": 20,
+          "callCount": 3,
+          "callLines": [
+            38,
+            40,
+            45
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/documents/stage19-library-audit.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "docWriteJsonToNetwork",
+          "ownerLine": 46,
+          "callCount": 2,
+          "callLines": [
+            41,
+            49
+          ]
+        },
+        {
+          "name": "docVerifyNetworkIntegrity",
+          "ownerLine": 41,
+          "callCount": 1,
+          "callLines": [
+            55
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage37-data-loss-safety.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 3,
+          "callLines": [
+            97,
+            115,
+            133
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage19-import.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "idbPutPhoto",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            249
+          ]
+        },
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 1,
+          "callLines": [
+            251
+          ]
+        },
+        {
+          "name": "idbDeletePhoto",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            256
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "renderFrv",
+          "ownerLine": 38,
+          "callCount": 3,
+          "callLines": [
+            5,
+            11,
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/twi/stage29-from-sop.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "htmlToTwi",
+          "ownerLine": 11,
+          "callCount": 1,
+          "callLines": [
+            6
+          ]
+        },
+        {
+          "name": "renderTwiSummary",
+          "ownerLine": 14,
+          "callCount": 1,
+          "callLines": [
+            6
+          ]
+        },
+        {
+          "name": "renderTwi",
+          "ownerLine": 106,
+          "callCount": 1,
+          "callLines": [
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "renderFrvStudy",
+          "ownerLine": 203,
+          "callCount": 2,
+          "callLines": [
+            11,
+            65
+          ]
+        },
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "docDbGetAll",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            29,
+            138
+          ]
+        },
+        {
+          "name": "docDbGet",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            73
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/ai/stage27-intelligence.js",
+      "callSites": 3,
+      "functions": [
+        {
+          "name": "stage27GuardCanApply",
+          "ownerLine": 62,
+          "callCount": 2,
+          "callLines": [
+            104,
+            111
+          ]
+        },
+        {
+          "name": "stage27RequestGuard",
+          "ownerLine": 55,
+          "callCount": 1,
+          "callLines": [
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/shared/stage19-ui-helpers.js",
+      "to": "src/modules/app/stage19-bootstrap.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderResponsibles",
+          "ownerLine": 66,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        },
+        {
+          "name": "renderAgreed",
+          "ownerLine": 67,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-protocol.js",
+      "to": "src/modules/review/stage23-safe-fixes.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "reviewNormalizeFixValue",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            64,
+            69
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "idbDeletePhoto",
+          "ownerLine": 7,
+          "callCount": 2,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "handlePhoto",
+          "ownerLine": 69,
+          "callCount": 2,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage39-step-actions.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 2,
+          "callLines": [
+            46,
+            162
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage19-repository.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "tryLegacyPhoto",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            63
+          ]
+        },
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            81
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "blobToDataUrl",
+          "ownerLine": 1,
+          "callCount": 2,
+          "callLines": [
+            7,
+            290
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "sanitizeIllustrationAnnotations",
+          "ownerLine": 17,
+          "callCount": 2,
+          "callLines": [
+            102,
+            287
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/ai/stage23-dispute.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "mentorCleanDisputeReply",
+          "ownerLine": 13,
+          "callCount": 1,
+          "callLines": [
+            47
+          ]
+        },
+        {
+          "name": "sendDispute",
+          "ownerLine": 55,
+          "callCount": 1,
+          "callLines": [
+            71
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/ai/stage28-review-task.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stage28CurrentDiff",
+          "ownerLine": 42,
+          "callCount": 2,
+          "callLines": [
+            78,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            169
+          ]
+        },
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            170
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/ai/stage23-protocol.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "extractJson",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            26
+          ]
+        },
+        {
+          "name": "validateDisputeResponse",
+          "ownerLine": 67,
+          "callCount": 1,
+          "callLines": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            59
+          ]
+        },
+        {
+          "name": "formatDuration",
+          "ownerLine": 24,
+          "callCount": 1,
+          "callLines": [
+            76
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/review/stage28-render.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderReviewResults",
+          "ownerLine": 1,
+          "callCount": 2,
+          "callLines": [
+            69,
+            104
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/review/stage23-safe-fixes.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "reviewNormalizeFixValue",
+          "ownerLine": 8,
+          "callCount": 2,
+          "callLines": [
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/review/stage28-render.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderReviewResults",
+          "ownerLine": 1,
+          "callCount": 2,
+          "callLines": [
+            78,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/ai/stage27-core.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stage27Normalize",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            189
+          ]
+        },
+        {
+          "name": "stage27DocumentSignature",
+          "ownerLine": 91,
+          "callCount": 1,
+          "callLines": [
+            191
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-model.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            56
+          ]
+        },
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            174
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-study-io.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            29
+          ]
+        },
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            118
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage26-proposals.js",
+      "to": "src/modules/ai/stage25-preview.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiReviewChoiceModal",
+          "ownerLine": 25,
+          "callCount": 2,
+          "callLines": [
+            79,
+            155
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/ai/stage25-preview.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiReviewChoiceModal",
+          "ownerLine": 25,
+          "callCount": 2,
+          "callLines": [
+            129,
+            203
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage36-library.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 2,
+          "callLines": [
+            275,
+            468
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-xlsx.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 1,
+          "callLines": [
+            5
+          ]
+        },
+        {
+          "name": "frvStudyMeasuredDuration",
+          "ownerLine": 49,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/quality/stage38-reasons.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "textLines",
+          "ownerLine": 23,
+          "callCount": 1,
+          "callLines": [
+            83
+          ]
+        },
+        {
+          "name": "clamp",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            86
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage25-preview.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiSopHasMeaningfulSteps",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            24
+          ]
+        },
+        {
+          "name": "aiSopPlanPreview",
+          "ownerLine": 86,
+          "callCount": 1,
+          "callLines": [
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 2,
+          "callLines": [
+            66,
+            79
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/core/stage19-step-shape.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "createEmptyStep",
+          "ownerLine": 60,
+          "callCount": 1,
+          "callLines": [
+            5
+          ]
+        },
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 1,
+          "callLines": [
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 1,
+          "callLines": [
+            55
+          ]
+        },
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            88
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage38-print-xlsx.js",
+      "to": "src/modules/twi/stage24-merge.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "twiSourceSignature",
+          "ownerLine": 35,
+          "callCount": 1,
+          "callLines": [
+            47
+          ]
+        },
+        {
+          "name": "twiHasGeneratedContent",
+          "ownerLine": 48,
+          "callCount": 1,
+          "callLines": [
+            52
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage28-review-state.js",
+      "to": "src/modules/review/stage38-review-core.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stage28NormalizeMeta",
+          "ownerLine": 20,
+          "callCount": 2,
+          "callLines": [
+            43,
+            56
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "sanitizeIllustrationAnnotations",
+          "ownerLine": 17,
+          "callCount": 1,
+          "callLines": [
+            2
+          ]
+        },
+        {
+          "name": "restoreStepPhotos",
+          "ownerLine": 57,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/ai/stage27-core.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "stage27ExportState",
+          "ownerLine": 53,
+          "callCount": 1,
+          "callLines": [
+            2
+          ]
+        },
+        {
+          "name": "stage27Normalize",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            38
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 2,
+          "callLines": [
+            9,
+            45
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/app/stage19-bootstrap.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderResponsibles",
+          "ownerLine": 66,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        },
+        {
+          "name": "renderAgreed",
+          "ownerLine": 67,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-io.js",
+      "to": "src/modules/documents/stage19-network-sync.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderDocumentFolderStatus",
+          "ownerLine": 61,
+          "callCount": 1,
+          "callLines": [
+            3
+          ]
+        },
+        {
+          "name": "renderNetworkSyncInfo",
+          "ownerLine": 71,
+          "callCount": 1,
+          "callLines": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "photoDocumentRecordKey",
+          "ownerLine": 18,
+          "callCount": 1,
+          "callLines": [
+            11
+          ]
+        },
+        {
+          "name": "photoCopyRecordToKey",
+          "ownerLine": 19,
+          "callCount": 1,
+          "callLines": [
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/frv/stage34-study-io.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "frvStudySchema",
+          "ownerLine": 71,
+          "callCount": 1,
+          "callLines": [
+            24
+          ]
+        },
+        {
+          "name": "frvStudyExport",
+          "ownerLine": 40,
+          "callCount": 1,
+          "callLines": [
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 2,
+          "callLines": [
+            38
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/documents/stage19-network-sync.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "docUpdateNetworkIndex",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            55
+          ]
+        },
+        {
+          "name": "renderDocumentFolderStatus",
+          "ownerLine": 61,
+          "callCount": 1,
+          "callLines": [
+            55
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "blobToDataUrl",
+          "ownerLine": 1,
+          "callCount": 2,
+          "callLines": [
+            11,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "dataUrlToBlob",
+          "ownerLine": 1,
+          "callCount": 2,
+          "callLines": [
+            28,
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 2,
+          "callLines": [
+            75,
+            76
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-library.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "photoSaveDocumentCopies",
+          "ownerLine": 25,
+          "callCount": 2,
+          "callLines": [
+            8,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage37-data-loss-safety.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "findDraftRaw",
+          "ownerLine": 47,
+          "callCount": 1,
+          "callLines": [
+            4
+          ]
+        },
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            57
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage37-data-loss-safety.js",
+      "to": "src/modules/documents/stage27-db.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "docSnapshot",
+          "ownerLine": 13,
+          "callCount": 1,
+          "callLines": [
+            104
+          ]
+        },
+        {
+          "name": "docDbGet",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage19-export-setup.js",
+      "to": "src/modules/safety/stage19-icons-logo.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "isoIconUrl",
+          "ownerLine": 11,
+          "callCount": 2,
+          "callLines": [
+            9,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage20-photo-read.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 2,
+          "callLines": [
+            12,
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/excel/stage19-export-setup.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "ensureExcelJS",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            275
+          ]
+        },
+        {
+          "name": "buildIconStripPng",
+          "ownerLine": 33,
+          "callCount": 1,
+          "callLines": [
+            361
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/documents/stage19-network-io.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "docWriteNetworkFile",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            530
+          ]
+        },
+        {
+          "name": "docSafeFileBase",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            530
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "renderChecklist",
+          "ownerLine": 71,
+          "callCount": 2,
+          "callLines": [
+            11,
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-intelligence.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            50
+          ]
+        },
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            191
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-intelligence.js",
+      "to": "src/modules/ai/stage22-context-guard.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiGuardCapture",
+          "ownerLine": 42,
+          "callCount": 1,
+          "callLines": [
+            56
+          ]
+        },
+        {
+          "name": "aiGuardMatches",
+          "ownerLine": 52,
+          "callCount": 1,
+          "callLines": [
+            59
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-intelligence.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiReadTaskObject",
+          "ownerLine": 14,
+          "callCount": 1,
+          "callLines": [
+            197
+          ]
+        },
+        {
+          "name": "aiTaskSchemaError",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            198
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiAsk",
+          "ownerLine": 36,
+          "callCount": 1,
+          "callLines": [
+            100
+          ]
+        },
+        {
+          "name": "diagnoseAIError",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            132
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/ai/stage25-preview.js",
+      "callSites": 2,
+      "functions": [
+        {
+          "name": "aiSopHasMeaningfulSteps",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            106
+          ]
+        },
+        {
+          "name": "aiSopPlanPreview",
+          "ownerLine": 86,
+          "callCount": 1,
+          "callLines": [
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/shared/stage19-ui-helpers.js",
+      "to": "src/modules/safety/stage19-icons-logo.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderIconPicker",
+          "ownerLine": 29,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/shared/stage19-ui-helpers.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/shared/stage19-ui-helpers.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderFrv",
+          "ownerLine": 38,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/shared/stage19-ui-helpers.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderChecklist",
+          "ownerLine": 71,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/shared/stage19-ui-helpers.js",
+      "to": "src/modules/twi/stage29-from-sop.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderTwi",
+          "ownerLine": 106,
+          "callCount": 1,
+          "callLines": [
+            44
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/safety/stage19-icons-logo.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            29
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/safety/stage19-icons-logo.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            29
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage26-transport.js",
+      "to": "src/modules/ai/stage26-errors.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "aiUserFacingError",
+          "ownerLine": 48,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage23-safe-fixes.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "isDeferredIssue",
+          "ownerLine": 81,
+          "callCount": 1,
+          "callLines": [
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage23-safe-fixes.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 1,
+          "callLines": [
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-protocol.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "normalizeTimeString",
+          "ownerLine": 42,
+          "callCount": 1,
+          "callLines": [
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-protocol.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "setAIStatus",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            71
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage24-task-response.js",
+      "to": "src/modules/ai/stage23-protocol.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "extractJson",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage24-task-response.js",
+      "to": "src/modules/review/stage23-safe-fixes.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "reviewNormalizeFixValue",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage22-context-guard.js",
+      "to": "src/modules/documents/stage28-review-state.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "captureSopReviewState",
+          "ownerLine": 37,
+          "callCount": 1,
+          "callLines": [
+            38
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage22-context-guard.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/frv/stage34-sop-frv-guard.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "sopFrvRefreshProjectedPart",
+          "ownerLine": 26,
+          "callCount": 1,
+          "callLines": [
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/ai/stage29-generate-sop.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "generatePhotoHint",
+          "ownerLine": 79,
+          "callCount": 1,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderFrv",
+          "ownerLine": 38,
+          "callCount": 1,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/editor/stage38-steps.js",
+      "to": "src/modules/photos/stage31-illustration-editor.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "openIllustrationEditor",
+          "ownerLine": 2,
+          "callCount": 1,
+          "callLines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage19-repository.js",
+      "to": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "blobToDataUrl",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            49
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage19-repository.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            81
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "dataUrlToBlob",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            304
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            304
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage31-illustration-editor.js",
+      "to": "src/modules/photos/stage30-history.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage30CreatePhotoHistory",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            320
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-measurements.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            81
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-sop-frv-guard.js",
+      "to": "src/modules/ai/stage25-preview.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "aiReviewChoiceModal",
+          "ownerLine": 25,
+          "callCount": 1,
+          "callLines": [
+            70
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/preview/stage19-preview.js",
+      "to": "src/modules/safety/stage19-icons-logo.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "bindIsoIconFallbacks",
+          "ownerLine": 20,
+          "callCount": 1,
+          "callLines": [
+            43
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage19-checklist.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderChecklist",
+          "ownerLine": 71,
+          "callCount": 1,
+          "callLines": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/review/stage28-render.js",
+      "to": "src/modules/review/stage38-review-core.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage28PhotoGuidance",
+          "ownerLine": 205,
+          "callCount": 1,
+          "callLines": [
+            99
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage23-dispute.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            103
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/review/stage19-checklist.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "autoScoreChecklist",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            68
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "aiReadTaskObject",
+          "ownerLine": 14,
+          "callCount": 1,
+          "callLines": [
+            101
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/ai/stage23-protocol.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "validateReviewResponse",
+          "ownerLine": 50,
+          "callCount": 1,
+          "callLines": [
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "saveDraftDebounced",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            155
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage28-review-task.js",
+      "to": "src/modules/ai/stage27-intelligence.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage27Store",
+          "ownerLine": 48,
+          "callCount": 1,
+          "callLines": [
+            192
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-model.js",
+      "to": "src/modules/frv/stage35-study-ai.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "frvStudySuggestRow",
+          "ownerLine": 85,
+          "callCount": 1,
+          "callLines": [
+            300
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study-model.js",
+      "to": "src/modules/frv/stage35-study.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "frvStudyHasBackup",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            304
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-study-io.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "toast",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage35-study.js",
+      "to": "src/modules/ai/stage27-core.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage27Empty",
+          "ownerLine": 6,
+          "callCount": 1,
+          "callLines": [
+            180
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-xlsx.js",
+      "to": "src/modules/frv/stage34-study-io.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "frvStudySyncFields",
+          "ownerLine": 101,
+          "callCount": 1,
+          "callLines": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/frv/stage34-xlsx.js",
+      "to": "src/modules/frv/stage36-library.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "frvStudyFlush",
+          "ownerLine": 199,
+          "callCount": 1,
+          "callLines": [
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage38-quality-core.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage29SopNormalize",
+          "ownerLine": 66,
+          "callCount": 1,
+          "callLines": [
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage23-protocol.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "validateGeneratedSop",
+          "ownerLine": 22,
+          "callCount": 1,
+          "callLines": [
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "aiReadTaskObject",
+          "ownerLine": 14,
+          "callCount": 1,
+          "callLines": [
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/ai/stage22-field-editor.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "cleanAIFieldResult",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            79
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage29-generate-sop.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            79
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/ai/stage38-quality-core.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage29TwiNormalize",
+          "ownerLine": 153,
+          "callCount": 1,
+          "callLines": [
+            58
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "aiReadTwiPlan",
+          "ownerLine": 31,
+          "callCount": 1,
+          "callLines": [
+            58
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage29-from-sop.js",
+      "to": "src/modules/twi/stage24-preview.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "twiShowPreview",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            72
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage38-print-xlsx.js",
+      "to": "src/modules/quality/stage38-reasons.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage38ReasonIssues",
+          "ownerLine": 32,
+          "callCount": 1,
+          "callLines": [
+            62
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/twi/stage38-print-xlsx.js",
+      "to": "src/modules/excel/stage19-export-setup.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "ensureExcelJS",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            306
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage28-review-state.js",
+      "to": "src/modules/review/stage23-safe-fixes.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "reviewNormalizeFixValue",
+          "ownerLine": 8,
+          "callCount": 1,
+          "callLines": [
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage28-review-state.js",
+      "to": "src/modules/review/stage28-render.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderReviewResults",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            61
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderFrv",
+          "ownerLine": 38,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/safety/stage19-icons-logo.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderIconPicker",
+          "ownerLine": 29,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/review/stage26-deterministic.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderChecklist",
+          "ownerLine": 71,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/twi/stage29-from-sop.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderTwi",
+          "ownerLine": 106,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage33-draft.js",
+      "to": "src/modules/frv/stage35-study-model.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "ensureFrvStudy",
+          "ownerLine": 40,
+          "callCount": 1,
+          "callLines": [
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-db.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "htmlFieldToState",
+          "ownerLine": 43,
+          "callCount": 1,
+          "callLines": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-db.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "sanitizeIllustrationAnnotations",
+          "ownerLine": 17,
+          "callCount": 1,
+          "callLines": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-db.js",
+      "to": "src/modules/documents/stage28-review-state.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "captureSopReviewState",
+          "ownerLine": 37,
+          "callCount": 1,
+          "callLines": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-db.js",
+      "to": "src/modules/ai/stage27-core.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage27ExportState",
+          "ownerLine": 53,
+          "callCount": 1,
+          "callLines": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-library-audit.js",
+      "to": "src/modules/documents/stage19-portable-photos.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "docBuildPortableJson",
+          "ownerLine": 40,
+          "callCount": 1,
+          "callLines": [
+            51
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            73
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-portable-photos.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            73
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage36-backup.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "photoDocumentRecordKey",
+          "ownerLine": 18,
+          "callCount": 1,
+          "callLines": [
+            261
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage36-backup.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "idbDeletePhoto",
+          "ownerLine": 7,
+          "callCount": 1,
+          "callLines": [
+            271
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/photos/stage19-idb.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "idbGetPhoto",
+          "ownerLine": 6,
+          "callCount": 1,
+          "callLines": [
+            45
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage19-network-sync.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "photoDocumentRecordKey",
+          "ownerLine": 18,
+          "callCount": 1,
+          "callLines": [
+            45
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-library.js",
+      "to": "src/modules/documents/stage19-library-audit.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "docWriteJsonToNetwork",
+          "ownerLine": 46,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage27-library.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/documents/stage37-data-loss-safety.js",
+      "to": "src/modules/twi/stage24-merge.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "twiHasAnyContent",
+          "ownerLine": 51,
+          "callCount": 1,
+          "callLines": [
+            82
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/demo/stage19-demo.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage20-photo-read.js",
+      "to": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "dataUrlToBlob",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage20-photo-read.js",
+      "to": "src/modules/photos/stage19-repository.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "photoDocumentRecordKey",
+          "ownerLine": 18,
+          "callCount": 1,
+          "callLines": [
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/photos/stage20-photo-read.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "tryLegacyPhoto",
+          "ownerLine": 10,
+          "callCount": 1,
+          "callLines": [
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/core/stage20-export-snapshot.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "parseDuration",
+          "ownerLine": 34,
+          "callCount": 1,
+          "callLines": [
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "blobToDataUrl",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            213
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/photos/stage20-photo-read.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "readSopStepPhotoBlobForExport",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            245
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/core/stage20-export-snapshot.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "createSopExportSnapshot",
+          "ownerLine": 36,
+          "callCount": 1,
+          "callLines": [
+            264
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/frv/stage34-sop-frv-guard.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "sopFrvCheckBeforeExcel",
+          "ownerLine": 45,
+          "callCount": 1,
+          "callLines": [
+            267
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/safety/stage19-icons-logo.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "makeLogo",
+          "ownerLine": 28,
+          "callCount": 1,
+          "callLines": [
+            308
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/quality/stage38-reasons.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage38CorporateReasonHeight",
+          "ownerLine": 82,
+          "callCount": 1,
+          "callLines": [
+            433
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/frv/stage34-measurements.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "computeFrv",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            463
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage38-export.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            543
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage19-import.js",
+      "to": "src/modules/excel/stage19-export-setup.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "ensureExcelJS",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/excel/stage19-import.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "saveDraft",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            268
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/excel/stage19-import.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "importSopFromXlsx",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/ai/stage26-transport.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "setAIStatus",
+          "ownerLine": 3,
+          "callCount": 1,
+          "callLines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/documents/stage27-library.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "docSaveCurrent",
+          "ownerLine": 1,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/documents/stage19-portable-photos.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "docImportPortableBackup",
+          "ownerLine": 50,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/excel/stage38-export.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "generateExcel",
+          "ownerLine": 257,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/documents/stage19-library-audit.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "docVerifyNetworkIntegrity",
+          "ownerLine": 41,
+          "callCount": 1,
+          "callLines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/preview/stage19-preview.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderPreview",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/safety/stage19-icons-logo.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderIconPicker",
+          "ownerLine": 29,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/editor/stage38-steps.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "renderSteps",
+          "ownerLine": 4,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage19-bootstrap.js",
+      "to": "src/modules/ai/stage23-protocol.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "pingAI",
+          "ownerLine": 71,
+          "callCount": 1,
+          "callLines": [
+            65
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/ai/stage23-protocol.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "validateGeneratedSop",
+          "ownerLine": 22,
+          "callCount": 1,
+          "callLines": [
+            103
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/ai/stage24-task-response.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "aiReadTaskObject",
+          "ownerLine": 14,
+          "callCount": 1,
+          "callLines": [
+            103
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/documents/stage33-draft.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stateChanged",
+          "ownerLine": 9,
+          "callCount": 1,
+          "callLines": [
+            129
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/ai/stage27-analogs-history.js",
+      "to": "src/modules/app/stage28-ui.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "stage27Attr",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            156
+          ]
+        }
+      ]
+    },
+    {
+      "from": "src/modules/app/stage28-ui.js",
+      "to": "src/modules/shared/stage19-ui-helpers.js",
+      "callSites": 1,
+      "functions": [
+        {
+          "name": "escapeHtml",
+          "ownerLine": 5,
+          "callCount": 1,
+          "callLines": [
+            5
+          ]
+        }
+      ]
+    }
+  ]
+}
