@@ -166,6 +166,10 @@ def document_guard_and_gallery(p):
     }""")
     assert p.locator("#sopVersionLabel").count()==1
     assert "Stage37" in p.locator("#sopVersionLabel").inner_text()
+    # Wait until the normal transient "Opened" toast has faded, so that
+    # documentation screenshots show the complete toolbar and AI indicator.
+    p.wait_for_timeout(3900)
+    assert not p.locator("#toastContainer .toast").is_visible()
     paths={}
     for tab,filename in [
       ("editor","stage37-editor.png"),
