@@ -8,8 +8,8 @@ const stage391BeforeReasonReviewFill=aiFillField;
 function stage391ReasonAIIsReferenceInsteadOfWhy(text){
   const lines=stage38StripOrdinalLabels(String(text||'')).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   return lines.some(line=>
-    /^(?:ПТЭЭП\b|ПУЭ\b|ГОСТ\b|ISO\s*\d+|СанПиН\b|СНиП\b|СТО\s+(?:№\s*)?[A-ZА-Я0-9]|(?:Приказ|Постановление)\s+(?:[\p{L} ]{0,35})?№\s*\d+)/iu.test(line)||
-    /^(?:при\s+несоответствии\s*[—–:-]?\s*)?(?:проверь(?:те)?|сверь(?:те)?|уточни(?:те)?|обратитесь|следует\s+обратиться)\b.*(?:инструкц|документац|технолог)/iu.test(line)
+    /^(?:(?:ПТЭЭП|ПУЭ|ГОСТ|СанПиН|СНиП)(?![\p{L}\p{N}])|ISO\s*\d+|СТО\s+(?:№\s*)?[A-ZА-Я0-9]|(?:Приказ|Постановление)\s+(?:[\p{L} ]{0,35})?№\s*\d+)/iu.test(line)||
+    /^(?:при\s+несоответствии\s*[—–:-]?\s*)?(?:проверь(?:те)?|сверь(?:те)?|уточни(?:те)?|обратитесь|следует\s+обратиться)(?=\s|[.:—–-]|$).*(?:инструкц|документац|технолог)/iu.test(line)
   );
 }
 function stage391ReasonAIDraftForContext(previous){
