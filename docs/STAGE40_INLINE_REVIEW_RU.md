@@ -1,3 +1,13 @@
+## STAGE40 — LINUX/WINDOWS/PUBLISH SUCCESS, HTML ГОТОВ К ПРОВЕРКЕ ПОЛЬЗОВАТЕЛЯ (23.11.2026)
+
+- **Текущее положение:** Stage40 реализована в feature/stage40-inline-ai-review-20261123, [PR #38](https://github.com/shonentez-afk/SOP-generanjr/pull/38) Draft. Пользователь ещё НЕ подтвердил новую сборку; принятую main Stage39.1 не менять.
+- **Подтверждённый CI:** [Actions #45146745986](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45146745986) — Linux SUCCESS, Windows SUCCESS, Publish SUCCESS. 115 модульных тестов, Chrome Stage40, исходные тесты Reason/WHY Stage39.1, SOP/TWI XLSX и FRV, Windows ExcelJS/ISO/photo smoke.
+- **Проверенный HTML:** [stage40-inline-review-20261123.html](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage40-inline-ai-review-20261123/releases/stage40-inline-review-20261123.html), Git blob SHA **92f76201c2d05fbf8c088e87eb67e532e9c0e146**, SHA256 **698ba3812c6dc2954984d48b0c18508bb63777005cc149b640a3ed2cab5fe02a**. Файл побайтово сверяется с проверенным артефактом Linux.
+- **Что показать пользователю:** в существующем блоке полной проверки открыть замечание с безопасным готовым исправлением: там две компактные колонки «Сейчас / После применения» и прежняя кнопка «Применить». Не открывается новое окно. После ручной правки в том же поле старое исправление не применяется. Возле ✨ «Причина» по-прежнему НЕТ кнопки очистки и окна подтверждения.
+- **Не затронуто:** Yandex Cloud proxy, принятая Stage39.1, ФРВ RAW, фото/IndexedDB, ISO/ExcelJS и корпоративские СОП/TWI XLSX. Реальная модель YandexGPT и технологическая достоверность рекомендаций проверяются пользователем.
+- **Дальше:** после пользовательского «работает» можно принимать и объединять PR #38 с main. Не объявлять Stage40 принятой до этого. Ниже — история разработки.
+
+---
 # Stage40 — сравнение ИИ-исправлений внутри существующей полной проверки СОП
 
 Дата: 23.11.2026. База: принятая Stage39.1 в main. Разработка в feature/stage40-inline-ai-review-20261123, отдельный Draft PR. Основную ветку до пользовательской приёмки не менять.
