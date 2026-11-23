@@ -17,6 +17,7 @@ BASELINE=ROOT/"releases/stage39-step-management-browser-candidate.html"
 OUT=ROOT/"releases/stage39-1-ai-reasons-frv-browser-candidate.html"
 
 REPLACEMENTS={
+  "src/modules/ai/stage38-base-prompts.js":"src/modules/ai/stage39-1-base-prompts.js",
   "src/modules/review/stage23-safe-fixes.js":"src/modules/review/stage39-1-safe-fixes.js",
   "src/modules/ai/stage22-field-editor.js":"src/modules/ai/stage39-1-field-editor.js",
   "src/modules/review/stage19-checklist.js":"src/modules/review/stage39-1-checklist.js",
@@ -58,7 +59,7 @@ def verify_static(html=None):
     old=json.loads(PREVIOUS.read_text(encoding="utf-8"))
     baseline=BASELINE.read_text(encoding="utf-8")
     # Ensure baseline actually matches its original 67 modules, and that only
-    # the 8 approved source substitutions and two added modules differ.
+    # the 9 approved source substitutions and two added modules differ.
     assert modular.build_from_manifest(old)==baseline,"Accepted Stage39 baseline changed"
     expected=baseline
     for old_path,new_path in REPLACEMENTS.items():
