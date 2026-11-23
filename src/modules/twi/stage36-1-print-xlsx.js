@@ -112,7 +112,6 @@ function twiPrintPage(ws,orientation,repeatRange){
   };
   ws.headerFooter.oddFooter='&LTWI · Job Instruction&RСтраница &P из &N';
   ws.pageSetup.printTitlesRow=repeatRange;
-  ws.sheetView.showGridLines=false;
 }
 function twiPrintRow(ws,r,values,colorAlternate=false){
   const row=ws.getRow(r);
