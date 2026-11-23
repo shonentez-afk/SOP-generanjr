@@ -31,7 +31,7 @@ def build() -> str:
                 "excelJsLicensePath","iconOpen","iconParts","runtimeOpen"):
         assert spec[key]==old[key], "Changed protected asset/layout: "+key
     assert spec["baseRelease"]==old["outputRelease"]
-    assert spec["outputRelease"]==str(OUT.relative_to(ROOT))
+    assert spec["outputRelease"]==OUT.relative_to(ROOT).as_posix()
     return modular.build_from_manifest(spec)
 
 
