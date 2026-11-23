@@ -82,3 +82,14 @@ function stage391RejectInvalidReason(previous,proposed,step){
   if(!checked.ok)toast(checked.message,'warning');
   return checked;
 }
+
+function stage391ValidateTextProposal(candidate,step,sourceOverride){
+  const value=typeof candidate==='string'?candidate.trim():'';
+  if(!value||/^(?:null|undefined|none|keep|n\/a)$/iu.test(value))
+    return {ok:false,message:'ИИ вернул пустое или служебное значение.'};
+  const extras=stage29HasUnconfirmedNumber(value,
+    sourceOverride??stage391FactCorpus(step),0);
+  if(extras.length)
+    return {ok:false,message:'ИИ предложил неподтверждённые числовые параметры: '+extras.join(', ')+'.'};
+  return {ok:true,value};
+}
