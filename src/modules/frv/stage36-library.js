@@ -288,7 +288,20 @@ async function frvStudySwitchTo(d,{persist=true}={}){
 async function frv35RestoreActiveStudy(){
   if(frv34SwitchBusy)return;
   if(!frv35SelectedStudyId&&!frv34Pending)return;
-  if(!frv34Pending&&state.frvStudy?.libraryId===frv35SelectedStudyId)return;
+  if(!frv34Pending&&state.frvStudy?.libraryId===frv35SelectedStudyId){
+    // After a browser reload, the draft in localStorage can already refer
+    // to the same saved research, while our in-memory revision map is empty.
+    // Establish a baseline only when the two copies are truly identical.
+    if(frv36KnownRevisions.has(frv35SelectedStudyId))return;
+    const rec=await frv34StoreGet(frv35SelectedStudyId);
+    if(!rec?.payload){frv35ClearActiveId();return}
+    if(JSON.stringify(rec.payload)!==JSON.stringify(state.frvStudy)){
+      frv36DisplayConflict(frv35SelectedStudyId);
+      return;
+    }
+    frv36KnownRevisions.set(rec.id,frv36RecordRevision(rec));
+    return;
+  }
   frv34SetSwitchBusy(true);
   try{
     // Flush a pending study first; its successful commit can establish the
