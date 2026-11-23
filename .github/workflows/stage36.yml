@@ -1,0 +1,85 @@
+name: Stage36 full-library safety acceptance
+on:
+  push:
+    branches: [feature/stage36-library-backup-conflict-safety-20261123]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage36-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux:
+    name: Linux Chrome full backup conflict old regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build candidate from accepted Stage35
+        run: |
+          python tools/build_stage35.py --verify-release --verify-static
+          python tools/build_stage36.py --verify-static
+          python tools/build_stage36.py
+          python tools/build_stage36.py --verify-release --verify-static
+      - name: Unit and historical regression
+        run: python -m unittest discover -s tests -v
+      - name: Install Chrome test dependencies
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: Stage36 Chrome and accepted Stage35 regressions
+        run: python qa/stage36_browser_smoke.py
+      - name: Upload verified candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage36-library-safety-linux
+          path: |
+            releases/stage36-library-safety-browser-candidate.html
+            artifacts/stage36-library-safety.png
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish only tested candidate
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage36-library-backup-conflict-safety-20261123'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage36-library-backup-conflict-safety-20261123
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch moved; skip stale publish"
+            exit 0
+          fi
+          git add releases/stage36-library-safety-browser-candidate.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage36 checked standalone browser candidate"
+            git push origin HEAD:feature/stage36-library-backup-conflict-safety-20261123
+          fi
+  windows:
+    name: Windows Chrome Stage36 and existing regressions
+    runs-on: windows-latest
+    timeout-minutes: 55
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build candidate
+        run: python tools/build_stage36.py
+      - name: Install test dependencies
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Stage36 real Chrome regression
+        run: python qa/stage36_browser_smoke.py
+      - name: Existing Windows ExcelJS ISO TWI checks
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage36-library-safety-browser-candidate.html'; m.main()"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage36-library-safety-windows
+          path: releases/stage36-library-safety-browser-candidate.html
+          if-no-files-found: error

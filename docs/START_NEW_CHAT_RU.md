@@ -1,3 +1,22 @@
+## ОБНОВЛЕНИЕ Stage36: CI PASS, ПОЛЬЗОВАТЕЛЬСКАЯ ПРИЁМКА ЕЩЁ НЕТ (23.11.2026)
+
+- Ветка `feature/stage36-library-backup-conflict-safety-20261123`, [PR #31](https://github.com/shonentez-afk/SOP-generanjr/pull/31) DRAFT. [GitHub Actions #45093610144](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45093610144) — **Linux/Windows PASS, 98/98 unit, реальный Chrome file://**, новая защита JSON библиотеки/фото/ФРВ и параллельных вкладок.
+- [Скачать проверенный HTML Stage36](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage36-library-backup-conflict-safety-20261123/releases/stage36-library-safety-browser-candidate.html), сборка SHA-256 `ea1a1b5529548c2f6593627234d159a59f645b280f3752561548ba5059ef48a6`.
+- **Не объединять в main до проверки пользователем**. Stage35 остаётся принятой основной версией, Stage37 не начат.
+
+---
+
+## АКТУАЛЬНО: Stage36 — новый кандидат в отдельной ветке, НЕ ПРИНЯТ (23.11.2026)
+
+- **Принятая рабочая версия:** Stage35 в `main`, PR #30 merged; 96/96 unit и Chrome Linux/Windows PASS. Ничего из Stage36 в main пока не включено.
+- **Stage36 ветка:** `feature/stage36-library-backup-conflict-safety-20261123`. Реализована общая JSON-копия всей сохранённой библиотеки СОП (с фото/разметкой) и отдельных исследований ФРВ; SHA-256; безопасный импорт с предварительным планом, пропуском совпадений, копиями при конфликте идентификаторов и компенсирующим откатом. Защита одного исследования от записи из двух вкладок через атомарную проверку ревизии IndexedDB и кнопку «Сохранить правки отдельной копией».
+- **Реальные тесты Stage36:** `.github/workflows/stage36.yml` (Windows/Linux), `tests/test_stage36.py`, `qa/stage36_browser_smoke.py`; ожидают фактической проверки статуса Actions. **Не объявлять Stage36 принятой или проверенной, пока нет PASS и проверки пользователем.**
+- **Новая сборка-кандидат после успешной CI:** `releases/stage36-library-safety-browser-candidate.html`, инструмент `tools/build_stage36.py`, манифест `src/app/stage36-parts.json` (63 модуля). Передача изменений: [описание Stage36](../docs/STAGE36_LIBRARY_SAFETY_RU.md).
+- **Ограничения:** экспортируются только сохранённые документы СОП; перед копией нужно сохранить черновик. FRV flush перед экспортом. Корпоративная папка между физическими ПК, разные `file://` пути и многопользовательское редактирование СОП — не подтверждены. Yandex-прокси/AI, ExcelJS/ISO, фото, TWI, ФРВ разделы не менять.
+- **Дальше:** после Linux/Windows CI и ручной проверки пользователь может принять Stage36, только после этого merge в main. Затем Stage37 — полная приёмка приложения и актуальное руководство со скриншотами.
+
+---
+
 ## АКТУАЛЬНО: Stage 35 ПРИНЯТА И ОБЪЕДИНЕНА В MAIN — 23.11.2026
 
 - **Пользователь подтвердил:** «все работает» после проверки HTML Stage35. Принята вся исправительная сборка Stage35 по предоставленной программе, включая UX-проверки разделов ФРВ.
