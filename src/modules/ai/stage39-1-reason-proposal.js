@@ -3,6 +3,24 @@
 // tool remain unchanged. No generated response writes to SOP without consent.
 const stage391BeforeReasonReviewFill=aiFillField;
 
+// A normative citation or "ask someone / consult instructions" is not a
+// Reason Why. Manual text is NEVER rewritten here: this only gates AI drafts.
+function stage391ReasonAIIsReferenceInsteadOfWhy(text){
+  const lines=stage38StripOrdinalLabels(String(text||'')).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  return lines.some(line=>
+    /^(?:ПТЭЭП\b|ПУЭ\b|ГОСТ\b|ISO\s*\d+|СанПиН\b|СНиП\b|СТО\s+(?:№\s*)?[A-ZА-Я0-9]|(?:Приказ|Постановление)\s+(?:[\p{L} ]{0,35})?№\s*\d+)/iu.test(line)||
+    /^(?:при\s+несоответствии\s*[—–:-]?\s*)?(?:проверь(?:те)?|сверь(?:те)?|уточни(?:те)?|обратитесь|следует\s+обратиться)\b.*(?:инструкц|документац|технолог)/iu.test(line)
+  );
+}
+function stage391ReasonAIDraftForContext(previous){
+  const s=String(previous||'');
+  // The existing Reason can contain a previous model hallucination. Keep it
+  // in the document for comparison, but never treat it as source evidence.
+  return stage391ReasonAIIsReferenceInsteadOfWhy(s)
+    ? 'В прежнем поле только нормативная ссылка или указание проверить документацию; подтверждённой WHY-причины пока нет.'
+    : s;
+}
+
 function stage391ReasonAIInspect(previous,proposed,step){
   if(typeof proposed!=='string'||!proposed.trim())
     return {ok:false,message:'ИИ вернул пустую причину; исходный текст сохранён.'};
@@ -10,8 +28,10 @@ function stage391ReasonAIInspect(previous,proposed,step){
   // *proposal only*. The operator must see and approve the final wording.
   const cleaned=stage391CleanupReason(proposed,step);
   const value=stage38ReasonText(cleaned.after,2000);
-  if(!value||/^(?:keep|null|undefined|none|n\/a)$/iu.test(value))
-    return {ok:false,message:'ИИ вернул служебное значение вместо причины.'};
+  if(!value||/^(?:keep|null|undefined|none|n\/a|NEEDS_REASON_FACTS)$/iu.test(value))
+    return {ok:false,message:'В исходных данных недостаточно подтверждённого WHY. Уточните технологическую цель проверки; документ сохранён.'};
+  if(stage391ReasonAIIsReferenceInsteadOfWhy(value))
+    return {ok:false,message:'ИИ вернул ссылку на норматив или инструкцию вместо причины WHY. Сформулируйте технологическую цель проверки.'};
   const lines=value.split('\n').filter(s=>s.trim());
   const incoming=stage391ReasonLabels(value);
   if(lines.length>1&&!incoming.labels.length)
@@ -20,7 +40,9 @@ function stage391ReasonAIInspect(previous,proposed,step){
   if(!shape.ok)return {ok:false,message:shape.message};
   // New normative claims are not substantiated by the system reference list.
   // Only references actually present in the user's document/context count.
-  const facts=stage391FactCorpus(step).toLocaleLowerCase('ru');
+  // A preexisting model-generated Reason is NOT independent evidence.
+  const sourceEvidence=stage391TwiSourceFacts(step);
+  const facts=sourceEvidence.toLocaleLowerCase('ru');
   // Unicode word boundaries: never mistake "состояние" for a "СТО"
   // standard or an ordinary word containing "ГОСТ" for a normative claim.
   const namedNorms=value.match(/(?<![\p{L}\p{N}])(?:ГОСТ(?:\s+[A-Za-zА-Яа-я0-9.\/-]+)?|ISO\s*\d+|ПТЭЭП|СанПиН(?:\s*[\d.]+)?|СНиП|СТО\s+(?:№\s*)?[A-ZА-Я0-9][\w.\/-]*|Приказ\s*[№N]?\s*\d+)(?![\p{L}\p{N}])/giu)||[];
@@ -37,8 +59,13 @@ function stage391ReasonAIInspect(previous,proposed,step){
   // The previous count is checked on the normal path; special changes
   // are never permitted by a bypass that writes without a preview.
   const checked=stage391ValidateReasonProposal(
-    changedCount?'':String(previous||''),value,step);
+    changedCount?'':String(previous||''),value,step,sourceEvidence);
   if(!checked.ok)return checked;
+  // Never allow a hazard to be laundered through an old, unverified Reason.
+  const unsupported=stage391TwiReasonQualityIssues(value,step,sourceEvidence,'')
+    .find(x=>x.blockAI&&x.kind==='unconfirmed_consequence');
+  if(unsupported)
+    return {ok:false,message:'ИИ предложил неподтверждённое последствие: '+unsupported.message};
   const oldValue=stage38ReasonText(String(previous||''));
   if(checked.value===oldValue)
     return {ok:false,message:'ИИ не предложил изменений; исходная причина сохранена.'};
