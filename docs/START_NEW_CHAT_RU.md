@@ -1,3 +1,9 @@
+## Уточнение Stage38 после проверки пользователем (23.11.2026)
+
+Stage38 работает, но пользователь показал скриншот Excel: **строка «Причина» выравнивалась по центру**. В `src/modules/excel/stage38-export.js` изменено только `alignment:C` на `alignment:T` для причин (по левому и верхнему краю с переносом текста), а в `qa/stage38_numbered_reasons_browser.py` добавлена проверка Excel-выравнивания без потери шрифтов, заливок и рамок. Требуется новая PASS-проверка Linux и Windows и затем проверка обновлённого HTML в Excel. PR #34 продолжает быть draft, `main` не менять без подтверждения.
+
+---
+
 ## РЕЗУЛЬТАТ Stage38: CI PASS, пользовательская приёмка пока НЕТ (23.11.2026)
 
 - **Принятая основная версия:** Stage37 в `main`. Новая Stage38 только в `feature/stage38-numbered-reasons-corporate-xlsx-20261123`, [PR #34 DRAFT](https://github.com/shonentez-afk/SOP-generanjr/pull/34).
