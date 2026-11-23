@@ -10645,9 +10645,8 @@ renderSteps=function stage391RenderSteps(){
     label.title='Совместимость подсказок ИИ, причин СОП, чек-листа и Анализа ФРВ с Stage38';
   }
 };
-// Stage39.1: manual, preview-first cleanup of duplicate Key Points in Reasons Why.
-// This module does NOT change the ✨ AI handler, generation, FRV, or XLSX.
-// Data is modified ONLY by a deliberate click on "Применить" in the preview.
+// Stage39.1: exact Key Point echoes are removed from AI proposals only.
+// No manual button, popup, or change to existing user-authored SOP text.
 function stage391CleanupNormalize(value){
   return String(value||'').toLocaleLowerCase('ru').replace(/\s+/gu,' ')
     .replace(/[.!?;:]+$/gu,'').trim();
@@ -10691,195 +10690,9 @@ function stage391CleanupReason(reason,step){
   }
   return {before:original,after:result.join('\n'),changed,skipped};
 }
-function stage391CleanupElement(tag,classes,textValue){
-  const el=document.createElement(tag);
-  if(classes)el.className=classes;
-  if(textValue!==undefined)el.textContent=textValue;
-  return el;
-}
-function stage391CloseReasonCleanup(){
-  document.getElementById('stage391CleanupOverlay')?.remove();
-}
-function stage391ShowReasonCleanup(stepId){
-  const step=state.steps.find(s=>s.id===stepId);
-  if(!step){toast('Шаг не найден','warning');return;}
-  if(!String(step.reason||'').trim()){
-    toast('Сначала заполните причины. Удалять повтор нечего.','info');return;
-  }
-  const preview=stage391CleanupReason(step.reason,step);
-  if(!preview.changed){
-    toast('Точных повторов ключевых моментов в причинах не найдено. Текст сохранён.','info');
-    return;
-  }
-  stage391CloseReasonCleanup();
-  const fingerprint=JSON.stringify([step.action,step.keyMoments]);
-  const overlay=stage391CleanupElement('div',
-    'fixed inset-0 z-[1000] bg-slate-900/60 flex items-center justify-center p-4');
-  overlay.id='stage391CleanupOverlay';
-  // Standalone HTML must not depend on a Tailwind build containing arbitrary
-  // max-height/fixed classes. These explicit styles also work on Windows.
-  Object.assign(overlay.style,{
-    position:'fixed',inset:'0',zIndex:'99999',
-    display:'flex',alignItems:'center',justifyContent:'center',
-    padding:'8px',boxSizing:'border-box',overflow:'auto',
-    background:'rgba(15,23,42,0.65)'
-  });
-  const dialog=stage391CleanupElement('section',
-    'bg-white rounded-xl shadow-2xl w-full max-w-4xl p-5');
-  Object.assign(dialog.style,{
-    width:'100%',maxWidth:'900px',maxHeight:'calc(100vh - 16px)',
-    display:'flex',flexDirection:'column',overflow:'hidden',boxSizing:'border-box',
-    backgroundColor:'#fff',borderRadius:'12px',boxShadow:'0 16px 42px rgba(15,23,42,.28)'
-  });
-  dialog.setAttribute('role','dialog');
-  dialog.setAttribute('aria-modal','true');
-  dialog.setAttribute('aria-labelledby','stage391CleanupTitle');
-  // Keep the action footer visible even when the window is short/zoomed.
-  // Generated Tailwind classes cannot be relied upon for brand-new buttons.
-  const header=stage391CleanupElement('header','');
-  Object.assign(header.style,{
-    padding:'16px 20px 10px',flex:'0 0 auto',
-    borderBottom:'1px solid #e2e8f0'
-  });
-  const scroller=stage391CleanupElement('div','');
-  Object.assign(scroller.style,{
-    padding:'12px 20px 16px',flex:'1 1 auto',minHeight:'0',
-    overflowY:'auto',overflowX:'hidden'
-  });
-  const title=stage391CleanupElement('h3','font-bold text-lg text-slate-800',
-    'Предпросмотр: убрать повтор КМ');
-  title.id='stage391CleanupTitle';
-  header.appendChild(title);
-  header.appendChild(stage391CleanupElement('p','text-sm text-slate-600 mt-2',
-    'Найдено повторов: '+preview.changed+
-    (preview.skipped?' · Строк без точного совпадения: '+preview.skipped:'')+
-    '. Строки без точного совпадения останутся без изменений.'));
-  dialog.appendChild(header);
-  const compare=stage391CleanupElement('div','');
-  Object.assign(compare.style,{
-    display:'grid',
-    gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,370px),1fr))',
-    gap:'12px',width:'100%',boxSizing:'border-box'
-  });
-  const makePanel=(label,value)=>{
-    const panel=stage391CleanupElement('div','min-w-0');
-    panel.appendChild(stage391CleanupElement('p','font-semibold text-sm mb-1',label));
-    const content=stage391CleanupElement('pre',
-      'whitespace-pre-wrap break-words text-sm bg-slate-50 border border-slate-200 p-3 rounded-lg min-h-24',
-      value);
-    Object.assign(content.style,{
-      fontFamily:'inherit',whiteSpace:'pre-wrap',overflowWrap:'anywhere',
-      maxWidth:'100%',boxSizing:'border-box'
-    });
-    panel.appendChild(content);
-    return panel;
-  };
-  compare.appendChild(makePanel('Было',preview.before));
-  compare.appendChild(makePanel('Стало',preview.after));
-  scroller.appendChild(compare);
-  scroller.appendChild(stage391CleanupElement('p','text-xs text-amber-700 mt-3',
-    'Изменяется только оформление текста причин. Техническая правильность объяснений не подтверждается автоматически.'));
-  dialog.appendChild(scroller);
-  const actions=stage391CleanupElement('footer','');
-  Object.assign(actions.style,{
-    display:'flex',flexWrap:'wrap',justifyContent:'flex-end',alignItems:'center',
-    gap:'12px',padding:'12px 20px 16px',flex:'0 0 auto',minHeight:'60px',
-    backgroundColor:'#fff',borderTop:'1px solid #e2e8f0',boxSizing:'border-box'
-  });
-  const cancel=stage391CleanupElement('button',
-    'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50',
-    'Отмена');
-  cancel.type='button';
-  cancel.id='stage391CleanupCancel';
-  Object.assign(cancel.style,{
-    display:'inline-flex',alignItems:'center',justifyContent:'center',
-    minHeight:'40px',padding:'9px 18px',fontSize:'14px',fontWeight:'600',
-    color:'#334155',backgroundColor:'#fff',border:'1px solid #cbd5e1',
-    borderRadius:'8px',cursor:'pointer'
-  });
-  const apply=stage391CleanupElement('button',
-    'px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700',
-    'Применить');
-  apply.type='button';
-  apply.id='stage391CleanupApply';
-  // The standalone CSS does not include every dynamic Tailwind utility.
-  // Explicit background and text color prevent white-on-white invisibility.
-  Object.assign(apply.style,{
-    display:'inline-flex',alignItems:'center',justifyContent:'center',
-    minHeight:'40px',padding:'9px 18px',fontSize:'14px',fontWeight:'600',
-    color:'#fff',backgroundColor:'#2563eb',border:'1px solid #1d4ed8',
-    borderRadius:'8px',cursor:'pointer',opacity:'1',visibility:'visible'
-  });
-  actions.append(cancel,apply);
-  dialog.appendChild(actions);
-  overlay.appendChild(dialog);
-  document.body.appendChild(overlay);
-  const close=()=>stage391CloseReasonCleanup();
-  cancel.addEventListener('click',close);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
-  overlay.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close()}});
-  apply.addEventListener('click',()=>{
-    // Snapshot protection: never apply a proposal to a different or edited step.
-    if(typeof stage39CanEdit==='function'&&!stage39CanEdit())return;
-    const current=state.steps.find(s=>s.id===stepId);
-    if(!current||current.reason!==preview.before||
-       JSON.stringify([current.action,current.keyMoments])!==fingerprint){
-      close();
-      toast('Шаг или причины изменились. Откройте предпросмотр заново.','warning');
-      return;
-    }
-    if(['Опубликован','Архив'].includes(state.documentManager?.status)){
-      toast('Документ защищён от редактирования.','warning');return;
-    }
-    current.reason=preview.after;
-    close();
-    stateChanged();
-    renderSteps();
-    toast('Удалены только точные повторы КМ. Причины и номера сохранены.','success');
-  });
-  cancel.focus();
-}
-function stage391DecorateReasonCleanup(){
-  const locked=['Опубликован','Архив'].includes(state.documentManager?.status);
-  document.querySelectorAll('#stepsContainer [data-step-field="reason"]').forEach(field=>{
-    const id=Number(field.dataset.id);
-    const label=field.parentElement?.querySelector('label');
-    if(!label)return;
-    let button=label.querySelector('[data-stage391-cleanup]');
-    if(!button){
-      button=stage391CleanupElement('button',
-        'ml-1 mt-1 px-2 py-1 rounded text-xs font-medium border border-blue-200 text-blue-700 hover:bg-blue-50',
-        'Убрать повтор КМ');
-      button.type='button';
-      button.title='Сравнить причины с ключевыми моментами и показать результат до применения';
-      button.setAttribute('data-stage391-cleanup',String(id));
-      label.appendChild(button);
-    }
-    button.disabled=locked;
-    button.classList.toggle('opacity-50',locked);
-  });
-}
-const stage391RenderBeforeCleanup=renderSteps;
-renderSteps=function stage391RenderStepsWithCleanup(){
-  stage391CloseReasonCleanup();
-  stage391RenderBeforeCleanup();
-  stage391DecorateReasonCleanup();
-};
-const stage391ApplyLockBeforeCleanup=applyDocumentLock;
-applyDocumentLock=function stage391LockWithCleanup(){
-  stage391ApplyLockBeforeCleanup();
-  stage391DecorateReasonCleanup();
-};
-document.addEventListener('click',e=>{
-  const button=e.target?.closest?.('button[data-stage391-cleanup]');
-  if(!button||button.disabled)return;
-  e.preventDefault();
-  e.stopPropagation();
-  stage391ShowReasonCleanup(Number(button.dataset.stage391Cleanup));
-},true);
 // Stage39.1: safe ✨ Reasons proposal. This is deliberately an independent
-// overlay: the accepted Stage39 Reason handler and the manual "Убрать повтор КМ"
-// tool remain unchanged. No generated response writes to SOP without consent.
+// overlay over the accepted Stage39 Reason handler. A valid grounded AI WHY
+// updates the editable Reason directly, without an extra modal or KM button.
 const stage391BeforeReasonReviewFill=aiFillField;
 
 // A normative citation or "ask someone / consult instructions" is not a
@@ -10952,68 +10765,6 @@ function stage391ReasonAIInspect(previous,proposed,step){
     changedCount,oldCount:old.labels.length,newCount:incoming.labels.length,
     echoesRemoved:cleaned.changed};
 }
-function stage391ReasonAIReviewDetails(inspection,step){
-  const old=escapeHtml(inspection.previous||'(пусто)');
-  const revised=escapeHtml(inspection.value);
-  const note=inspection.changedCount?
-    '<p style="color:#9a3412;font-weight:600;margin:0 0 10px;">'+
-    'Меняется количество причин: '+
-    (inspection.oldCount||'одна общая')+' → '+
-    (inspection.newCount||'одна общая')+
-    '. Проверьте, что важные обоснования не потеряны.</p>':'';
-  const echo=inspection.echoesRemoved?
-    '<p style="color:#475569;margin:0 0 10px;">Удалено точных повторов КМ из предложения ИИ: '+
-    inspection.echoesRemoved+' (проверяйте смысл).</p>':'';
-  const panel=(name,value)=>'<section style="min-width:0;">'+
-    '<p style="font-weight:700;font-size:13px;margin:0 0 5px;">'+name+'</p>'+
-    '<pre style="font-family:inherit;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;'+
-    'padding:12px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:9px;'+
-    'min-height:90px;margin:0;">'+value+'</pre></section>';
-  return note+echo+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));'+
-    'gap:12px;margin-bottom:10px;">'+
-    panel('Было',old)+panel('Стало',revised)+'</div>'+
-    '<p style="font-size:12px;color:#92400e;">Контроль ИИ не подтверждает технологическую '+
-    'достоверность причин. Проверьте их по фактам операции и инструкции оборудования.</p>';
-}
-function stage391ReasonAIReviewModal(inspection,step){
-  const pending=aiReviewChoiceModal({
-    id:'stage391ReasonAIReview',
-    title:'Предложение ИИ: причины TWI',
-    intro:'ИИ предлагает изменить только поле «Причина» шага «'+
-      String(step.action||'').slice(0,90)+'». Документ не изменится без вашего подтверждения.',
-    details:stage391ReasonAIReviewDetails(inspection,step),
-    choices:[
-      {action:'cancel',label:'Оставить как было'},
-      {action:'apply',label:'Применить к причине',primary:true}
-    ]
-  });
-  // Use the existing shared review modal, with the same fixed-height footer
-  // behavior as our user-approved manual cleanup preview. This affects only
-  // the current modal instance; it cannot change other FRV/TWI dialogs.
-  const root=document.getElementById('stage391ReasonAIReview');
-  if(root){
-    root.style.padding='8px';
-    const dialog=root.querySelector('[role="dialog"]');
-    if(dialog){
-      Object.assign(dialog.style,{
-        display:'flex',flexDirection:'column',
-        maxHeight:'calc(100vh - 16px)',overflow:'hidden'
-      });
-      const content=dialog.children[2];
-      if(content)Object.assign(content.style,{
-        flex:'1 1 auto',minHeight:'0',maxHeight:'none',
-        overflowY:'auto',overflowX:'hidden'
-      });
-      const footer=dialog.lastElementChild;
-      if(footer)Object.assign(footer.style,{
-        flex:'0 0 auto',background:'#fff',
-        paddingBottom:'2px'
-      });
-    }
-  }
-  return pending;
-}
 aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
   if(type!=='reason')
     return stage391BeforeReasonReviewFill(btn,type,source,applyFn);
@@ -11080,8 +10831,6 @@ aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
         (inspection?.message||'Уточните технологическую цель у специалиста.'),'warning');
       return;
     }
-    const choice=await stage391ReasonAIReviewModal(inspection,step);
-    if(choice!=='apply')return;
     if(!aiGuardCanApply(guard))return;
     if(['Опубликован','Архив'].includes(state.documentManager?.status)){
       toast('Документ защищён. Создайте новую версию для изменения.','warning');return;
@@ -11094,7 +10843,7 @@ aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
     }
     applyFn(fresh.value);
     stateChanged();renderSteps();
-    toast('Изменение причины применено после подтверждения. Проверьте актуальность TWI.','success');
+    toast('Причина обновлена ИИ. Проверьте технологический смысл и актуальность TWI.','success');
   }catch(e){
     toast(diagnoseAIError(e),'error');
   }finally{
