@@ -1,0 +1,95 @@
+name: Personal GitNexus Stage39 read-only evaluation
+on:
+  push:
+    branches:
+      - docs/gitnexus-personal-eval-20261123
+    paths:
+      - .github/workflows/gitnexus-personal-trial.yml
+permissions:
+  contents: read
+jobs:
+  index-stage39:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Create isolated copy of active Stage39 modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          export TRIAL_ROOT="$RUNNER_TEMP/sop-stage39-personal-trial"
+          echo "TRIAL_ROOT=$TRIAL_ROOT" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json, os, pathlib, shutil
+          root=pathlib.Path.cwd()
+          paths=json.loads((root/'src/app/stage39-parts.json').read_text('utf-8'))['modules']
+          assert len(paths)==67 and len(set(paths))==67, f'Expected 67 modules, found {len(paths)}'
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'sop-stage39-personal-trial'
+          for path in paths:
+              src=root/path
+              if not src.is_file(): raise RuntimeError(f'Missing: {path}')
+              target=dest/path
+              target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copy2(src,target)
+          (dest/'README.md').write_text('Isolated personal experiment: exactly 67 Stage39 JS sources; no production configuration.\n')
+          print('COPIED_ACTIVE_MODULES',len(paths),flush=True)
+          PY
+          cd "$TRIAL_ROOT"
+          git init -q
+          git config user.email "trial@example.invalid"
+          git config user.name "Read Only Stage39 Trial"
+          git add src README.md
+          git commit -qm "Temporary isolated Stage39 source snapshot"
+      - name: Install GitNexus CLI for personal research
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --version
+          npm --version
+          npm install -g gitnexus@1.6.12 --no-audit --no-fund
+          gitnexus --version
+      - name: Index the isolated snapshot (offline AI, no repo integrations)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$TRIAL_ROOT"
+          gitnexus analyze --index-only --skip-embeddings --skip-skills --skip-agents-md --workers 2 2>&1 | tee "$RUNNER_TEMP/gitnexus-analyze.log"
+          gitnexus status 2>&1 | tee "$RUNNER_TEMP/gitnexus-status.log"
+      - name: Query call graph and key symbols
+        if: success()
+        shell: bash
+        run: |
+          cd "$TRIAL_ROOT"
+          set +e
+          mkdir -p "$RUNNER_TEMP/gitnexus-reports"
+          for symbol in aiAsk generateSOP reviewEntireSOP generateTwiPlan frvStudyAnalyze stage28ReviewLogic; do
+            gitnexus context "$symbol" > "$RUNNER_TEMP/gitnexus-reports/context-$symbol.json" 2>&1
+            code=$?
+            echo "CONTEXT_RESULT $symbol status=$code"
+            head -c 4000 "$RUNNER_TEMP/gitnexus-reports/context-$symbol.json"
+            echo
+          done
+          gitnexus query "aiAsk" > "$RUNNER_TEMP/gitnexus-reports/query-aiAsk.json" 2>&1
+          echo "QUERY_aiAsk status=$?"
+          head -c 4000 "$RUNNER_TEMP/gitnexus-reports/query-aiAsk.json"
+          echo
+          gitnexus impact "aiAsk" > "$RUNNER_TEMP/gitnexus-reports/impact-aiAsk.json" 2>&1
+          echo "IMPACT_aiAsk status=$?"
+          head -c 4000 "$RUNNER_TEMP/gitnexus-reports/impact-aiAsk.json"
+          echo
+      - name: Preserve diagnostic reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: personal-gitnexus-stage39-evaluation
+          path: |
+            ${{ runner.temp }}/gitnexus-analyze.log
+            ${{ runner.temp }}/gitnexus-status.log
+            ${{ runner.temp }}/gitnexus-reports/
+          if-no-files-found: warn
+          retention-days: 3
