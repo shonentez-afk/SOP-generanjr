@@ -261,7 +261,7 @@ hr{{border:0;border-top:1px solid var(--line);margin:30px 0}}
 <header><small>Полный автономный комплект · Stage41</small><h1>Конструктор СОП, исходники и карты — вместе</h1>
 <p>Этот комплект работает с локальными файлами. Из него можно открыть принятую сборку конструктора, изучить взаимосвязи функций, перейти из схемы к конкретной строке исходного кода и получить исходники для дальнейшей разработки.</p><p class="help"><strong>Важно:</strong> сначала полностью распакуйте ZIP. Открывайте <b>SOP-Stage41/index.html</b> из папки рядом с каталогами <b>maps</b>, <b>constructor</b>, <b>viewer</b> и <b>source</b>. Если открыть только этот HTML из предпросмотра архива или отдельно скопировать файл, кнопки не найдут соседние страницы.</p></header><main>
 <div class="cards">
-<div class="card"><h2>Интерактивная архитектура</h2><p>73 активных модуля · 367 межфайловых связей · подробные схемы СОП, TWI, ФРВ и ИИ · доказательства вызовов в AST.</p>
+<div class="card"><h2>Интерактивная архитектура</h2><p>Одна карта, два режима: 8 полноценных представлений LikeC4 и интерактивный граф 73 JS-модулей / 367 зависимостей с AST-доказательствами.</p>
 <a class="action" href="maps/stage41-unified.html">Открыть карту программы</a></div>
 <div class="card"><h2>Конструктор СОП Stage41</h2><p>Принятая версия приложения в одном HTML. Локальная сборка, редактор фотографий, СОП, TWI, ФРВ, печатные XLSX и библиотека документов.</p>
 <a class="action" href="constructor/Stage41.html">Запустить конструктор</a></div>
@@ -317,6 +317,124 @@ def scan_links(root: Path, manifest: list[str]) -> dict[str,int]:
         raise AssertionError("Invalid links:\n" + "\n".join(missed[:25]))
     return counter
 
+def compile_likec4(model_text: str, views_text: str) -> dict:
+    """Compile saved LikeC4 syntax into local, source-linked graph data.
+
+    This is a small parser for the deliberately pinned Stage41 model, not a
+    general LikeC4 implementation. It fails loudly on a different topology.
+    """
+    nodes, edges, stack = [], [], []
+    lookup = {}
+    in_model = False
+    kinds = "person|system|module|storage|cloud|external"
+    declaration = re.compile(r"^([\w-]+)\s*=\s*(" + kinds + r")\s+'([^']+)'")
+    edge_syntax = re.compile(r"^([\w.-]+)\s*->\s*([\w.-]+)\s+'([^']+)'")
+    for line in model_text.splitlines():
+        text = line.strip()
+        if not in_model:
+            if text == "model {":
+                in_model = True
+            continue
+        if text == "}":
+            if stack:
+                stack.pop()
+            else:
+                in_model = False
+            continue
+        found = declaration.match(text)
+        if found:
+            parent = stack[-1] if stack else ""
+            ident = (parent + "." if parent else "") + found.group(1)
+            if ident in lookup:
+                raise AssertionError("Duplicate LikeC4 node " + ident)
+            node = {
+                "id": ident, "label": found.group(3), "parent": parent,
+                "kind": found.group(2), "description": "", "source": ""
+            }
+            nodes.append(node)
+            lookup[ident] = node
+            if text.endswith("{"):
+                stack.append(ident)
+            continue
+        relation = edge_syntax.match(text)
+        if relation:
+            edges.append({
+                "from": relation.group(1), "to": relation.group(2),
+                "label": relation.group(3)
+            })
+            continue
+        if stack:
+            description = re.match(r"description\s+'([^']*)'", text)
+            if description:
+                lookup[stack[-1]]["description"] = description.group(1)
+            source = re.search(r"/blob/[^/]+/([^\s]+)\s+'", text)
+            if source:
+                path = source.group(1)
+                if path == "src/app/stage39-parts.json":
+                    path = "src/app/stage41-parts.json"
+                if path != "proxy/index.py":
+                    lookup[stack[-1]]["source"] = path
+
+    views = []
+    view_pattern = re.compile(
+        r"^\s*view\s+([\w-]+)(?:\s+of\s+([\w.]+))?\s*\{([\s\S]*?)^\s*\}",
+        re.MULTILINE
+    )
+    for view in view_pattern.finditer(views_text):
+        body = view.group(3)
+        title = re.search(r"\btitle\s+'([^']+)'", body)
+        description = re.search(r"\bdescription\s+'([^']+)'", body)
+        include = re.search(r"\binclude\s*([\s\S]*)", body)
+        extras = []
+        if include:
+            extras = [x.strip() for x in include.group(1).split(",")
+                      if x.strip() and x.strip() != "*"]
+        views.append({
+            "id": view.group(1), "scope": view.group(2) or "",
+            "title": title.group(1) if title else view.group(1),
+            "description": description.group(1) if description else "",
+            "include": extras
+        })
+    known = set(lookup)
+    for edge in edges:
+        if edge["from"] not in known or edge["to"] not in known:
+            raise AssertionError("LikeC4 relation points to missing node: " + repr(edge))
+    for view in views:
+        if view["scope"] and view["scope"] not in known:
+            raise AssertionError("LikeC4 view scope absent: " + view["scope"])
+        if any(x not in known for x in view["include"]):
+            raise AssertionError("LikeC4 view includes a missing component")
+    if len(nodes) != 37 or len(edges) != 47 or len(views) != 8:
+        raise AssertionError("Unexpected Stage41 LikeC4 topology")
+    return {"nodes": nodes, "edges": edges, "views": views}
+
+
+def unified_local_map(docs: Path) -> str:
+    original = (docs / "sop-stage41-unified.html").read_text("utf-8")
+    opening = '<script type="application/json" id="model">'
+    start = original.index(opening) + len(opening)
+    end = original.index("</script>", start)
+    data = json.loads(original[start:end])
+    if len(data["nodes"]) != 73 or len(data["edges"]) != 367:
+        raise AssertionError("Unverified CodeFlow/AST payload for Stage41")
+    architecture = compile_likec4(
+        (docs / "likec4-stage41" / "model.c4").read_text("utf-8"),
+        (docs / "likec4-stage41" / "views.c4").read_text("utf-8")
+    )
+    payload = {"code": {"nodes": data["nodes"], "edges": data["edges"]},
+               "arch": architecture}
+    template = (Path(__file__).parent / "stage41_map_template.html").read_text("utf-8")
+    marker = "__STAGE41_MODEL_JSON__"
+    ensure_count(template, marker, "new unified map template")
+    encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    # Escape '<' so embedded string values cannot terminate a script element.
+    encoded = encoded.replace("<", "\\u003c")
+    result = template.replace(marker, encoded)
+    if BRAND_PATTERN.search(result) or PRIVATE_PROXY_URL.search(result):
+        raise AssertionError("External repository or owner proxy data in map")
+    return result
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--app", type=Path, required=True, help="Pinned accepted Stage41 checkout")
@@ -351,10 +469,9 @@ def main() -> None:
     store_text(bundle/"constructor"/"Stage41.html",constructor)
     if len(constructor)<900_000:
         raise AssertionError("Stand-alone Stage41 seems incomplete")
-    # The architecture shell and two task-oriented maps are all local files.
-    store_text(bundle/"maps"/"stage41-unified.html",localize_unified((docs/"sop-stage41-unified.html").read_text("utf-8")))
-    store_text(bundle/"maps"/"stage41-overview.html",localize_overview((docs/"sop-stage41-interactive.html").read_text("utf-8")))
-    store_text(bundle/"maps"/"stage41-ai.html",localize_ai((docs/"sop-stage41-ai-interactive.html").read_text("utf-8")))
+    # Only one user-facing map: LikeC4 architecture and CodeFlow/AST graph.
+    # The separate Archify/AI data and editable C4 definitions remain in diagrams/.
+    store_text(bundle/"maps"/"stage41-unified.html", unified_local_map(docs))
     for filename in TOOL_JSON:
         obj = json.loads((docs / filename).read_text("utf-8"))
         obj.pop("ci_url",None)
@@ -373,7 +490,7 @@ def main() -> None:
     store_text(bundle/"README_OFFLINE.txt",
         "SOP-generanjr Stage41 / portable offline archive\n\n"
         "1. Unzip the whole package (do not preview index.html inside ZIP).\n2. Open index.html in Chrome/Edge from the extracted SOP-Stage41 folder.\n"
-        "3. Open the architecture explorer or standalone constructor from the home page.\n"
+        "3. Open the unified two-mode map or standalone constructor from the home page.\n"
         "4. Source links open local HTML viewers with numbered lines; raw source files are adjacent under source/.\n"
         "5. The owner's private AI proxy endpoint is removed from this archive; AI requests are unavailable.\n"
         "6. LikeC4 and Archify editable source definitions are in diagrams/.\n"

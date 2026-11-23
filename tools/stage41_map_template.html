@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stage41 — интерактивная карта</title>
+<style>
+:root{color-scheme:dark;--bg:#071521;--panel:#102333;--line:#304a5f;--text:#e6f4fb;--muted:#9eb5c8;--mint:#71d8c3}
+*{box-sizing:border-box}body{margin:0;font:14px/1.48 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:#94d5ff}button,input,select{font:inherit}button{cursor:pointer}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 21px;background:#0c1e2c;border-bottom:1px solid var(--line)}
+.brand{text-decoration:none;color:var(--text);display:flex;gap:11px;align-items:center}.brand b{display:block;font-size:17px}.brand small{display:block;color:var(--muted);font-size:11px}
+.logo{border:1px solid #459b9c;border-radius:10px;padding:9px;background:#144945;font-weight:900;color:#dbfff6}
+nav{display:flex;gap:5px;background:#091925;padding:4px;border:1px solid var(--line);border-radius:10px}
+nav button{border:0;background:transparent;color:#9ab2c4;padding:9px 14px;border-radius:7px;font-weight:700}
+nav button.active{background:#1c5a50;color:#e6fff8}
+.launch{padding:9px 13px;background:#174a48;color:#d7f9f2;border:1px solid #56a39b;text-decoration:none;border-radius:9px;font-weight:700}
+.stats{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px 20px;border-bottom:1px solid var(--line);background:#0a1926}
+.chip{padding:3px 9px;border:1px solid #315468;border-radius:30px;background:#122c3b;color:#bad2df;font-size:11px}
+.work{display:grid;grid-template-columns:245px minmax(350px,1fr) 290px;height:calc(100vh - 115px);min-height:580px}
+aside{padding:16px;background:var(--panel);overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}
+h2{font-size:16px;margin:0 0 9px}.overline{font-size:10px;font-weight:850;letter-spacing:.12em;color:var(--mint);text-transform:uppercase;margin:0 0 8px}
+input,select{display:block;width:100%;padding:9px 10px;margin-bottom:8px;background:#091a28;color:#e9f6ff;border:1px solid #42617a;border-radius:8px;outline:0}
+input:focus,select:focus{border-color:#7fccdc}.help{font-size:12px;color:var(--muted);margin:8px 0 14px}
+.item{width:100%;background:none;border:1px solid transparent;border-radius:8px;padding:8px 10px;color:#d5e7f2;text-align:left;margin-bottom:5px}
+.item:hover{background:#1c3850;border-color:#3e7087}.item.active{background:#1d4e4b;border-color:#4b9a87}
+.item b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.item small{display:block;color:var(--muted);font-size:11px;line-height:1.4}
+.group{font-size:10px;color:#9cb5c6;text-transform:uppercase;font-weight:800;letter-spacing:.08em;margin:14px 0 5px}
+.canvas-panel{display:flex;flex-direction:column;min-width:0;min-height:0;background:radial-gradient(ellipse at 45% 35%,#16344b,#081724 72%)}
+.canvas-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 15px;border-bottom:1px solid #2a4557}
+.canvas-head h1{font-size:15px;margin:0}.canvas-head small{font-size:11px;color:var(--muted);display:block}
+.ctrl{display:flex;gap:5px}.ctrl button{padding:6px 10px;background:#19394e;border:1px solid #476b80;color:var(--text);border-radius:7px}
+.canvas{flex:1;min-height:200px;background-image:radial-gradient(#244356 .8px,transparent .8px);background-size:22px 22px;overflow:hidden}
+svg{display:block;width:100%;height:100%;touch-action:none;cursor:grab}svg.dragging{cursor:grabbing}
+.edge{stroke:#62b4c6;stroke-opacity:.17;stroke-width:1.15}.edge.lit{stroke:#86ebce;stroke-opacity:.95;stroke-width:2.2}.edge.fade{stroke-opacity:.06}
+.node{cursor:pointer;outline:0}.node.fade{opacity:.27}.node circle{stroke:#d6efff;stroke-opacity:.65;stroke-width:1}.node.lit circle,.node:focus circle{stroke:white;stroke-width:2.5}
+.node text{font:10.5px system-ui,sans-serif;fill:#eaf6ff;stroke:#0a1c2b;stroke-width:2.5;paint-order:stroke;stroke-linejoin:round;pointer-events:none}
+.foot{padding:9px 14px;border-top:1px solid var(--line);color:#b1c7d6;font-size:11px}
+.path{font:11px/1.5 Consolas,monospace;overflow-wrap:anywhere;padding:8px;background:#0a1b2b;border:1px solid #31526a;border-radius:8px;margin:10px 0}
+.kpis{display:flex;gap:8px;margin:12px 0}.kpi{flex:1;text-align:center;background:#0c2535;border:1px solid #31556b;border-radius:9px;padding:9px}.kpi b{display:block;font-size:20px}.kpi small{display:block;font-size:10px;color:#a4baca}
+.source{display:block;text-align:center;background:#205b50;border:1px solid #51ad98;border-radius:8px;color:#e2fff6;padding:9px;text-decoration:none;font-weight:750;margin:12px 0}
+.edge-row{display:block;width:100%;border:1px solid #28485e;background:#102a3b;border-radius:8px;color:#d2e6f1;text-align:left;padding:8px;margin:6px 0;font-size:12px}
+.edge-row:hover{background:#1c4557}.edge-row small{display:block;color:#9ab8ca;font-size:10px}
+.call-ref{display:block;font-size:11px;margin:5px 0;overflow-wrap:anywhere}
+.right h2{overflow-wrap:anywhere;line-height:1.3}.subhead{font-size:12px;font-weight:800;color:#9bc9da;margin:17px 0 8px}
+@media(max-width:1100px){.work{grid-template-columns:205px 1fr;height:auto}.left,.canvas-panel{height:650px}.right{grid-column:1/-1;border-top:1px solid var(--line);border-left:0;max-height:320px}}
+@media(max-width:670px){.work{display:block}.left{height:auto;max-height:270px}.canvas-panel{height:520px}.right{max-height:none}header{padding:10px}.stats{padding:8px 10px}}
+</style></head><body>
+<header><a href="../index.html" class="brand"><span class="logo">SOP</span><span><b>Единая карта Stage41</b><small>Одна точка входа · архитектура и связи кода</small></span></a>
+<nav aria-label="Режим карты"><button data-mode="architecture">Архитектура</button><button data-mode="code" class="active">Связи кода</button></nav>
+<a class="launch" href="../constructor/Stage41.html" target="_blank" rel="noopener">Открыть конструктор</a></header>
+<div class="stats" id="stats"></div>
+<div class="work">
+<aside class="left"><p class="overline" id="sideCaption">CodeFlow + AST</p><h2 id="sideHeading">Исходные модули</h2><div id="filters"></div><div class="help" id="resultCount"></div><div id="items"></div></aside>
+<main class="canvas-panel"><div class="canvas-head"><div><h1 id="graphTitle">Граф связей</h1><small id="graphDescription">Масштаб: колесо мыши · перемещение: перетаскивание</small></div><div class="ctrl"><button id="minus" title="Уменьшить">−</button><button id="plus" title="Увеличить">+</button><button id="fit">Вписать</button></div></div>
+<div class="canvas"><svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Граф кода и архитектуры"><g id="world"></g></svg></div><div class="foot" id="foot"></div></main>
+<aside class="right"><p class="overline">Связи и исходники</p><div id="detail"></div></aside>
+</div><script type="application/json" id="payload">__STAGE41_MODEL_JSON__</script>
+<script>
+"use strict";
+const D=JSON.parse(document.getElementById("payload").textContent);
+const E=id=>document.getElementById(id);
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const groups={ai:"ИИ",app:"Интерфейс",core:"Ядро",documents:"Документы",editor:"Редактор",excel:"Excel",frv:"ФРВ",photos:"Фото",review:"Контроль",quality:"Причины",shared:"Общее",twi:"TWI"};
+const colors=["#69b6fd","#55d9c1","#eab876","#bba4ff","#f08d9e","#a0cfff","#d8c26b","#e6a7e0","#7cd89d","#8cd4e5","#f1c3a0","#8eb3f0"];
+const codeNodes=D.code.nodes.map((n,i)=>Object.assign({id:n.path,label:n.path.split("/").at(-1).replace(/\.js$/,""),kind:"code",color:colors[Math.max(0,Object.keys(groups).indexOf(n.group))%colors.length],index:i},n));
+const codeIndex=new Map(codeNodes.map(n=>[n.id,n]));
+const archIndex=new Map(D.arch.nodes.map(n=>[n.id,n]));
+const S={mode:"code",view:"landscape",selected:"src/modules/ai/stage41-quality.js",query:"",group:"",evidence:"all",zoom:1,x:0,y:0,graph:null,positions:null,drag:null};
+let W=800,H=600;
+function parent(id){const n=id.lastIndexOf(".");return n===-1?"":id.slice(0,n)}
+function ancestor(id,set){while(id){if(set.has(id))return id;id=parent(id)}return null}
+function href(p,line){if(!p||p==="proxy/index.py")return"";return "../viewer/"+encodeURI(p)+".html"+(line?"#L"+line:"")}
+function makeArchGraph(){
+ const v=D.arch.views.find(x=>x.id===S.view)||D.arch.views[0], ids=new Set();
+ if(v.id==="landscape")D.arch.nodes.filter(n=>!n.parent).forEach(n=>ids.add(n.id));
+ else if(v.id==="modules"){D.arch.nodes.filter(n=>n.parent==="app").forEach(n=>ids.add(n.id));["worker","app","proxy","yandex","network"].forEach(x=>ids.add(x))}
+ else {ids.add(v.scope);D.arch.nodes.filter(n=>n.parent===v.scope).forEach(n=>ids.add(n.id));(v.include||[]).forEach(id=>{if(archIndex.has(id))ids.add(id)})}
+ const nodes=D.arch.nodes.filter(n=>ids.has(n.id)).map(n=>Object.assign({kind:"arch",color:n.id===v.scope?"#67dcc4":n.id.startsWith("app.ai.")?"#e9b672":"#68b6f4"},n));
+ const edges=new Map();
+ D.arch.edges.forEach(e=>{const from=ancestor(e.from,ids),to=ancestor(e.to,ids);if(!from||!to||from===to)return;const key=from+"|"+to;if(!edges.has(key))edges.set(key,{from,to,labels:[],evidenceClass:"architecture"});edges.get(key).labels.push(e.label)});
+ const positions=new Map(),root=v.id==="landscape"?"app":(v.scope||"app"),outer=nodes.filter(n=>n.id!==root);
+ if(ids.has(root))positions.set(root,{x:0,y:0});
+ outer.forEach((n,i)=>{const a=i*Math.PI*2/outer.length-Math.PI/2,r=outer.length>15?470:outer.length>8?390:300;positions.set(n.id,{x:Math.cos(a)*r,y:Math.sin(a)*r})});
+ return {nodes,edges:[...edges.values()],positions,title:v.title,description:v.description,kind:"arch"};
+}
+function buildPositions(){
+ const P=new Map(),gs=[...new Set(codeNodes.map(n=>n.group))].sort();
+ gs.forEach((g,i)=>{const a=2*Math.PI*i/gs.length-Math.PI/2,cx=Math.cos(a)*680,cy=Math.sin(a)*540;
+ codeNodes.filter(n=>n.group===g).forEach((n,j)=>{const t=j*2.399963229728653,r=32+39*Math.sqrt(j);P.set(n.id,{x:cx+Math.cos(t)*r,y:cy+Math.sin(t)*r})})});
+ return P;
+}
+function makeCodeGraph(){
+ if(!S.positions)S.positions=buildPositions();
+ const nodes=codeNodes.filter(n=>!S.group||n.group===S.group),ids=new Set(nodes.map(n=>n.id));
+ const edges=D.code.edges.filter(e=>ids.has(e.from)&&ids.has(e.to)&&(S.evidence==="all"||e.evidenceClass===S.evidence));
+ return {nodes,edges,positions:S.positions,title:"Граф связей исходного кода",description:"CodeFlow + AST · реальные файлы и функции · 73 модуля",kind:"code"};
+}
+function graph(){return S.mode==="code"?makeCodeGraph():makeArchGraph()}
+function changeMode(mode){S.mode=mode;S.selected=mode==="code"?"src/modules/ai/stage41-quality.js":"app";render(true)}
+function changeView(id){S.view=id;const v=D.arch.views.find(x=>x.id===id);S.selected=v&&v.scope?v.scope:"app";render(true)}
+function select(id,center){S.selected=id;render(false);if(center)focus(id)}
+function sidebar(){
+ const isCode=S.mode==="code";E("sideCaption").textContent=isCode?"CodeFlow + AST":"LikeC4";E("sideHeading").textContent=isCode?"Исходные модули":"Уровни системы";
+ E("filters").innerHTML=isCode?'<input id="q" placeholder="Поиск файла и подсистемы" aria-label="Поиск"><select id="group" aria-label="Группа"><option value="">Все подсистемы</option>'+Object.entries(groups).map(x=>'<option value="'+x[0]+'">'+esc(x[1])+'</option>').join("")+'</select><select id="evidence" aria-label="Тип связи"><option value="all">Все связи CodeFlow</option><option value="direct">Прямые вызовы AST</option><option value="reference">Ссылки на функции</option><option value="uncertain">Требуют проверки</option></select>':
+ '<p class="help">Восемь настоящих представлений построены из модельных файлов LikeC4, без повторения прежних блок-схем.</p>';
+ if(isCode){E("q").value=S.query;E("group").value=S.group;E("evidence").value=S.evidence;
+ E("q").addEventListener("input",e=>{S.query=e.target.value;sidebarList()});
+ E("group").addEventListener("change",e=>{S.group=e.target.value;render(true)});
+ E("evidence").addEventListener("change",e=>{S.evidence=e.target.value;render(false)})}
+ sidebarList();
+}
+function sidebarList(){
+ if(S.mode==="architecture"){
+ E("resultCount").textContent=D.arch.views.length+" уровней · "+D.arch.nodes.length+" компонентов";
+ E("items").innerHTML=D.arch.views.map((v,i)=>'<button class="item'+(S.view===v.id?' active':'')+'" data-view="'+esc(v.id)+'"><b>'+String(i+1).padStart(2,"0")+' · '+esc(v.title.replace(/^\d+\s*·\s*/,""))+'</b><small>'+esc(v.description)+'</small></button>').join("");
+ E("items").querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>changeView(b.dataset.view)));return;
+ }
+ const q=S.query.trim().toLowerCase(),list=codeNodes.filter(n=>(!S.group||S.group===n.group)&&(!q||n.path.toLowerCase().includes(q)||(groups[n.group]||"").toLowerCase().includes(q)));
+ E("resultCount").textContent=list.length+" из "+codeNodes.length+" модулей";
+ let current="",html="";
+ list.forEach(n=>{if(current!==n.group){current=n.group;html+='<div class="group">'+esc(groups[current]||current)+'</div>'}
+ html+='<button class="item'+(S.selected===n.id?' active':'')+'" data-file="'+esc(n.id)+'"><b>'+esc(n.path.split("/").at(-1))+'</b><small>'+esc(n.path.replace(/^src\/modules\//,""))+'</small></button>'});
+ E("items").innerHTML=html||'<p class="help">Файлы не найдены</p>';
+ E("items").querySelectorAll("[data-file]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.file,true)));
+}
+function edgeList(edges,id,g){
+ if(!edges.length)return '<p class="help">Связей в выбранном представлении нет.</p>';
+ return edges.slice(0,65).map(e=>{const other=e.from===id?e.to:e.from,n=(g.kind==="code"?codeIndex:archIndex).get(other);
+ if(!n)return"";const label=g.kind==="code"?other.split("/").at(-1):n.label;
+ const status=g.kind==="code"?(e.evidenceClass==="direct"?"AST · вызов":e.evidenceClass==="reference"?"AST · ссылка":"CodeFlow · не подтверждено AST"):(e.labels||[]).slice(0,2).join(" · ");
+ const refs=(e.functions||[]).slice(0,3).map(fn=>{const source=e.from===id?e.from:e.to,lines=e.from===id?fn.callLines:fn.definitionLines;const line=(lines||[]).find(Number.isInteger);return line?'<a class="call-ref" href="'+esc(href(source,line))+'" target="_blank" rel="noopener">'+esc(fn.name)+' · L'+line+'</a>':''}).join("");
+ return '<button class="edge-row" data-neighbor="'+esc(other)+'">'+(e.from===id?'→ ':'← ')+esc(label)+'<small>'+esc(status)+'</small></button>'+refs;
+ }).join("");
+}
+function detail(g){
+ const n=g.nodes.find(n=>n.id===S.selected);
+ if(!n){E("detail").innerHTML='<h2>Выберите модуль</h2><p class="help">Нажмите на узел графа или строку слева.</p>';return}
+ const inside=g.edges.filter(e=>e.to===n.id),outside=g.edges.filter(e=>e.from===n.id),src=href(g.kind==="code"?n.path:n.source);
+ E("detail").innerHTML='<h2>'+esc(g.kind==="code"?n.path.split("/").at(-1):n.label)+'</h2><div class="path">'+esc(n.id)+'</div><p class="help">'+esc(g.kind==="arch"?(n.description||"Компонент LikeC4"):(groups[n.group]||n.group))+'</p>'+
+ '<div class="kpis"><div class="kpi"><b>'+inside.length+'</b><small>Входящие</small></div><div class="kpi"><b>'+outside.length+'</b><small>Исходящие</small></div></div>'+
+ (src?'<a class="source source-open" href="'+esc(src)+'" target="_blank" rel="noopener">Открыть локальный исходник</a>':"")+
+ '<div class="subhead">Связи</div>'+edgeList(inside.concat(outside),n.id,g)+
+ (g.kind==="arch"?'<div class="subhead">Модель</div><a href="../viewer/diagrams/likec4/model.c4.html" target="_blank">Открыть model.c4</a>':'<p class="help">AST подтверждает синтаксис вызова, но не факт исполнения.</p>');
+ E("detail").querySelectorAll("[data-neighbor]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.neighbor,true)));
+}
+const ns="http://www.w3.org/2000/svg";
+function svg(tag,attrs){const el=document.createElementNS(ns,tag);Object.entries(attrs||{}).forEach(([k,v])=>el.setAttribute(k,String(v)));return el}
+function transform(){E("world").setAttribute("transform","translate("+S.x+" "+S.y+") scale("+S.zoom+")")}
+function fit(){
+ if(!S.graph||!S.graph.nodes.length)return;
+ let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
+ S.graph.nodes.forEach(n=>{const p=S.graph.positions.get(n.id);if(p){minx=Math.min(minx,p.x);miny=Math.min(miny,p.y);maxx=Math.max(maxx,p.x);maxy=Math.max(maxy,p.y)}});
+ S.zoom=Math.max(.14,Math.min(1.15,(W-50)/Math.max(300,maxx-minx+230),(H-50)/Math.max(250,maxy-miny+180)));
+ S.x=W/2-(minx+maxx)*S.zoom/2;S.y=H/2-(miny+maxy)*S.zoom/2;transform();
+}
+function focus(id){const p=S.graph&&S.graph.positions.get(id);if(!p)return;S.zoom=Math.max(.95,S.zoom);S.x=W/2-S.zoom*p.x;S.y=H/2-S.zoom*p.y;transform()}
+function zoom(f,cx,cy){cx=cx==null?W/2:cx;cy=cy==null?H/2:cy;const z=Math.max(.12,Math.min(4,S.zoom*f)),f2=z/S.zoom;S.x=cx-(cx-S.x)*f2;S.y=cy-(cy-S.y)*f2;S.zoom=z;transform()}
+function draw(g){
+ const box=E("map").getBoundingClientRect();W=Math.max(300,box.width);H=Math.max(300,box.height);E("map").setAttribute("viewBox","0 0 "+W+" "+H);
+ const world=E("world");world.replaceChildren();const el=svg("g"),nodes=svg("g");world.append(el,nodes);
+ const focusId=g.nodes.some(n=>n.id===S.selected)?S.selected:null,neighbor=new Set([focusId]);
+ g.edges.forEach(e=>{if(e.from===focusId)neighbor.add(e.to);if(e.to===focusId)neighbor.add(e.from)});
+ g.edges.forEach(e=>{const a=g.positions.get(e.from),b=g.positions.get(e.to);if(!a||!b)return;const lit=focusId&&(e.from===focusId||e.to===focusId);el.append(svg("line",{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:"edge"+(lit?" lit":focusId?" fade":"")}))});
+ g.nodes.forEach(n=>{const p=g.positions.get(n.id);if(!p)return;const isSelected=n.id===focusId,r=g.kind==="code"?(isSelected?13:8):(isSelected?17:11);
+ const el=svg("g",{class:"node"+(neighbor.has(n.id)?" lit":" fade"),transform:"translate("+p.x+" "+p.y+")","data-id":n.id,role:"button",tabindex:"0"});
+ el.append(svg("circle",{r:r+6,fill:n.color,"fill-opacity":".13",stroke:"none"}),svg("circle",{r,fill:n.color}));
+ const t=svg("text",{"text-anchor":"middle",x:0,y:r+16});t.textContent=n.label.length>37?n.label.slice(0,35)+"…":n.label;el.append(t);
+ const title=svg("title");title.textContent=n.id;el.append(title);
+ el.addEventListener("click",ev=>{ev.stopPropagation();select(n.id,false)});
+ el.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(n.id,false)}});nodes.append(el)});
+ transform();
+}
+function render(refit){
+ document.querySelectorAll("[data-mode]").forEach(b=>{b.classList.toggle("active",b.dataset.mode===S.mode);b.setAttribute("aria-pressed",String(b.dataset.mode===S.mode))});
+ sidebar();const g=graph();S.graph=g;E("graphTitle").textContent=g.title;E("graphDescription").textContent=g.description;
+ E("stats").innerHTML='<span class="chip">Stage41</span><span class="chip">'+D.code.nodes.length+' JS-модуля</span><span class="chip">'+D.code.edges.length+' межфайловых связей</span><span class="chip">'+D.arch.views.length+' уровней LikeC4</span><span class="chip">Офлайн · без внешних ссылок</span>';
+ E("foot").textContent=S.mode==="code"?"Круги — модули · линии — статические зависимости · цвет — подсистема":"Компоненты и направления связей взяты из сохранённой модели LikeC4";
+ draw(g);detail(g);if(refit)fit();
+}
+function init(){
+ document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>changeMode(b.dataset.mode)));
+ E("plus").addEventListener("click",()=>zoom(1.22));E("minus").addEventListener("click",()=>zoom(1/1.22));E("fit").addEventListener("click",fit);
+ const map=E("map");map.addEventListener("wheel",ev=>{ev.preventDefault();const r=map.getBoundingClientRect();zoom(ev.deltaY<0?1.13:1/1.13,ev.clientX-r.left,ev.clientY-r.top)},{passive:false});
+ map.addEventListener("pointerdown",ev=>{if(ev.target.closest(".node"))return;S.drag={x:ev.clientX,y:ev.clientY,px:S.x,py:S.y};map.classList.add("dragging");map.setPointerCapture(ev.pointerId)});
+ map.addEventListener("pointermove",ev=>{if(!S.drag)return;S.x=S.drag.px+ev.clientX-S.drag.x;S.y=S.drag.py+ev.clientY-S.drag.y;transform()});
+ function stop(){S.drag=null;map.classList.remove("dragging")}map.addEventListener("pointerup",stop);map.addEventListener("pointercancel",stop);
+ window.addEventListener("resize",()=>{if(S.graph)render(true)});render(true);
+}
+init();
+</script></body></html>
