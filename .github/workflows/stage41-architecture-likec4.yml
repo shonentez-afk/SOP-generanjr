@@ -1,0 +1,52 @@
+name: Stage41 official LikeC4 architecture build
+on:
+  push:
+    branches:
+      - docs/stage41-architecture-eval-20261123
+    paths:
+      - .github/workflows/stage41-architecture-likec4.yml
+permissions:
+  contents: read
+jobs:
+  likec4-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout diagrams from architecture branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/archify-stage39-architecture-20261123
+          path: architecture
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prepare isolated official LikeC4 model input
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/likec4-src"
+          cp architecture/docs/diagrams/likec4-stage41/*.c4 "$RUNNER_TEMP/likec4-src/"
+          ls -la "$RUNNER_TEMP/likec4-src"
+          echo "LIKEC4_DIR=$RUNNER_TEMP/likec4-src" >> "$GITHUB_ENV"
+      - name: Render with official LikeC4 1.61.0 CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$LIKEC4_DIR"
+          node --version
+          npx --yes likec4@1.61.0 build -o dist 2>&1 | tee "$RUNNER_TEMP/likec4-build.log"
+          test -f dist/index.html
+          echo "LIKEC4_BUILD_PASS"
+          find dist -type f | head -n 25
+      - name: Save official site build and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage41-likec4-official-site
+          path: |
+            ${{ runner.temp }}/likec4-src/dist/
+            ${{ runner.temp }}/likec4-build.log
+          if-no-files-found: warn
+          retention-days: 7
+
