@@ -40,6 +40,8 @@ jobs:
         run: python qa/stage39_1_twi_why_browser.py
       - name: Real Chrome Reason-star exact screenshot regression
         run: python qa/stage39_1_reason_star_browser.py
+      - name: Real Chrome manual Key Point cleanup preview and guarded apply
+        run: python qa/stage39_1_reason_cleanup_browser.py
       - name: Stage39 structural actions and complete Stage37 regression on new HTML
         run: |
           python -c "import sys;sys.path.insert(0,'qa');import importlib.util; s=importlib.util.spec_from_file_location('qa39','qa/stage39_step_management_browser.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
@@ -80,6 +82,8 @@ jobs:
         run: python qa/stage39_1_twi_why_browser.py
       - name: Windows Chrome Reason-star exact screenshot regression
         run: python qa/stage39_1_reason_star_browser.py
+      - name: Real Chrome manual Key Point cleanup preview and guarded apply
+        run: python qa/stage39_1_reason_cleanup_browser.py
       - name: Stage39 actions plus old browser regression
         run: |
           python -c "import sys;sys.path.insert(0,'qa');import importlib.util; s=importlib.util.spec_from_file_location('qa39','qa/stage39_step_management_browser.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage39-1-ai-reasons-frv-browser-candidate.html'; m.main()"
@@ -123,9 +127,9 @@ jobs:
           test -s "$source_file"
           mkdir -p releases
           cp "$source_file" releases/stage39-1-ai-reasons-frv-browser-candidate.html
-          cp "$source_file" releases/stage39-1-reverted-reason-star-20261123.html
-          cmp releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-reverted-reason-star-20261123.html
-          git add releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-reverted-reason-star-20261123.html
+          cp "$source_file" releases/stage39-1-manual-km-cleanup-20261123.html
+          cmp releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-manual-km-cleanup-20261123.html
+          git add releases/stage39-1-ai-reasons-frv-browser-candidate.html releases/stage39-1-manual-km-cleanup-20261123.html
           if ! git diff --cached --quiet; then
             git commit -m "Build: Stage39.1 verified Chrome Linux Windows AI FRV XLSX"
             git push origin HEAD:feature/stage39-1-ai-reasons-frv-20261123
