@@ -2,6 +2,13 @@
 
 Дата: 23.11.2026. Основная версия: **Stage36** объединена с `main` после подтверждения пользователя и Linux/Windows CI. Новые изменения — в отдельной ветке `feature/stage36-1-twi-print-xlsx-20261123`, **не принимать и не сливать до тестов и проверки на ПК**.
 
+## Результаты CI — PASS, ожидается пользовательская приёмка (23.11.2026)
+
+- [GitHub Actions #45095016959](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45095016959): Linux **PASS** и Windows **PASS**. **100/100 unit**.
+- Chrome `file://` реально скачал TWI `.xlsx`; Python openpyxl проверил два листа, содержание шагов/моментов/причин/плана, A4, ориентацию, области печати, повторяемые заголовки, отсутствие формул, длинные тексты/продолжения, предупреждения и отсутствие мутации исходного СОП/TWI. Регрессия Stage36–Stage32 включая фотографии Excel также PASS.
+- [Печатная сборка Stage36.1](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/feature/stage36-1-twi-print-xlsx-20261123/releases/stage36-1-twi-print-xlsx-browser-candidate.html) опубликована, SHA-256 `ce21cc5aa6c5ed2c5936946dd10d9deb3b6ee4939d4c8460f5fdacbe739d8038`.
+- [PR #32](https://github.com/shonentez-afk/SOP-generanjr/pull/32) — **DRAFT**. Реальная проверка пользователя в Microsoft Excel (включая физическую печать) ожидается. В `main` остаётся принятая Stage36.
+
 ## Назначение
 
 Из текущего СОП и сформированного в существующей вкладке TWI плана инструктажа создаётся **отдельный автономный XLSX для печати**. В сам СОП XLSX новые вкладки не внедряются. Запросы к Yandex AI, редактор фото, ФРВ, локальные ExcelJS и пиктограммы не изменены.
@@ -31,5 +38,5 @@
 - Модуль `src/modules/twi/stage36-1-print-xlsx.js`; манифест `src/app/stage36-1-parts.json` (64 модуля, на 1 больше принятой Stage36); HTML `src/app/stage36-1-between-vendor-icons.html`.
 - Сборщик `tools/build_stage36_1.py`; автономная сборка после CI: `releases/stage36-1-twi-print-xlsx-browser-candidate.html`.
 - QA `tests/test_stage36_1.py`, `qa/stage36_1_twi_print_browser.py`, `.github/workflows/stage36_1.yml` — проверяют фактический `.xlsx` через openpyxl, ориентацию A4, print titles, отсутствие формул/разрывов в данных, длинный текст, пометки, подписи и отсутствие изменения живого СОП и TWI; полный Stage36/35/34/33/32 регресс в Chrome на Linux и Windows.
-- До завершения CI и ручной приёмки **не заявлять PASS** и **не объединять в main**.
+- CI успешно завершена; до реальной ручной приёмки **не объединять в main**.
 - Дальше Stage37 — финальная комплексная приёмка всего конструктора и руководство со скриншотами.
