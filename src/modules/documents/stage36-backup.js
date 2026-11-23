@@ -128,9 +128,6 @@ async function stage36MakePlan(pack){
     if(existing&&stage36SameStudy(existing,r)){
       stats.frvSkipped++;frvIdMap.set(id,id);continue;
     }
-    const repeated=localStudies.find(s=>s.frv36OriginalId===id&&
-      s.frv36SourceDigest===null); // legacy records do not claim identity
-    void repeated;
     const digest=await stage36Hash({payload:r.payload,archived:!!r.archived});
     const prior=localStudies.find(s=>s.frv36OriginalId===id&&
       s.frv36SourceDigest===digest);
@@ -149,7 +146,10 @@ async function stage36MakePlan(pack){
       let same=false;
       try{
         const current=await docBuildPortableJson(existing);
-        same=current.integrity?.sha256===p.integrity.sha256;
+        same=JSON.stringify(current.constructor)===JSON.stringify(p.constructor) &&
+          JSON.stringify(current.photoAssets)===JSON.stringify(p.photoAssets) &&
+          String(existing.status)===String(p.document.status) &&
+          String(existing.number)===String(p.document.number);
       }catch(_){same=false}
       if(same){stats.sopSkipped++;docIdMap.set(id,id);continue}
     }
