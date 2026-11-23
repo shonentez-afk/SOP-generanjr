@@ -97,8 +97,54 @@ def main():
                     '3. предотвращает возможность поражения электрическим током.')
             run_star(broken)
             assert page.evaluate("() => state.steps[0].reason")==before
+
+            # Exact user's latest reproduction: not an em dash but a PERIOD,
+            # followed by "Это важно для..." or "Это необходимо для...".
+            latest=(
+              "1. Проверить штепсельную вилку и питающий кабель на повреждения. "
+              "Это важно для предотвращения короткого замыкания и обеспечения "
+              "безопасности работы с электроинструментом.\n"
+              "2. Проверить резиновый наконечник в месте ввода кабеля. "
+              "Это необходимо для предотвращения повреждения кабеля "
+              "и обеспечения надёжного контакта.\n"
+              "3. Проверить корпус на трещины и сколы. "
+              "Это важно для предотвращения поражения электрическим током "
+              "и обеспечения механической целостности инструмента."
+            )
+            run_star(latest)
+            exact_expected=(
+              "1. Для предотвращения короткого замыкания и обеспечения "
+              "безопасности работы с электроинструментом.\n"
+              "2. Для предотвращения повреждения кабеля и обеспечения "
+              "надёжного контакта.\n"
+              "3. Для предотвращения поражения электрическим током "
+              "и обеспечения механической целостности инструмента."
+            )
+            exact_actual=page.evaluate("() => state.steps[0].reason")
+            assert exact_actual==exact_expected,(exact_actual,exact_expected)
+            assert "Проверить " not in exact_actual
+            assert "Это важно" not in exact_actual
+            assert "Это необходимо" not in exact_actual
+            assert page.evaluate("() => JSON.stringify(state.steps[0].keyMoments)")==page.evaluate(
+                "() => window.starFixture.keyPoints")
+            # No mass cleanup: unrelated correctly-written reasons and
+            # punctuation inside the actual WHY remain untouched.
+            good_no_prefix=(
+              "1. Для предотвращения повреждения вилки.\n"
+              "2. Проверка перед пуском. Исключает использование повреждённого кабеля.\n"
+              "3. Для предотвращения повреждения корпуса."
+            )
+            run_star(good_no_prefix)
+            assert page.evaluate("() => state.steps[0].reason")==good_no_prefix
+            previous=good_no_prefix
+            run_star(
+              "1. Проверить штепсельную вилку и питающий кабель на повреждения. Это важно.\n"
+              "2. Проверка перед пуском. Исключает использование повреждённого кабеля.\n"
+              "3. Для предотвращения повреждения корпуса."
+            )
+            assert page.evaluate("() => state.steps[0].reason")==previous
             assert not errors,errors
-            print("PASS: ✨ Reason-only output removes 3 matching Key Points, keeps labels, "+
+            print("PASS: ✨ Reason-only output removes 3 matching Key Points with dash OR full stop, keeps labels, "+
                   "preserves good causes/dashes, rejects missing WHY; SOP generator untouched",flush=True)
         finally:
             browser.close()
