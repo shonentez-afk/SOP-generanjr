@@ -1892,7 +1892,6 @@ ${AI_DATA_BOUNDARY}
 {"prepare":{"purpose":"...","known":"...","prep":"...","interest":"..."},"present":{"round1":"...","round2":"...","round3":"..."},"tryOut":{"perform":"...","explain":"...","check":"...","correct":"..."},"followUp":{"help":"...","control":"...","observe":"...","close":"..."}}`,
  generate:`Ты — специалист по TWI Job Instruction и методолог стандартизированной работы производственного предприятия.
 ${TWI_CORE_GUIDE}
-${NORM_BASE}
 ${AI_DATA_BOUNDARY}
 
 ЦЕЛЬ: превратить фактическое описание работы пользователя в реалистичный, понятный и проверяемый черновик СОП. СОП должен быть пригоден для последующей проверки инженером/мастером и для обучения работника по TWI JI. Не пытайся сделать текст красивым ценой точности.
@@ -1920,6 +1919,7 @@ KEY POINTS
 REASON WHY
 Reason должен объяснять именно соответствующий Key Point, а не весь Action.
 Кратко сформулируй последствие несоблюдения именно этого приёма или подтверждённый технологический результат. Не начинай Reason с повторения полного текста Key Point; избегай «необходимо для обеспечения правильной/безопасной работы» без конкретики.
+Не используй названия норм, номера приказов или просьбу проверить локальную инструкцию вместо Reason Why. Эти вопросы помещаются в openQuestions, а не в поле reason. Если основание неизвестно, оставь reason пустым и задай конкретный вопрос в openQuestions.
 Не объявляй причиной неподтверждённые перегрев, травму, выход из строя, падение точности, повреждение и т. п. Только если конкретная связь подтверждена в исходном описании, условиях, инструкции или фактах.
 Не путай ход работы с Key Point: «включить питание/запустить» обычно Important Step или часть последовательности, а не критический КМ без специального приёма. Если для заданного времени (например, 1 минуты) причина не указана, не выдумывай её: оставь вопрос инженеру.
 ПО УМОЛЧАНИЮ предпочти ОДНУ краткую общую причину без номера, но только если она фактически объясняет все ключевые моменты и не теряет разные значимые риски или требования. Не создавай причины по количеству КМ. Если несколько разных Key Points требуют разных подтверждённых обоснований, перечисли их в одном поле через переносы строк: 1. причина / 2. причина.
@@ -2007,13 +2007,13 @@ ${AI_DATA_BOUNDARY}
 Ответ — только один Key Point.`,
  reason:`Ты — редактор Reasons Why по TWI Job Instruction.
 ${TWI_CORE_GUIDE}
-${NORM_BASE}
 ${AI_DATA_BOUNDARY}
 Исправь только данный Reason.
 Объясни ПОЧЕМУ соответствующий Key Point важен: какое последствие предотвращается, какое качество обеспечивается или какой технологический смысл поддерживается.
-Reason не обязан содержать нормативную ссылку.
-Если в исходном тексте есть нормативный источник — сохрани его без усиления и без выдумывания номера пункта.
-Если источник неизвестен — не изобретай его.
+Reason Why — технологическая цель или подтверждённое последствие Key Point, а не нормативная справка.
+Не возвращай номер приказа, ссылку на стандарт, просьбу проверить локальную инструкцию или обратиться к специалисту ВМЕСТО причины.
+Предыдущий Reason — неподтверждённый черновик: если там только норматив или инструкция «уточнить», не копируй это в новый ответ.
+Если из фактов процесса нельзя сформулировать WHY без домыслов, верни только NEEDS_REASON_FACTS.
 Не добавляй новые технологические факты.
 ФОРМАТ: только готовый текст причины.
 НЕ добавляй слова «Reason», «Reason Why», «Причина», «Почему», «Reason:» или «Reason Why:» в начале или конце ответа.
@@ -7191,10 +7191,23 @@ stage28TwiStructureChecks=function stage391TwiStructureWithWhy(steps){
 // inventing a reason or rejecting the full otherwise-valid SOP draft.
 const stage391PreviousSopNormalize=stage29SopNormalize;
 stage29SopNormalize=function stage391NormalizeWithReasonReview(sop,input){
+  // This is only the generated PROPOSAL, never state.steps. A reference to a
+  // rule or a request to consult documentation is not a causal Reason Why.
+  // Remove that non-WHY text before the numeric source gate, otherwise the
+  // model's invented order number can incorrectly reject the whole valid SOP.
+  const normOnly=[];
+  (Array.isArray(sop?.steps)?sop.steps:[]).forEach((step,i)=>{
+    if(stage391ReasonAIIsReferenceInsteadOfWhy(step.reason)){
+      step.reason='';
+      normOnly.push(i+1);
+    }
+  });
   const result=stage391PreviousSopNormalize(sop,input);
   const source=[input?.userDescription,input?.operation,input?.safety,
     input?.tools,input?.material].map(x=>String(x||'')).join('\n');
   const questions=Array.isArray(result.sop.openQuestions)?result.sop.openQuestions:[];
+  for(const n of normOnly)questions.push('Шаг '+n+
+    ': ИИ указал норматив или инструкцию вместо WHY. Уточните фактическое обоснование ключевого момента.');
   (result.sop.steps||[]).forEach((step,i)=>{
     const concerns=stage391TwiReasonQualityIssues(step.reason,step,source);
     if(concerns.length){
@@ -10861,6 +10874,24 @@ document.addEventListener('click',e=>{
 // tool remain unchanged. No generated response writes to SOP without consent.
 const stage391BeforeReasonReviewFill=aiFillField;
 
+// A normative citation or "ask someone / consult instructions" is not a
+// Reason Why. Manual text is NEVER rewritten here: this only gates AI drafts.
+function stage391ReasonAIIsReferenceInsteadOfWhy(text){
+  const lines=stage38StripOrdinalLabels(String(text||'')).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  return lines.some(line=>
+    /^(?:(?:ПТЭЭП|ПУЭ|ГОСТ|СанПиН|СНиП)(?![\p{L}\p{N}])|ISO\s*\d+|СТО\s+(?:№\s*)?[A-ZА-Я0-9]|(?:Приказ|Постановление)\s+(?:[\p{L} ]{0,35})?№\s*\d+)/iu.test(line)||
+    /^(?:при\s+несоответствии\s*[—–:-]?\s*)?(?:проверь(?:те)?|сверь(?:те)?|уточни(?:те)?|обратитесь|следует\s+обратиться)(?=\s|[.:—–-]|$).*(?:инструкц|документац|технолог)/iu.test(line)
+  );
+}
+function stage391ReasonAIDraftForContext(previous){
+  const s=String(previous||'');
+  // The existing Reason can contain a previous model hallucination. Keep it
+  // in the document for comparison, but never treat it as source evidence.
+  return stage391ReasonAIIsReferenceInsteadOfWhy(s)
+    ? 'В прежнем поле только нормативная ссылка или указание проверить документацию; подтверждённой WHY-причины пока нет.'
+    : s;
+}
+
 function stage391ReasonAIInspect(previous,proposed,step){
   if(typeof proposed!=='string'||!proposed.trim())
     return {ok:false,message:'ИИ вернул пустую причину; исходный текст сохранён.'};
@@ -10868,8 +10899,10 @@ function stage391ReasonAIInspect(previous,proposed,step){
   // *proposal only*. The operator must see and approve the final wording.
   const cleaned=stage391CleanupReason(proposed,step);
   const value=stage38ReasonText(cleaned.after,2000);
-  if(!value||/^(?:keep|null|undefined|none|n\/a)$/iu.test(value))
-    return {ok:false,message:'ИИ вернул служебное значение вместо причины.'};
+  if(!value||/^(?:keep|null|undefined|none|n\/a|NEEDS_REASON_FACTS)$/iu.test(value))
+    return {ok:false,message:'В исходных данных недостаточно подтверждённого WHY. Уточните технологическую цель проверки; документ сохранён.'};
+  if(stage391ReasonAIIsReferenceInsteadOfWhy(value))
+    return {ok:false,message:'ИИ вернул ссылку на норматив или инструкцию вместо причины WHY. Сформулируйте технологическую цель проверки.'};
   const lines=value.split('\n').filter(s=>s.trim());
   const incoming=stage391ReasonLabels(value);
   if(lines.length>1&&!incoming.labels.length)
@@ -10878,7 +10911,9 @@ function stage391ReasonAIInspect(previous,proposed,step){
   if(!shape.ok)return {ok:false,message:shape.message};
   // New normative claims are not substantiated by the system reference list.
   // Only references actually present in the user's document/context count.
-  const facts=stage391FactCorpus(step).toLocaleLowerCase('ru');
+  // A preexisting model-generated Reason is NOT independent evidence.
+  const sourceEvidence=stage391TwiSourceFacts(step);
+  const facts=sourceEvidence.toLocaleLowerCase('ru');
   // Unicode word boundaries: never mistake "состояние" for a "СТО"
   // standard or an ordinary word containing "ГОСТ" for a normative claim.
   const namedNorms=value.match(/(?<![\p{L}\p{N}])(?:ГОСТ(?:\s+[A-Za-zА-Яа-я0-9.\/-]+)?|ISO\s*\d+|ПТЭЭП|СанПиН(?:\s*[\d.]+)?|СНиП|СТО\s+(?:№\s*)?[A-ZА-Я0-9][\w.\/-]*|Приказ\s*[№N]?\s*\d+)(?![\p{L}\p{N}])/giu)||[];
@@ -10895,8 +10930,13 @@ function stage391ReasonAIInspect(previous,proposed,step){
   // The previous count is checked on the normal path; special changes
   // are never permitted by a bypass that writes without a preview.
   const checked=stage391ValidateReasonProposal(
-    changedCount?'':String(previous||''),value,step);
+    changedCount?'':String(previous||''),value,step,sourceEvidence);
   if(!checked.ok)return checked;
+  // Never allow a hazard to be laundered through an old, unverified Reason.
+  const unsupported=stage391TwiReasonQualityIssues(value,step,sourceEvidence,'')
+    .find(x=>x.blockAI&&x.kind==='unconfirmed_consequence');
+  if(unsupported)
+    return {ok:false,message:'ИИ предложил неподтверждённое последствие: '+unsupported.message};
   const oldValue=stage38ReasonText(String(previous||''));
   if(checked.value===oldValue)
     return {ok:false,message:'ИИ не предложил изменений; исходная причина сохранена.'};
@@ -10987,30 +11027,51 @@ aiFillField=async function stage391SafeReasonField(btn,type,source,applyFn){
     // several numbered WHYs remain valid when distinct facts require them.
     // Existing numbered reasons are never silently collapsed.
     const instruction='\n'+AI_DATA_BOUNDARY+
-      '\nРаботай только с Reason Why. По умолчанию предпочитай ОДНУ краткую общую '+
-      'причину без номера, ЕСЛИ она действительно объясняет все критичные Key Points. '+
-      'Если есть несколько разных подтверждённых обоснований, верни строки 1., 2. и т. д. '+
+      '\nЗАДАНИЕ: составь Reason Why как краткую технологическую ЦЕЛЬ уже описанного '+
+      'критического приёма. По умолчанию предпочитай ОДНУ краткую общую причину '+
+      'без номера, если она объясняет все Key Points и не теряет разных известных обоснований. '+
+      'При действительно разных подтверждённых причинах используй 1., 2., 3. '+
       'в одном поле. Число причин не обязано совпадать с числом КМ. '+
-      'Не повторяй тексты действий/Key Points. Не придумывай нормативы, травмы, '+
-      'перегрев, допуски или числовые параметры. '+
-      'Не скрывай уникальные причины из исходного текста: если их невозможно '+
-      'сохранить в одной общей формулировке, предложи несколько. '+
-      'Ответ — ТОЛЬКО текст причины, без заголовка, пояснений и Markdown.';
+      'Пример на основе фактов: если КМ проверяет наличие видимых повреждений инструмента, '+
+      'цель — «Позволяет выявить видимые повреждения до использования». '+
+      'Не заменяй эту цель цитатами документов, указанием обратиться к инструкциям '+
+      'или последствиями, не вытекающими из фактов операции. '+
+      'Предыдущая причина — неподтверждённый черновик, не источник фактов. '+
+      'Не копируй её нормативные ссылки или предположения. '+
+      'Если данных недостаточно даже для такой цели, верни ровно NEEDS_REASON_FACTS. '+
+      'Ответ — только готовый текст WHY без заголовков, пояснений и Markdown.';
     const context='DATA BEGIN\n'+JSON.stringify({
       operation:state.meta?.operation||'',
       description:state.description||'',
       action:step.action||'',
       allKeyPoints:(step.keyMoments||[]).filter(Boolean),
-      currentReason:String(source),
+      currentReason:stage391ReasonAIDraftForContext(source),
+      reasonDraftIsVerified:false,
       formatPreference:'Одна общая причина, если она охватывает все КМ; иначе разные нумерованные'
     })+'\nDATA END';
-    const raw=await aiAsk(AI_SYS.reason+instruction,context,{
-      model:currentModel,maxTokens:550,task:'edit_reason'
-    });
-    if(!aiGuardCanApply(guard))return;
-    const answer=cleanAIFieldResult(raw,'reason');
-    const inspection=stage391ReasonAIInspect(source,answer,step);
-    if(!inspection.ok){toast(inspection.message,'warning');return;}
+    // One bounded retry for typical hallucinated consequences or references.
+    // Never repair claims by guessing: the model must return a new grounded WHY.
+    let inspection=null;
+    for(let attempt=0;attempt<2;attempt++){
+      const correction=attempt===0?'':(
+        '\nПРЕДЫДУЩИЙ ОТВЕТ НЕ ПРОШЁЛ ПРОВЕРКУ: он не объяснил WHY '+
+        'из предоставленных фактов. Дай конкретную цель описанного КМ, '+
+        'не ссылайся на нормы, внешние документы и неподтверждённые последствия. '+
+        'Если оснований нет, ответь NEEDS_REASON_FACTS.'
+      );
+      const raw=await aiAsk(AI_SYS.reason+instruction+correction,context,{
+        model:currentModel,maxTokens:550,task:'edit_reason'
+      });
+      if(!aiGuardCanApply(guard))return;
+      const answer=cleanAIFieldResult(raw,'reason');
+      inspection=stage391ReasonAIInspect(source,answer,step);
+      if(inspection.ok||/^NEEDS_REASON_FACTS$/iu.test(answer))break;
+    }
+    if(!inspection?.ok){
+      toast('ИИ не смог подтвердить причину. Исходное поле сохранено. '+
+        (inspection?.message||'Уточните технологическую цель у специалиста.'),'warning');
+      return;
+    }
     const choice=await stage391ReasonAIReviewModal(inspection,step);
     if(choice!=='apply')return;
     if(!aiGuardCanApply(guard))return;
