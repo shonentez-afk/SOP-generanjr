@@ -62,7 +62,7 @@ class Stage391Contracts(unittest.TestCase):
         self.assertIn("stage391TwiReasonQualityIssues",gate)
         self.assertIn("stage391NormalizeWithReasonReview",gate)
         self.assertIn("stage391TwiStructureWithWhy",gate)
-        self.assertIn("не переписывай",new.read("src/modules/ai/stage39-1-base-prompts.js").lower())
+        self.assertIn("не добавляй новые технологические факты.",new.read("src/modules/ai/stage39-1-base-prompts.js").lower())
         self.assertNotIn("const ref=S.filter",checklist)
         self.assertIn("norm",review.lower())
         self.assertIn("stage391ValidateReasonProposal",facts)
