@@ -17,5 +17,8 @@ for index,name in enumerate((
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     module.RELEASE=RELEASE
-    module.main()
+    entry=getattr(module,'main',None) or getattr(module,'run',None)
+    if not callable(entry):
+        raise RuntimeError('No browser test entrypoint in '+name)
+    entry()
 print("PASS Stage40 inherited Stage39.1 Reason/WHY direct-apply regressions",flush=True)
