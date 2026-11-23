@@ -18,7 +18,7 @@ REQUIRED={
     "src/modules/ai/stage27-intelligence.js",
     "src/modules/ai/stage27-analogs-history.js",
     "src/modules/app/stage28-ui.js",
-    "src/modules/review/stage28-core.js",
+    "src/modules/review/stage38-review-core.js",
     "src/modules/review/stage28-render.js",
     "src/modules/ai/stage28-review-task.js",
     "src/modules/documents/stage28-review-state.js",
@@ -28,10 +28,10 @@ REQUIRED={
     "src/modules/core/stage19-config.js",
     "src/modules/ai/stage26-transport.js",
     "src/modules/ai/stage29-generate-sop.js",
-    "src/modules/ai/stage29-prompts.js",
-    "src/modules/ai/stage29-quality-core.js",
+    "src/modules/ai/stage38-prompts.js",
+    "src/modules/ai/stage38-quality-core.js",
     "src/modules/twi/stage29-from-sop.js",
-    "src/modules/twi/stage36-1-print-xlsx.js",
+    "src/modules/twi/stage38-print-xlsx.js",
     "src/modules/documents/stage37-data-loss-safety.js",
     "src/modules/frv/stage35-study-model.js",
     "src/modules/frv/stage36-library.js",
@@ -45,8 +45,8 @@ REQUIRED={
     "src/modules/frv/stage34-sop-frv-guard.js",
     "src/modules/photos/stage30-history.js",
     "src/modules/photos/stage31-illustration-editor.js",
-    "src/modules/editor/stage34-steps.js",
-    "src/modules/excel/stage34-export.js",
+    "src/modules/editor/stage38-steps.js",
+    "src/modules/excel/stage38-export.js",
     "src/modules/quality/stage38-reasons.js",
 }
 
@@ -57,6 +57,9 @@ def build()->str:
         raise AssertionError("Stage38 reason safeguards must be present once")
     if modules.index("src/modules/quality/stage38-reasons.js")>=modules.index("src/modules/ai/stage29-generate-sop.js"):
         raise AssertionError("Reason helpers must load before generation")
+    for old in ["src/modules/ai/stage19-prompts.js","src/modules/ai/stage29-quality-core.js","src/modules/ai/stage29-prompts.js","src/modules/review/stage28-core.js","src/modules/twi/stage36-1-print-xlsx.js","src/modules/excel/stage34-export.js","src/modules/editor/stage34-steps.js"]:
+        if old in modules:
+            raise AssertionError("Legacy module must not coexist with Stage38 module: "+old)
     if "src/modules/frv/stage35-library.js" in modules:
         raise AssertionError("Stage35 library replaced, not duplicated")
     if spec.get("schemaVersion")!=1 or len(modules)!=66 or len(set(modules))!=66:
@@ -67,7 +70,7 @@ def build()->str:
         raise AssertionError("Stage38 editor must appear exactly once")
     if "src/modules/excel/stage32-export.js" in modules:
         raise AssertionError("Legacy fixed 150x95 Excel photo export must not run in Stage38")
-    if modules.count("src/modules/excel/stage34-export.js")!=1:
+    if modules.count("src/modules/excel/stage38-export.js")!=1:
         raise AssertionError("Stage38 Excel export must appear exactly once")
     if any(old in modules for old in (
         "src/modules/frv/stage20-measurements.js",
