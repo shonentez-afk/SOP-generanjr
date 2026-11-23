@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage39.1 Chrome: user-driven, preview-before-apply Key Point echo cleanup."""
+"""Stage39.1: Key Point echo cleanup only for AI proposals, no separate UI."""
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -15,11 +15,10 @@ def main():
         try:
             page=browser.new_page(viewport={"width":1540,"height":980})
             page.on("pageerror",lambda err:errors.append(str(err)))
-            page.on("dialog",lambda d:d.accept())
             page.route("http://**",lambda route:route.abort())
             page.route("https://**",lambda route:route.abort())
             page.goto(RELEASE.resolve().as_uri(),wait_until="domcontentloaded",timeout=30000)
-            ids=page.evaluate("""() => {
+            initial=page.evaluate("""() => {
               const step=createEmptyStep();
               step.action='Осмотреть электроинструмент';
               step.keyMoments=[
@@ -35,172 +34,68 @@ def main():
               step.frvSource={studyId:'measured-original',observedTimeSec:17.5};
               step.photoHint='Фотография исходного шага';
               state.meta.operation='Осмотр электроинструмента';
-              state.meta.safety='Применять подходящие средства защиты';
               state.steps=[step];
-              stateToHtml();
-              renderSteps();
-              window.cleanupOriginal=structuredClone({
-                id:step.id,reason:step.reason,keyMoments:step.keyMoments,
-                action:step.action,frvSource:step.frvSource,
-                durationSeconds:step.durationSeconds,photoHint:step.photoHint
-              });
-              return {id:step.id,initial:step.reason};
+              stateToHtml();renderSteps();
+              window.cleanupOriginal=JSON.stringify(state.steps);
+              return step.reason;
             }""")
-            selector=f'button[data-stage391-cleanup="{ids["id"]}"]'
-            button=page.locator(selector)
-            assert button.count()==1 and button.is_visible()
-            assert button.inner_text()=="Убрать повтор КМ"
-            assert page.locator(f'[data-ai="reason"][data-id="{ids["id"]}"]').count()==1
 
-            # Preview is read-only and requires an explicit Apply.
-            button.click()
-            assert page.locator('#stage391CleanupOverlay').count()==1
-            assert page.locator('#stage391CleanupOverlay [role="dialog"]').count()==1
-            assert page.evaluate("() => state.steps[0].reason")==ids["initial"]
-            before=page.locator("#stage391CleanupOverlay pre").nth(0).inner_text()
-            after=page.locator("#stage391CleanupOverlay pre").nth(1).inner_text()
+            # The cleanup button and its before/after modal are gone.
+            assert page.locator('button[data-stage391-cleanup]').count()==0
+            assert page.locator('#stage391CleanupOverlay').count()==0
+            assert page.locator('[data-ai="reason"]').count()==1
+
+            # Helper strips only exact matches in a proposed text.
+            preview=page.evaluate("""() => ({
+              result:stage391CleanupReason(state.steps[0].reason,state.steps[0]),
+              original:JSON.stringify(state.steps)===window.cleanupOriginal
+            })""")
             expected=(
               "1. Для предотвращения короткого замыкания и обеспечения безопасности работы с электроинструментом.\n"
               "2. Обеспечение герметичности и защита от влаги и пыли.\n"
               "3. Для предотвращения механических повреждений."
             )
-            assert before==ids["initial"],before
-            assert after==expected,(after,expected)
-            assert "Проверить штепсельную вилку" not in after
-            assert "Проверить резиновый наконечник" not in after
-            assert "Проверить корпус" not in after
-            assert after.count("\n")==2
-            # Reproduce the user's narrow screenshot and higher desktop zoom.
-            # The Apply button must have a real blue background and BOTH
-            # actions must remain inside the viewport (not white-on-white,
-            # behind the scrollbar, or clipped below the window).
-            def verify_dialog_buttons(width,height):
-                page.set_viewport_size({"width":width,"height":height})
-                metrics=page.evaluate("""() => {
-                  const ids=['stage391CleanupCancel','stage391CleanupApply'];
-                  const buttons=ids.map(id=>{
-                    const b=document.getElementById(id);
-                    const r=b.getBoundingClientRect();
-                    const css=getComputedStyle(b);
-                    return {
-                      id,visible:css.display!=='none'&&css.visibility!=='hidden'&&
-                        css.opacity!=='0'&&r.width>=65&&r.height>=36,
-                      within:r.left>=0&&r.right<=innerWidth+1&&
-                        r.top>=0&&r.bottom<=innerHeight+1,
-                      background:css.backgroundColor,color:css.color,
-                      height:r.height
-                    };
-                  });
-                  const footer=document.querySelector('#stage391CleanupOverlay footer');
-                  const dialog=document.querySelector('#stage391CleanupOverlay [role="dialog"]');
-                  const scroll=dialog.children[1],scrollBox=scroll.getBoundingClientRect();
-                  const footerBox=footer.getBoundingClientRect();
-                  const dialogBox=dialog.getBoundingClientRect();
-                  return {buttons,footerWithin:footerBox.bottom<=innerHeight+1,
-                    dialogWithin:dialogBox.top>=0&&dialogBox.bottom<=innerHeight+1,
-                    scrollHeight:scroll.scrollHeight,clientHeight:scroll.clientHeight,
-                    scrollInside:scrollBox.top>=dialogBox.top&&
-                      scrollBox.bottom<=footerBox.top+1};
-                }""")
-                assert all(b["visible"] and b["within"] for b in metrics["buttons"]),metrics
-                assert metrics["buttons"][1]["background"]=="rgb(37, 99, 235)",metrics
-                assert metrics["buttons"][1]["color"]=="rgb(255, 255, 255)",metrics
-                assert metrics["footerWithin"] and metrics["dialogWithin"] and metrics["scrollInside"],metrics
-                return metrics
+            assert preview["result"]["before"]==initial,preview
+            assert preview["result"]["after"]==expected,preview
+            assert preview["result"]["changed"]==3,preview
+            assert preview["original"],preview
+            assert expected.count("\n")==2
 
-            verify_dialog_buttons(950,446)
-            compact=verify_dialog_buttons(620,320)
-            assert compact["clientHeight"]>0,compact
-            # Scroll the contents. The footer must not move off-screen.
-            page.evaluate("""() => {
-              document.querySelector('#stage391CleanupOverlay [role="dialog"]').children[1].scrollTop=9999;
-            }""")
-            verify_dialog_buttons(620,320)
-            page.locator("#stage391CleanupCancel").click()
-            page.set_viewport_size({"width":1540,"height":980})
-            assert page.locator("#stage391CleanupOverlay").count()==0
-            assert page.evaluate("() => state.steps[0].reason")==ids["initial"]
-
-            # Previewing must also be cancelled with Escape, never mutate.
-            button.click()
-            page.keyboard.press("Escape")
-            assert page.locator("#stage391CleanupOverlay").count()==0
-            assert page.evaluate("() => state.steps[0].reason")==ids["initial"]
-
-            # The user explicitly approves. Only Reason is updated.
-            button.click()
-            page.locator("#stage391CleanupApply").click()
-            assert page.locator("#stage391CleanupOverlay").count()==0
-            result=page.evaluate("""() => {
-              const step=state.steps[0],old=window.cleanupOriginal;
-              return {
-                reason:step.reason,
-                unchanged:step.id===old.id&&
-                  step.action===old.action&&
-                  JSON.stringify(step.keyMoments)===JSON.stringify(old.keyMoments)&&
-                  JSON.stringify(step.frvSource)===JSON.stringify(old.frvSource)&&
-                  step.durationSeconds===old.durationSeconds&&
-                  step.photoHint===old.photoHint
-              };
-            }""")
-            assert result["reason"]==expected,result
-            assert result["unchanged"],result
-            assert page.locator(f'[data-step-field="reason"][data-id="{ids["id"]}"]').input_value()==expected
-
-            # Running cleanup a second time leaves the document unchanged.
-            page.locator(selector).click()
-            assert page.locator("#stage391CleanupOverlay").count()==0
-            assert page.evaluate("() => state.steps[0].reason")==expected
-
-            # Protect against stale preview: manual text editing between preview
-            # and Apply wins; the modal cannot overwrite the fresh text.
-            page.evaluate("""() => {
-              state.steps[0].reason=
-                '1. Проверить штепсельную вилку и питающий кабель на повреждения — предотвращает неисправность.';
-              renderSteps();
-            }""")
-            page.locator(selector).click()
-            textbox=page.locator(f'[data-step-field="reason"][data-id="{ids["id"]}"]')
-            textbox.fill("Ручная причина инженера.")
-            page.locator("#stage391CleanupApply").click()
-            assert page.evaluate("() => state.steps[0].reason")=="Ручная причина инженера."
-            assert page.locator("#stage391CleanupOverlay").count()==0
-
-            # A partial match is shown to the user; unmatched lines are kept.
+            # Nonmatching text is preserved verbatim; no source mutation.
             mixed=(
               "1. Проверить штепсельную вилку и питающий кабель на повреждения — исключить неисправный кабель.\n"
               "2. Общая причина без повторения ключевого момента."
             )
-            page.evaluate("""s=>{state.steps[0].reason=s;renderSteps()}""",mixed)
-            page.locator(selector).click()
-            mixed_after=page.locator("#stage391CleanupOverlay pre").nth(1).inner_text()
-            assert mixed_after==(
+            partial=page.evaluate("""text => {
+              const original=JSON.stringify(state.steps);
+              const value=stage391CleanupReason(text,state.steps[0]);
+              return {value,unchanged:JSON.stringify(state.steps)===original};
+            }""",mixed)
+            assert partial["value"]["after"]==(
               "1. Исключить неисправный кабель.\n"
               "2. Общая причина без повторения ключевого момента."
-            ),mixed_after
-            assert "Строк без точного совпадения: 1" in page.locator(
-                "#stage391CleanupOverlay").inner_text()
-            page.locator("#stage391CleanupCancel").click()
-            assert page.evaluate("() => state.steps[0].reason")==mixed
+            ),partial
+            assert partial["value"]["changed"]==1,partial
+            assert partial["unchanged"],partial
 
-            # Ordinary reasons and hyphenated equipment model names are safe.
-            good="Одна общая причина — предотвращает повреждение детали."
-            page.evaluate("""s=>{state.steps[0].reason=s;renderSteps()}""",good)
-            page.locator(selector).click()
-            assert page.locator("#stage391CleanupOverlay").count()==0
-            assert page.evaluate("() => state.steps[0].reason")==good
+            plain="Одна общая причина — предотвращает повреждение детали."
+            assert page.evaluate("""text=>
+                stage391CleanupReason(text,state.steps[0]).after===text
+            """,plain)
 
-            # Do not show an enabled edit action for read-only SOPs.
+            # A published SOP still cannot show the removed button.
             page.evaluate("""() => {
               state.documentManager.status='Опубликован';
-              applyDocumentLock();
+              applyDocumentLock();renderSteps();
             }""")
-            assert page.locator(selector).is_disabled()
-            assert page.evaluate("() => state.steps[0].reason")==good
+            assert page.locator('button[data-stage391-cleanup]').count()==0
+            assert page.locator('#stage391CleanupOverlay').count()==0
+            assert page.evaluate("() => JSON.stringify(state.steps)")==page.evaluate(
+                "() => window.cleanupOriginal")
             assert not errors,errors
-            print("PASS Stage39.1 manual KM cleanup: blue Apply visible at 950x446 and 620x320, user preview, Cancel/Escape, "+
-                  "explicit Apply, numbered Reasons, exact-only match, stale-data guard, "+
-                  "partial match, FRV intact, readonly lock, old ✨ unchanged",flush=True)
+            print("PASS Stage39.1 KM cleanup: pure exact-match helper, "
+                  "no UI button/modal, original numbered reasons untouched, "
+                  "FRV/photo/steps safe, readonly safe",flush=True)
         finally:
             browser.close()
 

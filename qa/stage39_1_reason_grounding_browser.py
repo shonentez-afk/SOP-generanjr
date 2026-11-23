@@ -41,7 +41,6 @@ def main():
               return step.id;
             }""")
             selector=f'[data-ai="reason"][data-id="{id}"]'
-            overlay="#stage391ReasonAIReview"
             normative="ПТЭЭП (Приказ Минэнерго №811): при несоответствии — проверить локальную инструкцию"
             safe="Позволяет выявить видимые повреждения электроинструмента до начала его использования."
 
@@ -113,63 +112,54 @@ def main():
             ),mixed
             assert mixed["requested"] and mixed["preserved"],mixed
 
-            def start(replies,preview):
-                page.evaluate("r => {window.s391WhyTest.calls=[];window.s391WhyTest.responses=r}",replies)
+            def start(replies,expected):
+                page.evaluate("""old => {
+                  state.steps[0].reason=old;stateToHtml();renderSteps();
+                }""",normative)
+                page.evaluate("""r => {
+                  window.s391WhyTest.calls=[];
+                  window.s391WhyTest.responses=r;
+                }""",replies)
                 page.locator(selector).click()
-                if preview:
-                    page.locator(overlay).wait_for(state="visible",timeout=15000)
-                    assert page.evaluate("() => state.steps[0].reason")==normative
-                    assert page.locator(overlay+" [data-ai-preview-action='apply']").is_visible()
-                else:
-                    page.wait_for_function("""s=>{
-                      const b=document.querySelector(s);
-                      return b&&!b.disabled&&b.textContent==='✨';
-                    }""",arg=selector,timeout=15000)
-                    assert page.locator(overlay).count()==0
-                    assert page.evaluate("() => state.steps[0].reason")==normative
+                page.wait_for_function("""s=>{
+                  const b=document.querySelector(s);
+                  return b&&!b.disabled&&b.textContent==='✨';
+                }""",arg=selector,timeout=15000)
+                assert page.locator("#stage391ReasonAIReview").count()==0
+                assert page.locator("#stage391CleanupOverlay").count()==0
+                assert page.locator('button[data-stage391-cleanup]').count()==0
+                assert page.evaluate("() => state.steps[0].reason")==expected
                 return page.evaluate("() => window.s391WhyTest.calls")
 
-            # The exact old normative-only reply cannot be promoted to a WHY;
-            # the second grounded response is shown but not applied automatically.
-            calls=start([normative,safe],True)
+            # Unsupported normative response triggers one retry. A grounded
+            # follow-up applies immediately, without asking for confirmation.
+            calls=start([normative,safe],safe)
             assert len(calls)==2,calls
             assert all("ПТЭЭП" not in c["prompt"] for c in calls),calls
             assert all("ПТЭЭП" not in c["context"] for c in calls),calls
-            assert "ПТЭЭП" in page.locator(overlay).inner_text()  # OLD in "Было"
-            assert safe in page.locator(overlay).inner_text()  # NEW in "Стало"
-            page.locator(overlay+" [data-ai-preview-action='cancel']").click()
-            page.locator(overlay).wait_for(state="detached")
-            assert page.evaluate("() => state.steps[0].reason")==normative
 
-            # Same screenshot: an invented injury consequence is rejected.
-            calls=start(["Для предотвращения травмы при осмотре электроинструмента.",safe],True)
+            # Invented injury is rejected; a grounded retry succeeds.
+            calls=start(["Для предотвращения травмы при осмотре электроинструмента.",safe],safe)
             assert len(calls)==2,calls
-            page.locator(overlay+" [data-ai-preview-action='cancel']").click()
-            page.locator(overlay).wait_for(state="detached")
-            assert page.evaluate("() => state.steps[0].reason")==normative
 
-            # Two unsupported model replies -> no change, no review modal.
-            calls=start([normative,"Для предотвращения травмы при осмотре электроинструмента."],False)
+            # Two unsupported answers -> no write.
+            calls=start([normative,"Для предотвращения травмы при осмотре электроинструмента."],normative)
             assert len(calls)==2,calls
-            assert page.evaluate("() => state.steps[0].reason")==normative
 
-            # Insufficient-facts sentinel must NOT be stored as a reason.
-            calls=start(["NEEDS_REASON_FACTS"],False)
+            # Missing-facts marker is never stored or retried.
+            calls=start(["NEEDS_REASON_FACTS"],normative)
             assert len(calls)==1,calls
 
-            # A grounded WHY must still require explicit user approval.
-            calls=start([safe],True)
+            # A new click can succeed after an earlier invalid response.
+            calls=start([safe],safe)
             assert len(calls)==1,calls
-            assert page.evaluate("() => state.steps[0].reason")==normative
-            page.locator(overlay+" [data-ai-preview-action='apply']").click()
-            page.locator(overlay).wait_for(state="detached")
-            assert page.evaluate("() => state.steps[0].reason")==safe
+            assert page.locator(f'[data-step-field="reason"][data-id="{id}"]').input_value()==safe
             assert page.evaluate("""() => JSON.stringify(state.steps[0].keyMoments)""").count(
                 "Проверить")==3
             assert not errors,errors
             print("PASS screenshot PTEEP #811 is no longer seeded, unverified old reason "
                   "is not evidence, model injury/normative hallucinations trigger one "
-                  "bounded retry, fail-closed or approved preview, original safe",flush=True)
+                  "bounded retry, fail-closed or direct validated apply, original safe",flush=True)
         finally:
             browser.close()
 

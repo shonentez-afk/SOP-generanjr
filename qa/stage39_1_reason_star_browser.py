@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage39.1: ✨ Reason proposal must be grounded, previewed, and approved."""
+"""Stage39.1: grounded ✨ Reason applies directly, without UI confirmation."""
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -44,83 +44,40 @@ def main():
               return step.id;
             }""")
             button=f'[data-ai="reason"][data-id="{id}"]'
-            overlay="#stage391ReasonAIReview"
-            initial=page.evaluate("() => window.reasonStarFixture.initial")
+            assert page.locator('button[data-stage391-cleanup]').count()==0
+            assert page.locator('#stage391CleanupOverlay').count()==0
 
-            def start(reply,expect_preview=True):
-                page.evaluate("r => {window.reasonStarFixture.response=r}",reply)
-                page.locator(button).click()
-                if expect_preview:
-                    try:
-                        page.locator(overlay).wait_for(state="visible",timeout=5000)
-                    except Exception:
-                        debug=page.evaluate("""s => ({
-                          reason:state.steps[0]?.reason,
-                          buttonText:document.querySelector(s)?.textContent,
-                          popup:!!document.querySelector('#stage391ReasonAIReview'),
-                          modals:[...document.querySelectorAll('[role="dialog"]')].map(x=>x.id),
-                          callCount:window.reasonStarFixture?.calls?.length,
-                          htmlEnd:document.body.innerText.slice(-950)
-                        })""",button)
-                        print("AI Reason preview missing:",debug,flush=True)
-                        raise
-                    assert page.locator(overlay+" [data-ai-preview-action='apply']").count()==1
-                    assert page.locator(overlay+" [data-ai-preview-action='cancel']").count()==1
-                else:
-                    page.wait_for_function("""s=>{
-                      const b=document.querySelector(s);
-                      return !!b&&!b.disabled&&b.textContent==='✨';
-                    }""",arg=button,timeout=12000)
-                    assert page.locator(overlay).count()==0
-
-            def close(action):
-                page.locator(overlay+f" [data-ai-preview-action='{action}']").click()
-                page.locator(overlay).wait_for(state="detached",timeout=10000)
+            def ready():
                 page.wait_for_function("""s=>{
                   const b=document.querySelector(s);
                   return !!b&&!b.disabled&&b.textContent==='✨';
-                }""",arg=button,timeout=10000)
+                }""",arg=button,timeout=15000)
+                assert page.locator('#stage391ReasonAIReview').count()==0
+                assert page.locator('#stage391CleanupOverlay').count()==0
 
-            # The model may propose one general reason instead of 3 separate
-            # reasons. The document must NEVER collapse them automatically.
+            def start(reply):
+                page.evaluate("""r=>{
+                  window.reasonStarFixture.response=r;
+                  window.reasonStarFixture.calls=[];
+                }""",reply)
+                page.locator(button).click()
+                ready()
+                return page.evaluate("() => window.reasonStarFixture.calls")
+
+            # Three numbered WHYs -> one shared WHY without Apply or preview.
             one="Позволяет обнаружить видимые повреждения электроинструмента до начала работы."
-            start(one)
-            assert page.evaluate("() => state.steps[0].reason")==initial
-            content=page.locator(overlay).inner_text()
-            assert "Было" in content and "Стало" in content
-            assert "3 → одна общая" in content,content
-            assert one in content
-            call=page.evaluate("() => window.reasonStarFixture.calls.at(-1)")
+            calls=start(one)
+            assert page.evaluate("() => state.steps[0].reason")==one
+            assert page.locator(f'[data-step-field="reason"][data-id="{id}"]').input_value()==one
+            assert len(calls)==1,calls
+            call=calls[0]
             assert call["options"]["task"]=="edit_reason"
             assert call["options"]["maxTokens"]==550
             assert "formatPreference" in call["context"]
             assert "ОДНУ краткую общую" in call["prompt"]
-            # Test the exact independent modal after the user's prior complaint
-            # that Apply was invisible at short browser heights.
-            for width,height in [(950,446),(620,320)]:
-                page.set_viewport_size({"width":width,"height":height})
-                visible=page.evaluate("""() => {
-                  const host=document.getElementById('stage391ReasonAIReview');
-                  const dialog=host.querySelector('[role="dialog"]');
-                  const footer=dialog.lastElementChild;
-                  const b=footer.querySelector('[data-ai-preview-action="apply"]');
-                  const r=b.getBoundingClientRect(),d=dialog.getBoundingClientRect();
-                  return {inViewport:r.width>60&&r.height>30&&r.left>=0&&
-                    r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1,
-                    dialogInViewport:d.top>=0&&d.bottom<=innerHeight+1,
-                    text:b.textContent.trim()};
-                }""")
-                assert visible["inViewport"] and visible["dialogInViewport"],visible
-            page.set_viewport_size({"width":1480,"height":980})
-            close("cancel")
-            assert page.evaluate("() => state.steps[0].reason")==initial
-            start(one)
-            close("apply")
-            assert page.evaluate("() => state.steps[0].reason")==one
 
-            # Existing manual/numerated Reasons can be restored only after
-            # another explicit review. Key Point echoes are cleaned in the
-            # proposed text, NOT in the SOP.
+            # One WHY -> three numbered WHYs. Repeated Key Point text must be
+            # stripped only from the model answer, never other step fields.
             multiple=(
                 "1. Проверить штепсельную вилку и питающий кабель на повреждения — "
                 "Выявить повреждение до использования.\n"
@@ -134,23 +91,17 @@ def main():
               return stage391ReasonAIInspect(step.reason,proposal,step);
             }""",multiple)
             assert diagnosis["ok"],diagnosis
-            start(multiple)
-            while_before=page.evaluate("() => state.steps[0].reason")
-            assert while_before==one
-            text=page.locator(overlay).inner_text()
-            assert "одна общая → 3" in text,text
-            assert "Удалено точных повторов КМ" in text
-            assert "Проверить штепсельную вилку" in text or "Выявить повреждение" in text
-            close("apply")
+            calls=start(multiple)
             expected=("1. Выявить повреждение до использования.\n"
                       "2. Проверить состояние ввода кабеля.\n"
                       "3. Выявить трещины до начала работы.")
             assert page.evaluate("() => state.steps[0].reason")==expected
             assert page.evaluate("() => JSON.stringify(state.steps[0].keyMoments)")==page.evaluate(
                 "() => window.reasonStarFixture.keyPoints")
+            assert len(calls)==1,calls
 
-            # Fail closed: duplicated/omitted numbers, invented engineering
-            # figures, unsupported normative references, invented hazards.
+            # Invalid numbering, figures, references, risks and service values
+            # never overwrite the working Reason (including after retry).
             invalids=[
                 "1. Проверить вилку\n3. Проверить корпус",
                 "1. 999 Н\n2. Сохранить инструмент\n3. Избежать повреждений",
@@ -161,28 +112,43 @@ def main():
             ]
             for bad in invalids:
                 before=page.evaluate("() => state.steps[0].reason")
-                start(bad,expect_preview=False)
+                calls=start(bad)
                 assert page.evaluate("() => state.steps[0].reason")==before,bad
+                assert 1<=len(calls)<=2,(bad,calls)
 
-            # User edits after preview opened must invalidate the AI result.
-            start(one)
-            page.evaluate("() => {state.steps[0].reason='Исправлено инженером вручную.'}")
-            close("apply")
-            assert page.evaluate("() => state.steps[0].reason")=="Исправлено инженером вручную."
+            # The in-flight answer must not overwrite a manual correction.
+            page.evaluate("""() => {
+              aiAsk=async()=>new Promise(resolve=>{
+                window.reasonStarFixture.pendingResolve=resolve;
+              });
+            }""")
+            page.locator(button).click()
+            page.wait_for_function(
+                "() => typeof window.reasonStarFixture.pendingResolve==='function'")
+            page.evaluate("""() => {
+              state.steps[0].reason='Исправлено инженером вручную.';
+              renderSteps();
+              window.reasonStarFixture.pendingResolve(
+                'Позволяет выявить видимые повреждения инструмента до работы.');
+            }""")
+            ready()
+            assert page.evaluate(
+                "() => state.steps[0].reason")=="Исправлено инженером вручную."
 
-            # Published and archived documents are still read-only.
+            # Published and archived documents stay read-only.
             page.evaluate("() => {state.documentManager.status='Опубликован';applyDocumentLock()}")
             page.evaluate("""async () => {
-                const b=document.querySelector('[data-ai="reason"]');
-                await aiFillField(b,'reason',state.steps[0].reason,
-                    value=>{state.steps[0].reason=value});
+              const b=document.querySelector('[data-ai="reason"]');
+              await aiFillField(b,'reason',state.steps[0].reason,
+                  value=>{state.steps[0].reason=value});
             }""")
-            assert page.locator(overlay).count()==0
-            assert page.evaluate("() => state.steps[0].reason")=="Исправлено инженером вручную."
+            assert page.evaluate(
+                "() => state.steps[0].reason")=="Исправлено инженером вручную."
+            assert page.locator('button[data-stage391-cleanup]').count()==0
             assert not errors,errors
-            print("PASS Stage39.1 ✨ Reason: one shared WHY default, explicit 3-to-1 preview, "+
-                  "manual approval, exact KM cleanup, malformed list/figures/norms/hazards "+
-                  "blocked, stale edit protected, readonly and compact footer",flush=True)
+            print("PASS Stage39.1 Reason: direct validated 3-to-1 and 1-to-3, "
+                  "no KM button or confirmation modal, exact-only AI cleanup, "
+                  "invalid guesses blocked, stale and readonly safe",flush=True)
         finally:
             browser.close()
 
