@@ -18,6 +18,16 @@ function stage391ReasonAIInspect(previous,proposed,step){
     return {ok:false,message:'Несколько причин необходимо нумеровать 1., 2. и т. д. в одном поле.'};
   const shape=stage391ReasonShape(value);
   if(!shape.ok)return {ok:false,message:shape.message};
+  // New normative claims are not substantiated by the system reference list.
+  // Only references actually present in the user's document/context count.
+  const facts=stage391FactCorpus(step).toLocaleLowerCase('ru');
+  const namedNorms=value.match(/ГОСТ(?:\s+[\w.\/-]+)?|ISO\s*\d*|ПТЭЭП|СанПиН(?:\s*[\d.]+)?|СНиП|СТО\s*[\w.\/-]*|Приказ\s*[№N]?\s*\d+/giu)||[];
+  for(const norm of namedNorms){
+    const tag=norm.trim().toLocaleLowerCase('ru');
+    if(!facts.includes(tag))
+      return {ok:false,message:'ИИ добавил неподтверждённый норматив «'+norm+
+        '». Уточните источник; исходная причина сохранена.'};
+  }
   const old=stage391ReasonLabels(previous);
   const changedCount=old.labels.length!==incoming.labels.length;
   // Only for a pending, explicitly reviewable change of reason count:
