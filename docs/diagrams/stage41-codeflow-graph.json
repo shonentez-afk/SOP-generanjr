@@ -1,0 +1,4100 @@
+{
+  "schema_version": 1,
+  "source": "CodeFlow official headless JS fallback analyzer",
+  "source_revision": "b70af01cfd1a1cec4b02075b124fdd1ec8cc33be",
+  "target_revision": "fc1c06a034a52e8218b49bd87483adbd900c3ae4",
+  "stage": "Stage41",
+  "manifest": "src/app/stage41-parts.json",
+  "run": "https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45153304550",
+  "limitations": [
+    "Static analysis of 73 JS files, not runtime proof",
+    "Fallback parser without Web Tree-sitter",
+    "Function reassignment wrappers may not be fully represented",
+    "References count CodeFlow connection records, not actual invocation frequency",
+    "All links to source are anchored to pinned Stage41 main commit"
+  ],
+  "summary": {
+    "active_modules": 73,
+    "functions": 551,
+    "codeflow_connections": 687,
+    "unique_file_edges": 367,
+    "legacy_stage39_extra77_retained": 58,
+    "legacy_stage39_extra77_replaced": 19
+  },
+  "legacy_old77_status": {
+    "total": 77,
+    "both_still_in_stage41": 58,
+    "still_detected_stage41": 58,
+    "not_detected_stage41": [],
+    "removed_or_replaced_modules": [
+      {
+        "caller": "src/modules/ai/stage22-field-editor.js",
+        "definition": "src/modules/ai/stage22-context-guard.js"
+      },
+      {
+        "caller": "src/modules/ai/stage22-field-editor.js",
+        "definition": "src/modules/ai/stage26-transport.js"
+      },
+      {
+        "caller": "src/modules/ai/stage22-field-editor.js",
+        "definition": "src/modules/documents/stage33-draft.js"
+      },
+      {
+        "caller": "src/modules/ai/stage22-field-editor.js",
+        "definition": "src/modules/editor/stage38-steps.js"
+      },
+      {
+        "caller": "src/modules/ai/stage22-field-editor.js",
+        "definition": "src/modules/shared/stage19-ui-helpers.js"
+      },
+      {
+        "caller": "src/modules/ai/stage27-intelligence.js",
+        "definition": "src/modules/app/stage28-ui.js"
+      },
+      {
+        "caller": "src/modules/ai/stage27-intelligence.js",
+        "definition": "src/modules/quality/stage38-reasons.js"
+      },
+      {
+        "caller": "src/modules/ai/stage28-review-task.js",
+        "definition": "src/modules/app/stage28-ui.js"
+      },
+      {
+        "caller": "src/modules/app/stage19-bootstrap.js",
+        "definition": "src/modules/ai/stage28-review-task.js"
+      },
+      {
+        "caller": "src/modules/app/stage28-ui.js",
+        "definition": "src/modules/ai/stage27-intelligence.js"
+      },
+      {
+        "caller": "src/modules/app/stage28-ui.js",
+        "definition": "src/modules/ai/stage28-review-task.js"
+      },
+      {
+        "caller": "src/modules/editor/stage38-steps.js",
+        "definition": "src/modules/ai/stage22-field-editor.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-analytics.js",
+        "definition": "src/modules/frv/stage35-study-ai.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-analytics.js",
+        "definition": "src/modules/frv/stage35-study-model.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-study-ai.js",
+        "definition": "src/modules/quality/stage38-reasons.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-study-model.js",
+        "definition": "src/modules/frv/stage35-analytics.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-study.js",
+        "definition": "src/modules/app/stage28-ui.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-study.js",
+        "definition": "src/modules/frv/stage35-analytics.js"
+      },
+      {
+        "caller": "src/modules/frv/stage35-study.js",
+        "definition": "src/modules/frv/stage35-study-ai.js"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "path": "src/modules/core/stage19-config.js",
+      "order": 1,
+      "group": "core"
+    },
+    {
+      "path": "src/modules/shared/stage19-ui-helpers.js",
+      "order": 2,
+      "group": "shared"
+    },
+    {
+      "path": "src/modules/safety/stage19-icons-logo.js",
+      "order": 3,
+      "group": "safety"
+    },
+    {
+      "path": "src/modules/ai/stage39-1-base-prompts.js",
+      "order": 4,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage26-errors.js",
+      "order": 5,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage26-transport.js",
+      "order": 6,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/review/stage39-1-safe-fixes.js",
+      "order": 7,
+      "group": "review"
+    },
+    {
+      "path": "src/modules/ai/stage23-protocol.js",
+      "order": 8,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage24-task-response.js",
+      "order": 9,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage22-context-guard.js",
+      "order": 10,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/editor/stage38-steps.js",
+      "order": 11,
+      "group": "editor"
+    },
+    {
+      "path": "src/modules/editor/stage39-step-actions.js",
+      "order": 12,
+      "group": "editor"
+    },
+    {
+      "path": "src/modules/ai/stage39-1-field-editor.js",
+      "order": 13,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/photos/stage19-idb.js",
+      "order": 14,
+      "group": "photos"
+    },
+    {
+      "path": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "order": 15,
+      "group": "shared"
+    },
+    {
+      "path": "src/modules/photos/stage19-repository.js",
+      "order": 16,
+      "group": "photos"
+    },
+    {
+      "path": "src/modules/photos/stage30-history.js",
+      "order": 17,
+      "group": "photos"
+    },
+    {
+      "path": "src/modules/photos/stage31-illustration-editor.js",
+      "order": 18,
+      "group": "photos"
+    },
+    {
+      "path": "src/modules/frv/stage34-measurements.js",
+      "order": 19,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage34-sop-frv-guard.js",
+      "order": 20,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/preview/stage19-preview.js",
+      "order": 21,
+      "group": "preview"
+    },
+    {
+      "path": "src/modules/review/stage39-1-checklist.js",
+      "order": 22,
+      "group": "review"
+    },
+    {
+      "path": "src/modules/review/stage26-deterministic.js",
+      "order": 23,
+      "group": "review"
+    },
+    {
+      "path": "src/modules/review/stage38-review-core.js",
+      "order": 24,
+      "group": "review"
+    },
+    {
+      "path": "src/modules/review/stage28-render.js",
+      "order": 25,
+      "group": "review"
+    },
+    {
+      "path": "src/modules/ai/stage23-dispute.js",
+      "order": 26,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage39-1-review-task.js",
+      "order": 27,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/frv/stage39-1-study-model.js",
+      "order": 28,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage34-study-io.js",
+      "order": 29,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage26-proposals.js",
+      "order": 30,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage39-1-study-ai.js",
+      "order": 31,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage39-1-study.js",
+      "order": 32,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage36-library.js",
+      "order": 33,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage35-analytics.js",
+      "order": 34,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/frv/stage34-xlsx.js",
+      "order": 35,
+      "group": "frv"
+    },
+    {
+      "path": "src/modules/ai/stage25-preview.js",
+      "order": 36,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage38-quality-core.js",
+      "order": 37,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage38-prompts.js",
+      "order": 38,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/quality/stage38-reasons.js",
+      "order": 39,
+      "group": "quality"
+    },
+    {
+      "path": "src/modules/quality/stage39-1-ai-guards.js",
+      "order": 40,
+      "group": "quality"
+    },
+    {
+      "path": "src/modules/ai/stage29-generate-sop.js",
+      "order": 41,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/core/stage19-step-shape.js",
+      "order": 42,
+      "group": "core"
+    },
+    {
+      "path": "src/modules/twi/stage24-merge.js",
+      "order": 43,
+      "group": "twi"
+    },
+    {
+      "path": "src/modules/twi/stage24-preview.js",
+      "order": 44,
+      "group": "twi"
+    },
+    {
+      "path": "src/modules/twi/stage29-from-sop.js",
+      "order": 45,
+      "group": "twi"
+    },
+    {
+      "path": "src/modules/twi/stage38-print-xlsx.js",
+      "order": 46,
+      "group": "twi"
+    },
+    {
+      "path": "src/modules/documents/stage28-review-state.js",
+      "order": 47,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage33-draft.js",
+      "order": 48,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage27-db.js",
+      "order": 49,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage19-network-io.js",
+      "order": 50,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage19-library-audit.js",
+      "order": 51,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage19-portable-photos.js",
+      "order": 52,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage36-backup.js",
+      "order": 53,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage19-network-sync.js",
+      "order": 54,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage27-library.js",
+      "order": 55,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/documents/stage37-data-loss-safety.js",
+      "order": 56,
+      "group": "documents"
+    },
+    {
+      "path": "src/modules/demo/stage19-demo.js",
+      "order": 57,
+      "group": "demo"
+    },
+    {
+      "path": "src/modules/excel/stage19-export-setup.js",
+      "order": 58,
+      "group": "excel"
+    },
+    {
+      "path": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "order": 59,
+      "group": "shared"
+    },
+    {
+      "path": "src/modules/photos/stage20-photo-read.js",
+      "order": 60,
+      "group": "photos"
+    },
+    {
+      "path": "src/modules/core/stage20-export-snapshot.js",
+      "order": 61,
+      "group": "core"
+    },
+    {
+      "path": "src/modules/excel/stage38-export.js",
+      "order": 62,
+      "group": "excel"
+    },
+    {
+      "path": "src/modules/excel/stage19-import.js",
+      "order": 63,
+      "group": "excel"
+    },
+    {
+      "path": "src/modules/app/stage19-bootstrap.js",
+      "order": 64,
+      "group": "app"
+    },
+    {
+      "path": "src/modules/ai/stage27-core.js",
+      "order": 65,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage39-1-intelligence.js",
+      "order": 66,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/ai/stage27-analogs-history.js",
+      "order": 67,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/app/stage39-1-identity.js",
+      "order": 68,
+      "group": "app"
+    },
+    {
+      "path": "src/modules/editor/stage39-1-reason-cleanup.js",
+      "order": 69,
+      "group": "editor"
+    },
+    {
+      "path": "src/modules/ai/stage39-1-reason-proposal.js",
+      "order": 70,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/review/stage40-inline-review.js",
+      "order": 71,
+      "group": "review"
+    },
+    {
+      "path": "src/modules/ai/stage41-quality.js",
+      "order": 72,
+      "group": "ai"
+    },
+    {
+      "path": "src/modules/app/stage28-ui.js",
+      "order": 73,
+      "group": "app"
+    }
+  ],
+  "edges": [
+    {
+      "caller": "src/modules/ai/stage22-context-guard.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "functions": [
+        "captureSopReviewState"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage22-context-guard.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardCanApply",
+        "aiGuardMatches"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "functions": [
+        "extractJson",
+        "validateDisputeResponse"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "setAIStatus",
+        "diagnoseAIError"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraftDebounced"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "functions": [
+        "renderReviewResults"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewNormalizeFixValue"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-dispute.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "formatDuration"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-protocol.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "setAIStatus"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-protocol.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewNormalizeFixValue"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage23-protocol.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "normalizeTimeString"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage24-task-response.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "functions": [
+        "extractJson"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage24-task-response.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewNormalizeFixValue"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage25-preview.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage26-transport.js",
+      "definition": "src/modules/ai/stage26-errors.js",
+      "functions": [
+        "aiUserFacingError"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage26-transport.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "functions": [
+        "validateGeneratedSop"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiReadTaskObject"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "aiSopHasMeaningfulSteps",
+        "aiSopPlanPreview"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27Text",
+        "stage27RankAnalogs",
+        "stage27IsLocked",
+        "stage27DocumentData",
+        "stage27DiffSnapshots"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/ai/stage39-1-intelligence.js",
+      "functions": [
+        "stage27RequestGuard",
+        "stage27GuardCanApply"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "functions": [
+        "stage27Render",
+        "stage27SetBusy",
+        "stage27Attr"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docDbGetAll",
+        "docDbGet"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-analogs-history.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "parseDuration",
+        "escapeHtml"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-core.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiReadTaskObject",
+        "aiTaskSchemaError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage27-core.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardCanApply"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "functions": [
+        "validateGeneratedSop"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiReadTaskObject"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "aiSopHasMeaningfulSteps",
+        "aiSopPlanPreview"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage38-quality-core.js",
+      "functions": [
+        "stage29SopNormalize"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/ai/stage39-1-field-editor.js",
+      "functions": [
+        "cleanAIFieldResult"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage29-generate-sop.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "parseDuration",
+        "setVal",
+        "htmlFieldToState"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage38-quality-core.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38ReasonText",
+        "stage38StripOrdinalLabels"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-field-editor.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardCanApply"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-field-editor.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-field-editor.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-field-editor.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-field-editor.js",
+      "definition": "src/modules/quality/stage39-1-ai-guards.js",
+      "functions": [
+        "stage391ValidateKeyPointProposal",
+        "stage391ValidateTextProposal"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-field-editor.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardMatches"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiReadTaskObject",
+        "aiTaskSchemaError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27Normalize",
+        "stage27ExportState",
+        "stage27DocumentData",
+        "stage27ParseQuestions",
+        "stage27Text",
+        "stage27IsLocked",
+        "stage27ParseProposals",
+        "stage27DocumentSignature",
+        "stage27ValidStepId",
+        "stage27StepData"
+      ],
+      "references": 10,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "functions": [
+        "stage27SetBusy",
+        "stage27Render"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraftDebounced",
+        "stateChanged"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/quality/stage39-1-ai-guards.js",
+      "functions": [
+        "stage391FactCorpus",
+        "stage391ValidateReasonProposal",
+        "stage391ValidateTextProposal"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-intelligence.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardCanApply"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/ai/stage39-1-field-editor.js",
+      "functions": [
+        "aiFillField",
+        "cleanAIFieldResult"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/editor/stage39-1-reason-cleanup.js",
+      "functions": [
+        "stage391CleanupReason"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38StripOrdinalLabels",
+        "stage38ReasonText"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/quality/stage39-1-ai-guards.js",
+      "functions": [
+        "stage391ReasonLabels",
+        "stage391ReasonShape",
+        "stage391TwiSourceFacts",
+        "stage391ValidateReasonProposal",
+        "stage391TwiReasonQualityIssues"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-reason-proposal.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardMatches",
+        "aiGuardCanApply"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "functions": [
+        "validateReviewResponse"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiReadTaskObject"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27Normalize",
+        "stage27DocumentSignature"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/ai/stage39-1-intelligence.js",
+      "functions": [
+        "stage27Store"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "functions": [
+        "stage27Render",
+        "stage27SetBusy"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraftDebounced"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "runDeterministicChecks",
+        "isDeferredIssue",
+        "cssFor"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "functions": [
+        "renderReviewResults"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "functions": [
+        "stage28CompareSteps",
+        "stage28DocumentSignature",
+        "stage28GroundChecks",
+        "stage28TwiStructureChecks",
+        "stage28GroundAIReview",
+        "stage28Dedup",
+        "stage28NormalizeMeta",
+        "stage28IssueKey",
+        "stage28PreserveIssue",
+        "stage28MergeIssueLists",
+        "stage28EmptyMeta"
+      ],
+      "references": 11,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/review/stage39-1-checklist.js",
+      "functions": [
+        "autoScoreChecklist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage39-1-review-task.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "formatDuration",
+        "toast"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage41-quality.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage41-quality.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage41-quality.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage41-quality.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "functions": [
+        "stage28GroundAIReview"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/ai/stage41-quality.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewNormalizeFixValue"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage23-protocol.js",
+      "functions": [
+        "pingAI"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "setAIStatus",
+        "testAIConnection"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage29-generate-sop.js",
+      "functions": [
+        "generateSOP"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/ai/stage39-1-review-task.js",
+      "functions": [
+        "reviewEntireSOP"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/demo/stage19-demo.js",
+      "functions": [
+        "loadDemoData"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "functions": [
+        "docVerifyNetworkIntegrity",
+        "renderBackupList",
+        "renderDocumentHistory",
+        "docRunSelfTest"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docChooseFolder"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "functions": [
+        "docSyncFolder",
+        "docTestFolder"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "functions": [
+        "docImportPortableBackup"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "functions": [
+        "docNewVersion",
+        "docSaveCurrent",
+        "docPublishCurrent",
+        "docArchiveCurrent",
+        "docNew",
+        "docDownloadJson",
+        "renderDocumentManager",
+        "initDocumentManager"
+      ],
+      "references": 8,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraftDebounced",
+        "stateChanged",
+        "saveDraft",
+        "initDraft"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/excel/stage19-import.js",
+      "functions": [
+        "importSopFromXlsx"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/excel/stage38-export.js",
+      "functions": [
+        "generateExcel"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "renderFrv"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "renderFrvStudy",
+        "ensureFrvStudy"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/preview/stage19-preview.js",
+      "functions": [
+        "renderPreview"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "renderChecklist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "functions": [
+        "renderIconPicker"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "htmlFieldToState",
+        "createEmptyStep",
+        "toast",
+        "applyDocumentLock",
+        "setVal",
+        "escapeHtml"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage19-bootstrap.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "functions": [
+        "htmlToTwi",
+        "renderTwiSummary",
+        "generateTwiPlan",
+        "clearTwi",
+        "renderTwi"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage27-analogs-history.js",
+      "functions": [
+        "stage27RenderHistoryOptions",
+        "stage27FindAnalogs",
+        "stage27SelectAnalog",
+        "stage27GenerateAnalog",
+        "stage27RefreshHistory",
+        "stage27CompareSelectedVersion"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27Normalize",
+        "stage27DocumentSignature"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage39-1-intelligence.js",
+      "functions": [
+        "stage27ConfirmAnswer",
+        "stage27ExplainMentor",
+        "stage27AskQuestions",
+        "stage27SuggestFromFacts",
+        "stage27ApplySelected",
+        "stage27SaveAnswer"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/ai/stage39-1-review-task.js",
+      "functions": [
+        "stage28ReviewLogic"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/app/stage28-ui.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml",
+        "toast"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/app/stage39-1-identity.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/core/stage19-step-shape.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "createEmptyStep",
+        "parseDuration"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/core/stage20-export-snapshot.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "parseDuration"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/demo/stage19-demo.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/demo/stage19-demo.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "setVal",
+        "toast"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docGetFolderHandle",
+        "docHasFolderAccess",
+        "docReadJournal",
+        "docListBackups",
+        "docRestoreBackup",
+        "docEnsureFolderPermission",
+        "docSha256",
+        "docSafeFileBase",
+        "docBackupNetworkFile",
+        "docWriteNetworkFile",
+        "docAppendJournal"
+      ],
+      "references": 11,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "functions": [
+        "docUpdateNetworkIndex",
+        "renderDocumentFolderStatus"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "functions": [
+        "docBuildPortableJson"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docDbOpen",
+        "docFormatNumber",
+        "docDbGetAll",
+        "docMetaPut"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "functions": [
+        "frvStudySchema",
+        "frvStudyExport"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbPutPhoto",
+        "idbGetPhoto",
+        "idbDeletePhoto"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoDocumentRecordKey",
+        "photoCopyRecordToKey"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-library-audit.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "close"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "functions": [
+        "renderBackupList"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "functions": [
+        "renderDocumentFolderStatus",
+        "renderNetworkSyncInfo",
+        "docCollectNetworkDocuments",
+        "docSyncFolder"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docMetaGet",
+        "docMetaPut",
+        "docFormatNumber",
+        "docDbGetAll"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-io.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "close"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "functions": [
+        "docWriteJsonToNetwork",
+        "docVerifyNetworkIntegrity"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docEnsureFolderPermission",
+        "docWriteNetworkFile",
+        "docGetFolderHandle"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "functions": [
+        "docRestorePortablePhotos"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docDbGetAll",
+        "docMetaPut",
+        "docDbPut",
+        "docMetaGet"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "functions": [
+        "renderDocumentManager"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbGetPhoto"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoDocumentRecordKey"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-network-sync.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "escapeHtml"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docSha256"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docFormatNumber",
+        "docMakeId",
+        "docDbGet",
+        "docDbPut"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "functions": [
+        "docLoadToState",
+        "renderDocumentManager"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbGetPhoto",
+        "photoExtFromBlob",
+        "idbPutPhoto",
+        "idbDeletePhoto"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoDocumentRecordKey",
+        "sanitizeIllustrationAnnotations",
+        "restoreStepPhotos"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "functions": [
+        "blobToDataUrl"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "functions": [
+        "dataUrlToBlob"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage19-portable-photos.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27ExportState"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "functions": [
+        "captureSopReviewState"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "sanitizeIllustrationAnnotations"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-db.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "htmlFieldToState"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27Normalize",
+        "stage27Empty"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "functions": [
+        "stage27ResetTransient",
+        "stage27Render"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/core/stage19-step-shape.js",
+      "functions": [
+        "normalizeStepShape"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-library-audit.js",
+      "functions": [
+        "docWriteJsonToNetwork"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docCheckUniquePublished",
+        "docAppendJournal",
+        "docRemoveNetworkFile"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-network-sync.js",
+      "functions": [
+        "renderDocumentFolderStatus",
+        "renderNetworkSyncInfo",
+        "docAutoSyncOnStart"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "functions": [
+        "docBuildPortableJson"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docMakeId",
+        "docSnapshot",
+        "docTitle",
+        "docDbPut",
+        "docNextSeq",
+        "docDbGetAll",
+        "docDbGet",
+        "docFormatNumber",
+        "docDbOpen"
+      ],
+      "references": 9,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "functions": [
+        "restoreSopReviewState",
+        "renderRestoredSopReviewState"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/excel/stage38-export.js",
+      "functions": [
+        "generateExcel"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoSaveDocumentCopies",
+        "photoCloneDocumentRecords",
+        "restoreStepPhotos"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage27-library.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "htmlFieldToState",
+        "setVal",
+        "stateToHtml",
+        "applyDocumentLock",
+        "escapeHtml"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "functions": [
+        "renderReviewResults"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "functions": [
+        "stage28NormalizeMeta"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage28-review-state.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewNormalizeFixValue"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27ExportState",
+        "stage27Normalize"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/app/stage19-bootstrap.js",
+      "functions": [
+        "renderResponsibles",
+        "renderAgreed"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "functions": [
+        "stage27ResetTransient",
+        "stage27Render"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/core/stage19-step-shape.js",
+      "functions": [
+        "normalizeStepShape"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/documents/stage28-review-state.js",
+      "functions": [
+        "captureSopReviewState",
+        "restoreSopReviewState",
+        "renderRestoredSopReviewState"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "renderFrv"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "sanitizeIllustrationAnnotations",
+        "restoreStepPhotos"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "renderChecklist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "functions": [
+        "renderIconPicker"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "recalcTotalTime",
+        "renderOpenQuestions",
+        "stateToHtml"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage33-draft.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "functions": [
+        "renderTwi"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "close"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docSha256"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage19-portable-photos.js",
+      "functions": [
+        "docBuildPortableJson",
+        "docRestorePortablePhotos"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docDbGetAll",
+        "docMakeId",
+        "docDbOpen"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "functions": [
+        "renderDocumentManager"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyFlush",
+        "frv34StoreAll",
+        "frv34ValidateStudy",
+        "frvStudyNewId",
+        "frv34StorePut",
+        "frv34StoreRemove",
+        "frvStudyRefreshLibrary"
+      ],
+      "references": 7,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbDeletePhoto"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoDocumentRecordKey"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage36-backup.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/documents/stage27-db.js",
+      "functions": [
+        "docSnapshot",
+        "docDbGet"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "functions": [
+        "docOpen",
+        "docNew",
+        "docNewVersion"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "findDraftRaw",
+        "saveDraft",
+        "initDraft"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/documents/stage37-data-loss-safety.js",
+      "definition": "src/modules/twi/stage24-merge.js",
+      "functions": [
+        "twiHasAnyContent"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/ai/stage29-generate-sop.js",
+      "functions": [
+        "generatePhotoHint"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/ai/stage39-1-field-editor.js",
+      "functions": [
+        "aiFillField"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "renderFrv"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/frv/stage34-sop-frv-guard.js",
+      "functions": [
+        "sopFrvRefreshProjectedPart"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbDeletePhoto"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "handlePhoto"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/photos/stage31-illustration-editor.js",
+      "functions": [
+        "openIllustrationEditor"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/editor/stage38-steps.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "recalcTotalTime",
+        "escapeHtml",
+        "formatDuration",
+        "parseDuration",
+        "toast"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbDeletePhoto",
+        "idbGetPhoto"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoDocumentRecordKey",
+        "photoCopyRecordToKey",
+        "updateStepPhotoFromRecord"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/editor/stage39-step-actions.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "createEmptyStep",
+        "applyDocumentLock"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-export-setup.js",
+      "definition": "src/modules/core/stage19-step-shape.js",
+      "functions": [
+        "normalizeStepShape"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-export-setup.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "functions": [
+        "isoIconUrl"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/excel/stage19-export-setup.js",
+      "functions": [
+        "ensureExcelJS"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbPutPhoto",
+        "idbGetPhoto",
+        "idbDeletePhoto"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/excel/stage19-import.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "parseDuration",
+        "normText",
+        "setVal",
+        "stateToHtml",
+        "htmlFieldToState",
+        "toast"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/core/stage20-export-snapshot.js",
+      "functions": [
+        "createSopExportSnapshot"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/documents/stage19-network-io.js",
+      "functions": [
+        "docWriteNetworkFile",
+        "docSafeFileBase"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/excel/stage19-export-setup.js",
+      "functions": [
+        "ensureExcelJS",
+        "buildIconStripPng"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "computeFrv"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/frv/stage34-sop-frv-guard.js",
+      "functions": [
+        "sopFrvCheckBeforeExcel"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/photos/stage20-photo-read.js",
+      "functions": [
+        "readSopStepPhotoBlobForExport"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38CorporateReasonHeight"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "functions": [
+        "makeLogo"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "functions": [
+        "blobToDataUrl"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/excel/stage38-export.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "htmlFieldToState",
+        "textLines",
+        "escapeHtml"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage26-proposals.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiTaskSchemaError"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage26-proposals.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "aiReviewChoiceModal"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage26-proposals.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-measurements.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-measurements.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "formatHMS",
+        "escapeHtml",
+        "formatDuration"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-sop-frv-guard.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "aiReviewChoiceModal"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-sop-frv-guard.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "frvClassifiedPart"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-sop-frv-guard.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft",
+        "saveDraftDebounced"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyQueuePersist",
+        "frvStudyInternalId"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy",
+        "frvStudyMeasuredDuration",
+        "frvStudyCycleComplete",
+        "frvStudyTotal",
+        "renderFrvStudyDashboardOnly",
+        "frvStudyEsc"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-study-io.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "functions": [
+        "frvStudySyncFields"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage35-analytics.js",
+      "functions": [
+        "frv34AnalyticsData"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyFlush"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy",
+        "frvStudyMeasuredDuration"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage34-xlsx.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraftDebounced",
+        "saveDraft"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyQueuePersist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/frv/stage39-1-study-ai.js",
+      "functions": [
+        "frv35AiEvidenceKey"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy",
+        "frvStudyMeasuredDuration",
+        "frvStudyCycleComplete",
+        "frvStudyTotal",
+        "frvStudyEsc",
+        "renderFrvStudyDashboardOnly",
+        "renderFrvStudy"
+      ],
+      "references": 7,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage35-analytics.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "close"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/documents/stage27-library.js",
+      "functions": [
+        "docNew",
+        "docOpen"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy",
+        "frvStudyEmptyData",
+        "frvStudyEmptyObservation",
+        "frvStudyEmptyCycle",
+        "renderFrvStudy",
+        "frvStudyEsc"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/frv/stage36-library.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardCanApply"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/frv/stage26-proposals.js",
+      "functions": [
+        "frvAiRowProposal",
+        "frvAiRowChanges",
+        "frvAiRowDialog",
+        "frvAiApplyRow",
+        "frvAiNormalizeAnalysis",
+        "frvAiAnalysisDialog",
+        "frvAiApplyAnalysisRows"
+      ],
+      "references": 7,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "functions": [
+        "frvStudySyncFields"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyQueuePersist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy",
+        "renderFrvStudy",
+        "frvStudyMeasuredDuration",
+        "renderFrvStudyDashboardOnly"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/quality/stage39-1-ai-guards.js",
+      "functions": [
+        "stage391ValidateTextProposal",
+        "stage391FrvFacts",
+        "stage391ValidateReasonProposal"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-ai.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-model.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft",
+        "saveDraftDebounced"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-model.js",
+      "definition": "src/modules/frv/stage35-analytics.js",
+      "functions": [
+        "frv34RenderAnalytics"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-model.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyQueuePersist",
+        "frv34SetSwitchBusy"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-model.js",
+      "definition": "src/modules/frv/stage39-1-study-ai.js",
+      "functions": [
+        "frvStudySuggestRow"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-model.js",
+      "definition": "src/modules/frv/stage39-1-study.js",
+      "functions": [
+        "frvStudyHasBackup"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study-model.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml",
+        "toast"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "aiReviewChoiceModal"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/ai/stage27-core.js",
+      "functions": [
+        "stage27Empty"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/app/stage28-ui.js",
+      "functions": [
+        "stage27ResetTransient",
+        "stage27Render"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft",
+        "collectDraft",
+        "stateChanged",
+        "applyDraft",
+        "saveDraftDebounced"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/frv/stage34-study-io.js",
+      "functions": [
+        "frvStudySyncFields",
+        "frvStudyValidate",
+        "frvStudyDownloadJson"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/frv/stage35-analytics.js",
+      "functions": [
+        "frv34CanonicalKey"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/frv/stage36-library.js",
+      "functions": [
+        "frvStudyQueuePersist",
+        "frvStudyInternalId",
+        "frvStudyFlush"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/frv/stage39-1-study-ai.js",
+      "functions": [
+        "frvStudyBuild",
+        "frvStudyAnalyze"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/frv/stage39-1-study-model.js",
+      "functions": [
+        "ensureFrvStudy",
+        "frvStudyMeasuredDuration",
+        "renderFrvStudy",
+        "frvStudyEmptyCycle",
+        "frvStudyEmptyObservation"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38ReasonText"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/quality/stage39-1-ai-guards.js",
+      "functions": [
+        "stage391ReasonShape"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/frv/stage39-1-study.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast",
+        "createEmptyStep",
+        "escapeHtml",
+        "htmlFieldToState",
+        "stateToHtml"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "tryLegacyPhoto",
+        "stateChanged"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbPutPhoto",
+        "photoExtFromBlob",
+        "idbGetPhoto",
+        "downscaleToJpeg"
+      ],
+      "references": 4,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "functions": [
+        "blobToDataUrl"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage19-repository.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "tryLegacyPhoto"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbGetPhoto"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "photoDocumentRecordKey"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage20-photo-read.js",
+      "definition": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "functions": [
+        "dataUrlToBlob"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "close"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/photos/stage19-idb.js",
+      "functions": [
+        "idbGetPhoto",
+        "idbPutPhoto",
+        "photoExtFromBlob"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/photos/stage19-repository.js",
+      "functions": [
+        "sanitizeIllustrationAnnotations"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/photos/stage30-history.js",
+      "functions": [
+        "stage30CreatePhotoHistory"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/shared/stage19-blob-to-dataurl.js",
+      "functions": [
+        "blobToDataUrl"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/shared/stage19-dataurl-to-blob.js",
+      "functions": [
+        "dataUrlToBlob"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/photos/stage31-illustration-editor.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/preview/stage19-preview.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "getFrvMeta",
+        "computeFrv",
+        "pctEffect"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/preview/stage19-preview.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "functions": [
+        "makeLogo",
+        "bindIsoIconFallbacks"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/preview/stage19-preview.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "htmlFieldToState",
+        "recalcTotalTime",
+        "escapeHtml",
+        "formatDuration",
+        "textLines",
+        "formatHMS"
+      ],
+      "references": 6,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/quality/stage38-reasons.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "textLines"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/quality/stage39-1-ai-guards.js",
+      "definition": "src/modules/ai/stage38-quality-core.js",
+      "functions": [
+        "stage29HasUnconfirmedNumber",
+        "stage29SopNormalize"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/quality/stage39-1-ai-guards.js",
+      "definition": "src/modules/ai/stage39-1-reason-proposal.js",
+      "functions": [
+        "stage391ReasonAIIsReferenceInsteadOfWhy"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/quality/stage39-1-ai-guards.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38ReasonText",
+        "stage38StripOrdinalLabels"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/quality/stage39-1-ai-guards.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "functions": [
+        "stage28TwiStructureChecks"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/quality/stage39-1-ai-guards.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged",
+        "saveDraftDebounced"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "functions": [
+        "renderReviewResults"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage26-deterministic.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "normText",
+        "escapeHtml",
+        "toast"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/ai/stage23-dispute.js",
+      "functions": [
+        "mentorCleanDisputeReply",
+        "sendDispute"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/ai/stage39-1-review-task.js",
+      "functions": [
+        "stage28CurrentDiff",
+        "stage28ReviewChanged"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged",
+        "saveDraftDebounced"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "isDeferredIssue",
+        "toggleDeferredReview",
+        "cssFor",
+        "deferIssue",
+        "restoreDeferredIssue"
+      ],
+      "references": 5,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "functions": [
+        "stage28PhotoGuidance"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewGetApplicableFix",
+        "reviewNormalizeFixValue"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage28-render.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml",
+        "toast",
+        "htmlFieldToState"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage38-review-core.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add",
+        "stage38ReasonIssues"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/review/stage39-1-checklist.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38ReasonText",
+        "stage38ReasonIssues"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage39-1-checklist.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "renderChecklist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage39-1-safe-fixes.js",
+      "definition": "src/modules/quality/stage39-1-ai-guards.js",
+      "functions": [
+        "stage391ValidateKeyPointProposal",
+        "stage391ValidateReasonProposal",
+        "stage391ValidateTextProposal"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage39-1-safe-fixes.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "isDeferredIssue"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage39-1-safe-fixes.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "parseDuration"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage40-inline-review.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage40-inline-review.js",
+      "definition": "src/modules/review/stage28-render.js",
+      "functions": [
+        "renderReviewResults",
+        "applyIssueFix"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage40-inline-review.js",
+      "definition": "src/modules/review/stage38-review-core.js",
+      "functions": [
+        "stage28DocumentSignature"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage40-inline-review.js",
+      "definition": "src/modules/review/stage39-1-safe-fixes.js",
+      "functions": [
+        "reviewGetApplicableFix"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/review/stage40-inline-review.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/safety/stage19-icons-logo.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "stateChanged"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/safety/stage19-icons-logo.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/app/stage19-bootstrap.js",
+      "functions": [
+        "renderResponsibles",
+        "renderAgreed"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/editor/stage38-steps.js",
+      "functions": [
+        "renderSteps"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/frv/stage34-measurements.js",
+      "functions": [
+        "renderFrv"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/review/stage26-deterministic.js",
+      "functions": [
+        "renderChecklist"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/safety/stage19-icons-logo.js",
+      "functions": [
+        "renderIconPicker"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/shared/stage19-ui-helpers.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "functions": [
+        "renderTwi"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage24-preview.js",
+      "definition": "src/modules/ai/stage25-preview.js",
+      "functions": [
+        "close"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/twi/stage24-preview.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "add"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/twi/stage24-preview.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "escapeHtml"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage22-context-guard.js",
+      "functions": [
+        "aiGuardCapture",
+        "aiGuardCanApply"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage24-task-response.js",
+      "functions": [
+        "aiReadTwiPlan"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage26-transport.js",
+      "functions": [
+        "aiAsk",
+        "diagnoseAIError"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/ai/stage38-quality-core.js",
+      "functions": [
+        "stage29TwiNormalize"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/documents/stage33-draft.js",
+      "functions": [
+        "saveDraft"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "setVal",
+        "escapeHtml",
+        "toast"
+      ],
+      "references": 3,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/twi/stage24-merge.js",
+      "functions": [
+        "twiSourceSignature",
+        "twiManualCount",
+        "twiSopInput",
+        "twiHasGeneratedContent",
+        "twiProposalDiff",
+        "twiCommitProposal",
+        "twiFieldId",
+        "twiHasAnyContent"
+      ],
+      "references": 8,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage29-from-sop.js",
+      "definition": "src/modules/twi/stage24-preview.js",
+      "functions": [
+        "twiShowPreview"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/excel/stage19-export-setup.js",
+      "functions": [
+        "ensureExcelJS"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/quality/stage38-reasons.js",
+      "functions": [
+        "stage38ReasonIssues"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/shared/stage19-ui-helpers.js",
+      "functions": [
+        "toast"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/twi/stage24-merge.js",
+      "functions": [
+        "twiSourceSignature",
+        "twiHasGeneratedContent"
+      ],
+      "references": 2,
+      "historicalCodeFlowOnly": false
+    },
+    {
+      "caller": "src/modules/twi/stage38-print-xlsx.js",
+      "definition": "src/modules/twi/stage29-from-sop.js",
+      "functions": [
+        "htmlToTwi"
+      ],
+      "references": 1,
+      "historicalCodeFlowOnly": true
+    }
+  ]
+}
