@@ -19,7 +19,7 @@ class Stage391Contracts(unittest.TestCase):
         old=json.loads(new.PREVIOUS.read_text(encoding="utf-8"))
         cur=json.loads(new.MANIFEST.read_text(encoding="utf-8"))
         self.assertEqual(len(old["modules"]),67)
-        self.assertEqual(len(cur["modules"]),69)
+        self.assertEqual(len(cur["modules"]),70)
         self.assertTrue(set(new.REPLACEMENTS).issubset(set(old["modules"])))
         for unchanged in ("src/modules/excel/stage38-export.js",
                           "src/modules/twi/stage38-print-xlsx.js",
@@ -28,7 +28,7 @@ class Stage391Contracts(unittest.TestCase):
             self.assertIn(unchanged,cur["modules"])
 
     def test_changed_js_syntax(self):
-        for p in [*new.REPLACEMENTS.values(),*new.EXTRA.values()]:
+        for p in [*new.REPLACEMENTS.values(),*new.EXTRA.values(),new.NEW_MODULE]:
             result=subprocess.run(["node","--check","-"],input=new.read(p),
                                   text=True,encoding='utf-8',capture_output=True)
             self.assertEqual(result.returncode,0,p+": "+result.stderr)
@@ -41,6 +41,15 @@ class Stage391Contracts(unittest.TestCase):
         frv_ui=new.read("src/modules/frv/stage39-1-study-model.js")
         review=new.read("src/modules/ai/stage39-1-review-task.js")
         facts=new.read("src/modules/ai/stage39-1-intelligence.js")
+        cleaner=new.read(new.NEW_MODULE)
+        self.assertIn("stage391CleanupReason(",cleaner)
+        self.assertIn("stage391ShowReasonCleanup(",cleaner)
+        self.assertIn("stage391CleanupApply",cleaner)
+        self.assertIn("current.reason=preview.after",cleaner)
+        self.assertIn("current.reason!==preview.before",cleaner)
+        self.assertIn("JSON.stringify([current.action,current.keyMoments])!==fingerprint",cleaner)
+        self.assertNotIn("aiAsk(",cleaner)
+        self.assertNotIn("stage29SopNormalize(",cleaner)
         self.assertIn("stage391AcceptedReasonFill",f)
         self.assertIn("if(type==='reason')return stage391AcceptedReasonFill(btn,type,source,applyFn);",f)
         self.assertNotIn("stage391StarReasonOnly",f)
