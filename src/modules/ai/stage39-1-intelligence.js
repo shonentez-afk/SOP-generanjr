@@ -172,7 +172,7 @@ function stage27ApplySelected(){
     .map(el=>el.getAttribute('data-stage27-suggestion'));
   if(!choices.length){toast('Отметьте предложения для применения.','info');return;}
   const selected=d.suggestions.filter(p=>choices.includes(p.id));
-  const checkedReasonById=new Map();
+  const checkedValuesById=new Map();
   for(const p of selected){
     const s=state.steps.find(x=>x.id===p.stepId);
     const fact=d.questions.find(x=>x.id===p.questionId);
@@ -180,14 +180,18 @@ function stage27ApplySelected(){
        !fact?.confirmed||!fact.answer){
       toast('Одно из предложений устарело; СОП не изменён.','warning');return;
     }
-    if(p.field==='reason'){
-      const checked=stage391ValidateReasonProposal(s.reason,p.newValue,s);
-      if(!checked.ok){toast(checked.message+' Предложение не применено.','warning');return;}
-      checkedReasonById.set(p.id,checked.value);
-    }
+    // A formally confirmed human answer is a valid source for NEW numbers.
+    // Without it, AI text may only reuse numeric facts from the current SOP.
+    const facts=stage391FactCorpus(s)+'\n'+fact.answer;
+    const checked=p.field==='reason'?
+      stage391ValidateReasonProposal(s.reason,p.newValue,s,facts):
+      stage391ValidateTextProposal(p.newValue,s,facts);
+    if(!checked.ok){toast(checked.message+' Предложение не применено.','warning');return;}
+    checkedValuesById.set(p.id,checked.value);
   }
+  // Validate ALL selected changes before mutating any field.
   for(const p of selected){
-    state.steps.find(x=>x.id===p.stepId)[p.field]=p.field==='reason'?checkedReasonById.get(p.id):p.newValue;
+    state.steps.find(x=>x.id===p.stepId)[p.field]=checkedValuesById.get(p.id);
   }
   // Closing a question is explicit: only confirmed facts used for an applied change.
   const used=new Set(selected.map(s=>s.questionId));
