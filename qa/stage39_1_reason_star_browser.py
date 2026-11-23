@@ -117,6 +117,11 @@ def main():
                 "3. Проверить корпус на трещины и сколы — "
                 "Выявить трещины до начала работы."
             )
+            diagnosis=page.evaluate("""proposal => {
+              const step=state.steps[0];
+              return stage391ReasonAIInspect(step.reason,proposal,step);
+            }""",multiple)
+            assert diagnosis["ok"],diagnosis
             start(multiple)
             while_before=page.evaluate("() => state.steps[0].reason")
             assert while_before==one
