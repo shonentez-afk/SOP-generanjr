@@ -7197,10 +7197,18 @@ stage29SopNormalize=function stage391NormalizeWithReasonReview(sop,input){
   // model's invented order number can incorrectly reject the whole valid SOP.
   const normOnly=[];
   (Array.isArray(sop?.steps)?sop.steps:[]).forEach((step,i)=>{
-    if(stage391ReasonAIIsReferenceInsteadOfWhy(step.reason)){
-      step.reason='';
-      normOnly.push(i+1);
-    }
+    const lines=String(step.reason??'').replace(/\r\n?/g,'\n')
+      .split('\n').filter(s=>s.trim());
+    const kept=lines.filter(s=>!stage391ReasonAIIsReferenceInsteadOfWhy(s));
+    if(kept.length===lines.length)return;
+    // Preserve every usable AI-draft WHY line. If numbering was present,
+    // normalize only the remaining ordinal labels inside the single Reason
+    // field; never create extra Excel columns or edit the live state.steps.
+    const numbered=kept.length&&kept.every(s=>/^\s*\d{1,2}[.)]\s+\S/u.test(s));
+    step.reason=numbered?kept.map((s,n)=>
+      s.replace(/^\s*\d{1,2}[.)]\s+/u,(n+1)+'. ')).join('\n'):
+      kept.join('\n');
+    normOnly.push(i+1);
   });
   const result=stage391PreviousSopNormalize(sop,input);
   const source=[input?.userDescription,input?.operation,input?.safety,
