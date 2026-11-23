@@ -114,10 +114,11 @@ def localize_unified(source: str) -> str:
     start = text.index(tag) + len(tag)
     end = text.index('</script>', start)
     payload = json.loads(text[start:end])
-    # The original embedded overview and AI strings included external refs;
-    # use local standalone pages in iframe instead, saving archive size.
-    payload.pop("overview", None)
-    payload.pop("ai", None)
+    # Preserve iframe srcdoc so overview drilldown works under file://: and
+    # avoid cross-origin isolation between sibling local HTML files.
+    # All source links inside the embedded pages are converted to local viewers.
+    payload["overview"] = localize_overview(payload["overview"])
+    payload["ai"] = localize_ai(payload["ai"])
     text = text[:start] + json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c") + text[end:]
 
     begin = 'const BASE="https://github.com/shonentez-afk/SOP-generanjr/blob/"+M.revision+"/";'
@@ -127,10 +128,9 @@ def localize_unified(source: str) -> str:
     after = 'const url=(p,line)=>BASE+encodeURI(p)+".html"+(line?"#L"+line:"");'
     ensure_count(text, before, "unified url()")
     text = text.replace(before, after)
-    before = 'fr.srcdoc=which==="overview"?M.overview:M.ai;'
-    after = 'fr.src=which==="overview"?"stage41-overview.html":"stage41-ai.html";'
-    ensure_count(text, before, "unified frame load")
-    text = text.replace(before, after)
+    ensure_count(text, 'fr.srcdoc=which==="overview"?M.overview:M.ai;', "unified frame load")
+    text = text.replace('href.includes("stage41-ai-interactive.html")','href.includes("stage41-ai.html")')
+    text = text.replace('href.includes("stage41-interactive.html")','href.includes("stage41-overview.html")')
 
     # Local navigation to the actual ready-to-run application.
     ensure_count(text, "</nav>", "unified nav")
@@ -309,6 +309,9 @@ def main() -> None:
         for p in (app / dirname).rglob("*"):
             if p.is_file():
                 file_copy_sanitized(p,bundle / "source" / p.relative_to(app), substitutions)
+    # One referenced architectural document from the application checkout.
+    file_copy_sanitized(app / "docs" / "START_NEW_CHAT_RU.md",
+        bundle / "source" / "docs" / "START_NEW_CHAT_RU.md", substitutions)
     # One current working copy of the executable, no historical releases.
     original = (app / APP_RELEASE).read_text("utf-8")
     constructor = scrub_external_brand(original)
