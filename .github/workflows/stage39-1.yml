@@ -107,9 +107,14 @@ jobs:
             echo "Branch advanced; skip stale publish"
             exit 0
           fi
-          test -s artifacts-from-linux/stage39-1-ai-reasons-frv-browser-candidate.html
+          if [ -s artifacts-from-linux/releases/stage39-1-ai-reasons-frv-browser-candidate.html ]; then
+            source_file=artifacts-from-linux/releases/stage39-1-ai-reasons-frv-browser-candidate.html
+          else
+            source_file=artifacts-from-linux/stage39-1-ai-reasons-frv-browser-candidate.html
+          fi
+          test -s "$source_file"
           mkdir -p releases
-          cp artifacts-from-linux/stage39-1-ai-reasons-frv-browser-candidate.html releases/
+          cp "$source_file" releases/stage39-1-ai-reasons-frv-browser-candidate.html
           git add releases/stage39-1-ai-reasons-frv-browser-candidate.html
           if ! git diff --cached --quiet; then
             git commit -m "Build: Stage39.1 verified Chrome Linux Windows AI FRV XLSX"
