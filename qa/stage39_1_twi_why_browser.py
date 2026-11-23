@@ -79,7 +79,7 @@ def run():
                 noFalseAlarmOnGood:noExtras,commonReasonAllowed:common.length===0&&noNumberIssue,
                 sourceConfirmedConsequence:confirmed.ok,
                 promptMentionsGrounding:STAGE29_SOP_PROMPT.includes('Не объявляй причиной')&&
-                  AI_SYS.reason.includes('НЕ переписывай')
+                  AI_SYS.reason.includes('Объясни ПОЧЕМУ соответствующий Key Point важен')
               };
             }""")
             assert len(result["flagged"])>=3,result
