@@ -10700,28 +10700,46 @@ function stage391ShowReasonCleanup(stepId){
   Object.assign(overlay.style,{
     position:'fixed',inset:'0',zIndex:'99999',
     display:'flex',alignItems:'center',justifyContent:'center',
-    padding:'16px',boxSizing:'border-box',overflow:'auto',
+    padding:'8px',boxSizing:'border-box',overflow:'auto',
     background:'rgba(15,23,42,0.65)'
   });
   const dialog=stage391CleanupElement('section',
     'bg-white rounded-xl shadow-2xl w-full max-w-4xl p-5');
   Object.assign(dialog.style,{
-    width:'100%',maxWidth:'900px',maxHeight:'calc(100vh - 32px)',
-    overflowY:'auto',overflowX:'hidden',boxSizing:'border-box',
-    backgroundColor:'#fff',borderRadius:'12px'
+    width:'100%',maxWidth:'900px',maxHeight:'calc(100vh - 16px)',
+    display:'flex',flexDirection:'column',overflow:'hidden',boxSizing:'border-box',
+    backgroundColor:'#fff',borderRadius:'12px',boxShadow:'0 16px 42px rgba(15,23,42,.28)'
   });
   dialog.setAttribute('role','dialog');
   dialog.setAttribute('aria-modal','true');
   dialog.setAttribute('aria-labelledby','stage391CleanupTitle');
+  // Keep the action footer visible even when the window is short/zoomed.
+  // Generated Tailwind classes cannot be relied upon for brand-new buttons.
+  const header=stage391CleanupElement('header','');
+  Object.assign(header.style,{
+    padding:'16px 20px 10px',flex:'0 0 auto',
+    borderBottom:'1px solid #e2e8f0'
+  });
+  const scroller=stage391CleanupElement('div','');
+  Object.assign(scroller.style,{
+    padding:'12px 20px 16px',flex:'1 1 auto',minHeight:'0',
+    overflowY:'auto',overflowX:'hidden'
+  });
   const title=stage391CleanupElement('h3','font-bold text-lg text-slate-800',
     'Предпросмотр: убрать повтор КМ');
   title.id='stage391CleanupTitle';
-  dialog.appendChild(title);
-  dialog.appendChild(stage391CleanupElement('p','text-sm text-slate-600 mt-2',
+  header.appendChild(title);
+  header.appendChild(stage391CleanupElement('p','text-sm text-slate-600 mt-2',
     'Найдено повторов: '+preview.changed+
     (preview.skipped?' · Строк без точного совпадения: '+preview.skipped:'')+
     '. Строки без точного совпадения останутся без изменений.'));
-  const compare=stage391CleanupElement('div','grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4');
+  dialog.appendChild(header);
+  const compare=stage391CleanupElement('div','');
+  Object.assign(compare.style,{
+    display:'grid',
+    gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,370px),1fr))',
+    gap:'12px',width:'100%',boxSizing:'border-box'
+  });
   const makePanel=(label,value)=>{
     const panel=stage391CleanupElement('div','min-w-0');
     panel.appendChild(stage391CleanupElement('p','font-semibold text-sm mb-1',label));
@@ -10737,20 +10755,40 @@ function stage391ShowReasonCleanup(stepId){
   };
   compare.appendChild(makePanel('Было',preview.before));
   compare.appendChild(makePanel('Стало',preview.after));
-  dialog.appendChild(compare);
-  dialog.appendChild(stage391CleanupElement('p','text-xs text-amber-700 mt-3',
+  scroller.appendChild(compare);
+  scroller.appendChild(stage391CleanupElement('p','text-xs text-amber-700 mt-3',
     'Изменяется только оформление текста причин. Техническая правильность объяснений не подтверждается автоматически.'));
-  const actions=stage391CleanupElement('div','flex flex-wrap justify-end gap-2 mt-5');
+  dialog.appendChild(scroller);
+  const actions=stage391CleanupElement('footer','');
+  Object.assign(actions.style,{
+    display:'flex',flexWrap:'wrap',justifyContent:'flex-end',alignItems:'center',
+    gap:'12px',padding:'12px 20px 16px',flex:'0 0 auto',minHeight:'60px',
+    backgroundColor:'#fff',borderTop:'1px solid #e2e8f0',boxSizing:'border-box'
+  });
   const cancel=stage391CleanupElement('button',
     'px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50',
     'Отмена');
   cancel.type='button';
   cancel.id='stage391CleanupCancel';
+  Object.assign(cancel.style,{
+    display:'inline-flex',alignItems:'center',justifyContent:'center',
+    minHeight:'40px',padding:'9px 18px',fontSize:'14px',fontWeight:'600',
+    color:'#334155',backgroundColor:'#fff',border:'1px solid #cbd5e1',
+    borderRadius:'8px',cursor:'pointer'
+  });
   const apply=stage391CleanupElement('button',
     'px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700',
     'Применить');
   apply.type='button';
   apply.id='stage391CleanupApply';
+  // The standalone CSS does not include every dynamic Tailwind utility.
+  // Explicit background and text color prevent white-on-white invisibility.
+  Object.assign(apply.style,{
+    display:'inline-flex',alignItems:'center',justifyContent:'center',
+    minHeight:'40px',padding:'9px 18px',fontSize:'14px',fontWeight:'600',
+    color:'#fff',backgroundColor:'#2563eb',border:'1px solid #1d4ed8',
+    borderRadius:'8px',cursor:'pointer',opacity:'1',visibility:'visible'
+  });
   actions.append(cancel,apply);
   dialog.appendChild(actions);
   overlay.appendChild(dialog);
