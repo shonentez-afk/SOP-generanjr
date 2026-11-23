@@ -21,7 +21,24 @@ function stage391ReasonLabels(value){
   }
   return {labels,invalid,lines};
 }
-function stage391ValidateReasonProposal(previous,candidate,step){
+function stage391ReasonShape(value){
+  const e=stage391ReasonLabels(value);
+  if(e.labels.length){
+    if(e.invalid.length)return {ok:false,message:'В списке причин каждая непустая строка должна иметь свой номер.'};
+    if(e.labels.some((n,i)=>n!==i+1))
+      return {ok:false,message:'В списке причин есть пропуск или повтор номера.'};
+  }else if(/^\s*\d+[.)]\s*/m.test(String(value||''))){
+    return {ok:false,message:'Некорректный номер или пустая нумерованная причина.'};
+  }
+  return {ok:true};
+}
+function stage391FrvFacts(row,study){
+  return [study?.processDescription,study?.operationId,study?.workplace,
+    row?.actionRaw,row?.actionNormalized,row?.keyMoment,row?.reason,
+    row?.qualityKey,row?.safetyKey,row?.tool,row?.material,row?.comment,
+    row?.durationSec].map(x=>String(x??'')).join('\n');
+}
+function stage391ValidateReasonProposal(previous,candidate,step,sourceOverride){
   if(typeof candidate!=='string'||!candidate.trim())
     return {ok:false,message:'ИИ вернул пустую причину — прежний текст сохранён.'};
   if(candidate.length>2000)
@@ -44,7 +61,7 @@ function stage391ValidateReasonProposal(previous,candidate,step){
     return {ok:false,message:'ИИ изменил число или номера уже записанных причин. Исправьте вручную после проверки.'};
   }
   const unconfirmed=stage29HasUnconfirmedNumber(
-    stage38StripOrdinalLabels(value),stage391FactCorpus(step),0);
+    stage38StripOrdinalLabels(value),sourceOverride??stage391FactCorpus(step),0);
   if(unconfirmed.length)
     return {ok:false,message:'ИИ предложил неподтверждённые числовые параметры: '+unconfirmed.join(', ')+'.'};
   return {ok:true,value};
