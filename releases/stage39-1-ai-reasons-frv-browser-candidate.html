@@ -2010,9 +2010,7 @@ ${TWI_CORE_GUIDE}
 ${NORM_BASE}
 ${AI_DATA_BOUNDARY}
 Исправь только данный Reason.
-Объясни ПОЧЕМУ соответствующий Key Point важен: какое конкретное подтверждённое последствие предотвращается или какой проверяемый технологический результат достигается.
-Сохраняй смысл и известные факты; НЕ переписывай формулировку ключевого момента с «для обеспечения качества/безопасности» в конце. Предпочитай короткую фразу о результате или конкретном последствии без повторения HOW.
-Не приписывай оборудованию перегрев, повреждение, точность, риск травмы или сбой без сведений об этом в исходных данных. Если реальной причины нет в фактах, оставь исходное объяснение и предложи его уточнить, но не сочиняй новую физику.
+Объясни ПОЧЕМУ соответствующий Key Point важен: какое последствие предотвращается, какое качество обеспечивается или какой технологический смысл поддерживается.
 Reason не обязан содержать нормативную ссылку.
 Если в исходном тексте есть нормативный источник — сохрани его без усиления и без выдумывания номера пункта.
 Если источник неизвестен — не изобретай его.
@@ -2836,59 +2834,15 @@ function cleanAIFieldResult(text,type){
   }
   return v.replace(/^['"«]|['"»]$/g,'').trim();
 }
-// Stage39.1: the ✨ beside "Причина" must write WHY, never repeat HOW.
-// Only strip a prefix when it EXACTLY matches a Key Point or Important Step.
-// Do not paraphrase or invent a consequence; all results still pass the
-// existing number, numbering and fact-based checks before being applied.
-function stage391StarReasonOnly(text,step){
-  const references=[...(Array.isArray(step?.keyMoments)?step.keyMoments:[]),
-    step?.action].filter(x=>typeof x==='string'&&x.trim());
-  let removed=0;
-  const lines=String(text??'').replace(/\r\n?/g,'\n').split('\n');
-  const output=[];
-  for(const line of lines){
-    const match=line.match(/^(\s*(?:\d{1,2}[.)]\s*)?)(.*)$/u);
-    if(!match){output.push(line);continue;}
-    const label=match[1],body=match[2].trim();
-    if(!body){output.push(line);continue;}
-    let next=body;
-    // Only remove a full, verbatim Key Point/Action at the line start.
-    // Models may separate the HOW from WHY with "—", ":" OR a full stop:
-    // "1. Проверить вилку. Это важно для предотвращения ..."
-    // No free-form sentence cutting: protect correct causes, abbreviations,
-    // part numbers, and punctuation within the actual explanation.
-    const separators=/\s+[—–-]\s+|\s*:\s+|[.!?;]\s+/gu;
-    for(const split of body.matchAll(separators)){
-      const prefix=body.slice(0,split.index).trim();
-      const cause=body.slice(split.index+split[0].length).trim();
-      const same=references.some(ref=>
-        stage391TwiPlain(prefix)===stage391TwiPlain(ref));
-      if(!same)continue;
-      if(!cause||stage391TwiPlain(cause).length<8){
-        return {ok:false,message:'ИИ повторил ключевой момент без объяснения «почему». Исходная причина сохранена.'};
-      }
-      // Remove empty lead-ins, but do not invent a new technical assertion.
-      // Keep the literal rationale supplied by AI for fact-based validation.
-      next=cause
-        .replace(/^Это\s+(?:важно|необходимо|нужно|требуется)\s+для\s+/iu,'Для ')
-        .replace(/^Это\s+важно\s*,?\s*(поскольку|потому\s+что|так\s+как)\s+/iu,(_,link)=>
-          link.charAt(0).toUpperCase()+link.slice(1)+' ')
-        .replace(/^Это\s+(?:нужно|важно)\s*,?\s*чтобы\s+/iu,'Чтобы ');
-      if(/^(?:это\s+(?:важно|необходимо|нужно|требуется)|для\s+безопасности)\s*[.!?]?$/iu.test(next.trim())){
-        return {ok:false,message:'ИИ не объяснил, почему важен ключевой момент. Исходная причина сохранена.'};
-      }
-      removed++;
-      break;
-    }
-    output.push(label+next);
-  }
-  return {ok:true,value:output.join('\n'),removed};
-}
+// The ✨ 'Причина' action is restored to accepted Stage39 behavior.
+// Other Stage39.1 AI edits (Key Points, Action) remain unchanged.
+async function stage391AcceptedReasonFill(btn,type,source,applyFn){if(!source||(typeof source==='string'&&!source.trim())){toast('Сначала заполните поле — ИИ дорабатывает черновик, а не придумывает его с нуля','info');return}const guard=aiGuardCapture();const old=btn.textContent;btn.disabled=true;btn.textContent='⏳';try{const step=state.steps.find(x=>x.id===Number(btn.dataset.id));const ctx=type==='reason'&&step?`Действие: ${step.action}\nKey Points: ${step.keyMoments.filter(Boolean).join('; ')}\nТекущий Reason: ${source}`:String(source);const rawResult=await aiAsk(AI_SYS[type],ctx,{model:currentModel,maxTokens:400,task:`edit_${type}`});const result=cleanAIFieldResult(rawResult,type);if(!result)throw new Error('ИИ вернул пустой текст');if(!aiGuardCanApply(guard))return;applyFn(result);renderSteps();stateChanged();toast('Поле обновлено ИИ')}catch(e){toast(diagnoseAIError(e),'error')}finally{btn.disabled=false;btn.textContent=old}}
 
 async function aiFillField(btn,type,source,applyFn){
   if(['Опубликован','Архив'].includes(state.documentManager?.status)){
     toast('Документ защищён. Создайте новую версию для ИИ-правки.','info');return;
   }
+  if(type==='reason')return stage391AcceptedReasonFill(btn,type,source,applyFn);
   if(!source||(typeof source==='string'&&!source.trim())){
     toast('Сначала заполните поле — ИИ дорабатывает черновик, а не придумывает его с нуля','info');
     return;
@@ -2901,7 +2855,7 @@ async function aiFillField(btn,type,source,applyFn){
   try{
     // Stage39.1: a selected Key Point needs the action, neighbouring points
     // and the current (possibly multi-line) Reasons Why for context.
-    const context=step&&['km','reason'].includes(type)?
+    const context=step&&type==='km'?
       'DATA BEGIN\n'+JSON.stringify({
         operation:state.meta?.operation||'',
         description:state.description||'',
@@ -2913,23 +2867,15 @@ async function aiFillField(btn,type,source,applyFn){
       })+'\nDATA END':String(source);
     const instruction=type==='km'?
       '\nКорпоративное правило: причины относятся к критическим Key Points и хранятся ОДНИМ полем. Не меняй другие Key Points и Reasons. Если новая формулировка изменила бы смысл существующих причин, верни исходный Key Point без изменения. Не выдумывай параметры.':
-      type==='reason'?
-      '\nКнопка ✨ редактирует ТОЛЬКО Reasons Why. Верни СТРОГО объяснения ПОЧЕМУ, без текста Key Points и без конструкции «КМ — причина». Плохо: «1. Проверить кабель на повреждения — предотвращает риск» или «1. Проверить кабель на повреждения. Это важно для предотвращения риска». Хорошо: «1. Снижает риск при использовании повреждённого кабеля» (только если риск подтверждён исходными фактами). Не повторяй ни одно действие или критический приём в начале причины. Корпоративное правило: одно поле Reason на шаг. Общая причина может быть без номера; несколько причин — строго отдельными строками 1., 2., 3. Сохрани имеющиеся номера и количество причин, не заменяй отдельные причины общей. Не добавляй параметры или последствия, которых нет в фактическом контексте. Если причина не подтверждена, не сочиняй её.':
       '';
     const raw=await aiAsk(AI_SYS[type]+instruction,context,{
-      model:currentModel,maxTokens:type==='reason'?1200:400,task:'edit_'+type
+      model:currentModel,maxTokens:400,task:'edit_'+type
     });
     const result=cleanAIFieldResult(raw,type);
     if(!result)throw new Error('ИИ вернул пустой текст');
     if(!aiGuardCanApply(guard))return;
     let safe=result;
-    if(step&&type==='reason'){
-      const extracted=stage391StarReasonOnly(result,step);
-      if(!extracted.ok){toast(extracted.message,'warning');return;}
-      const check=stage391RejectInvalidReason(String(source),extracted.value,step);
-      if(!check.ok)return;
-      safe=check.value;
-    }else if(step&&type==='km'){
+    if(step&&type==='km'){
       const check=stage391ValidateKeyPointProposal(result,step);
       if(!check.ok){toast(check.message,'warning');return;}
       safe=check.value;
