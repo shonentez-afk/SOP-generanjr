@@ -23,7 +23,7 @@ def check_book(path,stale=False):
     wb=load_workbook(path)
     assert wb.sheetnames==["Карта разбора работы","План наставника"],wb.sheetnames
     for ws in wb:
-        assert ws.page_setup.paperSize==ws.PAPERSIZE_A4,(ws.title,ws.page_setup.paperSize)
+        assert str(ws.page_setup.paperSize)==str(ws.PAPERSIZE_A4),(ws.title,ws.page_setup.paperSize)
         assert ws.page_setup.fitToWidth==1,(ws.title,ws.page_setup.fitToWidth)
         assert ws.page_setup.fitToHeight==0,(ws.title,ws.page_setup.fitToHeight)
         assert not ws.sheet_view.showGridLines,ws.title
