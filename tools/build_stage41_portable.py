@@ -18,6 +18,7 @@ import shutil
 import sys
 import zipfile
 from urllib.parse import unquote, urlsplit
+from stage41_explanations import restore_explanations
 
 ARCHIVE_ROOT_NAME = "SOP-Stage41"
 PACKAGE_NAME = "SOP-Stage41-Full-Offline.zip"
@@ -261,7 +262,7 @@ hr{{border:0;border-top:1px solid var(--line);margin:30px 0}}
 <header><small>Полный автономный комплект · Stage41</small><h1>Конструктор СОП, исходники и карты — вместе</h1>
 <p>Этот комплект работает с локальными файлами. Из него можно открыть принятую сборку конструктора, изучить взаимосвязи функций, перейти из схемы к конкретной строке исходного кода и получить исходники для дальнейшей разработки.</p><p class="help"><strong>Важно:</strong> сначала полностью распакуйте ZIP. Открывайте <b>SOP-Stage41/index.html</b> из папки рядом с каталогами <b>maps</b>, <b>constructor</b>, <b>viewer</b> и <b>source</b>. Если открыть только этот HTML из предпросмотра архива или отдельно скопировать файл, кнопки не найдут соседние страницы.</p></header><main>
 <div class="cards">
-<div class="card"><h2>Интерактивная архитектура</h2><p>Одна карта, два режима: 8 полноценных представлений LikeC4 и интерактивный граф 73 JS-модулей / 367 зависимостей с AST-доказательствами.</p>
+<div class="card"><h2>Интерактивная архитектура</h2><p>Одна карта: 8 представлений LikeC4, 73 JS-модуля / 367 зависимостей и восстановленные подробные пояснения по СОП, TWI, ФРВ, ИИ и исходникам.</p>
 <a class="action" href="maps/stage41-unified.html">Открыть карту программы</a></div>
 <div class="card"><h2>Конструктор СОП Stage41</h2><p>Принятая версия приложения в одном HTML. Локальная сборка, редактор фотографий, СОП, TWI, ФРВ, печатные XLSX и библиотека документов.</p>
 <a class="action" href="constructor/Stage41.html">Запустить конструктор</a></div>
@@ -409,7 +410,7 @@ def compile_likec4(model_text: str, views_text: str) -> dict:
     return {"nodes": nodes, "edges": edges, "views": views}
 
 
-def unified_local_map(docs: Path) -> str:
+def unified_local_map(docs: Path, bundle: Path) -> str:
     original = (docs / "sop-stage41-unified.html").read_text("utf-8")
     opening = '<script type="application/json" id="model">'
     start = original.index(opening) + len(opening)
@@ -421,8 +422,11 @@ def unified_local_map(docs: Path) -> str:
         (docs / "likec4-stage41" / "model.c4").read_text("utf-8"),
         (docs / "likec4-stage41" / "views.c4").read_text("utf-8")
     )
+    explanations = restore_explanations(
+        docs, bundle, architecture, {n["path"] for n in data["nodes"]}
+    )
     payload = {"code": {"nodes": data["nodes"], "edges": data["edges"]},
-               "arch": architecture}
+               "arch": architecture, "explanations": explanations}
     template = (Path(__file__).parent / "stage41_map_template.html").read_text("utf-8")
     marker = "__STAGE41_MODEL_JSON__"
     ensure_count(template, marker, "new unified map template")
@@ -471,7 +475,7 @@ def main() -> None:
         raise AssertionError("Stand-alone Stage41 seems incomplete")
     # Only one user-facing map: LikeC4 architecture and CodeFlow/AST graph.
     # The separate Archify/AI data and editable C4 definitions remain in diagrams/.
-    store_text(bundle/"maps"/"stage41-unified.html", unified_local_map(docs))
+    store_text(bundle/"maps"/"stage41-unified.html", unified_local_map(docs, bundle))
     for filename in TOOL_JSON:
         obj = json.loads((docs / filename).read_text("utf-8"))
         obj.pop("ci_url",None)
@@ -494,6 +498,7 @@ def main() -> None:
         "4. Source links open local HTML viewers with numbered lines; raw source files are adjacent under source/.\n"
         "5. The owner's private AI proxy endpoint is removed from this archive; AI requests are unavailable.\n"
         "6. LikeC4 and Archify editable source definitions are in diagrams/.\n"
+        "7. Click a graph node to see explanatory text, interactions, AI scenarios and verified source links.\n"
     )
     checks = scan_links(bundle,manifest)
     forbidden = []

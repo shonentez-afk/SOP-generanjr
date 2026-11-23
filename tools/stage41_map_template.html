@@ -42,6 +42,31 @@ svg{display:block;width:100%;height:100%;touch-action:none;cursor:grab}svg.dragg
 .right h2{overflow-wrap:anywhere;line-height:1.3}.subhead{font-size:12px;font-weight:800;color:#9bc9da;margin:17px 0 8px}
 @media(max-width:1100px){.work{grid-template-columns:205px 1fr;height:auto}.left,.canvas-panel{height:650px}.right{grid-column:1/-1;border-top:1px solid var(--line);border-left:0;max-height:320px}}
 @media(max-width:670px){.work{display:block}.left{height:auto;max-height:270px}.canvas-panel{height:520px}.right{max-height:none}header{padding:10px}.stats{padding:8px 10px}}
+
+/* Contextual annotations restored from the previous detailed maps. */
+.story{border-left:3px solid #70d4c1;background:#122f39;padding:10px 12px;margin:9px 0 13px;border-radius:0 9px 9px 0;line-height:1.57}
+.story strong{color:#e9f7ff}.story p{margin:5px 0 0;color:#d8e9f3}
+.explain-meta{color:#9eafbd;font-size:11px;line-height:1.45;margin:6px 0 13px}
+.flow-note{border:1px solid #365b6d;background:#122d3b;border-radius:8px;margin:6px 0;padding:8px 10px;font-size:12px}
+.flow-note strong{display:block;color:#e6f9ff;margin-bottom:3px}
+.flow-note p{color:#b6d4e3;margin:0}
+.source-list{border-top:1px solid #2d4a5e;padding-top:6px}
+.source-ref{display:block;margin:6px 0;padding:6px;border-radius:6px;color:#a7e5ff;font-size:11px;overflow-wrap:anywhere}
+.source-ref:hover{background:#1d3e4b}
+.ai-task{border:1px solid #3b6072;background:#0b2536;border-radius:9px;margin:8px 0;overflow:hidden}
+.ai-task[open]{border-color:#56a39a}
+.ai-task>summary{padding:10px;cursor:pointer;list-style:revert}
+.ai-task>summary strong{display:block;font-size:12px}
+.ai-task>summary small{color:#9eb6c8;display:block;margin-top:3px;font-size:10px}
+.ai-task-body{padding:0 10px 10px}
+.ai-field{border-top:1px solid #2a4557;padding:9px 0}
+.ai-field strong{display:block;color:#98d7e9;font-size:11px}
+.ai-field p{color:#d6e7f1;margin:4px 0;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-field.warning strong{color:#f0c28b}
+.ai-schema{background:#081824;border-radius:8px;padding:8px;font:11px/1.55 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto}
+.ai-task details summary{cursor:pointer;color:#b3d7e9;font-size:11px;padding:6px}
+.ai-task details{border:1px solid #2b495f;border-radius:7px}
+.help-extra{font-size:11px;color:#9fb8c9;margin:8px 0}
 </style></head><body>
 <header><a href="../index.html" class="brand"><span class="logo">SOP</span><span><b>Единая карта Stage41</b><small>Одна точка входа · архитектура и связи кода</small></span></a>
 <nav aria-label="Режим карты"><button data-mode="architecture">Архитектура</button><button data-mode="code" class="active">Связи кода</button></nav>
@@ -130,15 +155,75 @@ function edgeList(edges,id,g){
  return '<button class="edge-row" data-neighbor="'+esc(other)+'">'+(e.from===id?'→ ':'← ')+esc(label)+'<small>'+esc(status)+'</small></button>'+refs;
  }).join("");
 }
+function sourceLinks(rows){
+ const seen=new Set(),links=[];
+ for(const source of rows||[]){
+   if(!source||!source.path)continue;
+   const key=source.path+"#L"+(source.line||0);
+   if(seen.has(key))continue;seen.add(key);
+   const url=href(source.path,source.line);
+   if(url)links.push('<a class="source-ref" href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(source.path)+(source.line?' · строка '+source.line:'')+'</a>');
+ }
+ return links.join("");
+}
+function notesForComponent(n){
+ const connections=(D.explanations&&D.explanations.connections||[]).filter(e=>e.from===n.id||e.to===n.id);
+ if(!connections.length)return "";
+ const labels=connections.slice(0,24).map(e=>{
+  const from=archIndex.get(e.from),to=archIndex.get(e.to);
+  return '<div class="flow-note"><strong>'+esc(from?.label||e.from)+' → '+esc(to?.label||e.to)+'</strong><p>'+esc(e.label)+'</p></div>';
+ }).join("");
+ return '<div class="subhead">Как взаимодействует с другими частями</div>'+labels;
+}
+function aiTaskCards(taskIds){
+ const metadata=D.explanations||{};
+ const tasks=(metadata.tasks||[]).filter(t=>taskIds.includes(t.id));
+ if(!tasks.length)return "";
+ const cards=tasks.map((t,i)=>{
+  const status=t.status==="not_in_ui"?" · исторический путь, нет кнопки в интерфейсе":"";
+  const dataBox=(label,value)=>'<div class="ai-field"><strong>'+esc(label)+'</strong><p>'+esc(value||"Не указано в исходной карте")+'</p></div>';
+  const examples='<details class="ai-examples"><summary>Примеры структуры данных</summary>'+
+   '<div class="ai-field"><strong>Входные данные (схема)</strong><pre class="ai-schema">'+esc(JSON.stringify(t.request,null,2))+'</pre></div>'+
+   '<div class="ai-field"><strong>Ожидаемый ответ (схема)</strong><pre class="ai-schema">'+esc(JSON.stringify(t.response,null,2))+'</pre></div></details>';
+  return '<details class="ai-task" data-task="'+esc(t.id)+'"'+(i===0?' open':'')+'>'+
+    '<summary><strong>'+esc(t.title)+'</strong><small>'+esc(t.category+' · '+t.entry+status)+'</small></summary>'+
+    '<div class="ai-task-body">'+
+    dataBox("Что уходит в запрос",t.input)+
+    dataBox("Что возвращает ИИ",t.output)+
+    dataBox("Как проверяется ответ",t.check)+
+    dataBox("Как применяется результат",t.apply)+
+    '<div class="ai-field warning"><strong>Ограничения и важные нюансы</strong><p>'+esc(t.notice||"Не указано")+'</p></div>'+
+    examples+
+    '<div class="subhead">Проверяемые исходники</div><div class="source-list">'+(sourceLinks(t.sources)||'<p class="help-extra">В составе автономного архива нет исходного файла для этого сценария.</p>')+'</div>'+
+    '</div></details>';
+ }).join("");
+ return '<div class="subhead">Сценарии ИИ ('+tasks.length+')</div>'+
+ '<p class="help-extra">Из подробной карты Stage41: вход, ответ, проверка, применение. Это документация сценариев, не реальные ответы YandexGPT.</p>'+cards;
+}
 function detail(g){
  const n=g.nodes.find(n=>n.id===S.selected);
- if(!n){E("detail").innerHTML='<h2>Выберите модуль</h2><p class="help">Нажмите на узел графа или строку слева.</p>';return}
- const inside=g.edges.filter(e=>e.to===n.id),outside=g.edges.filter(e=>e.from===n.id),src=href(g.kind==="code"?n.path:n.source);
- E("detail").innerHTML='<h2>'+esc(g.kind==="code"?n.path.split("/").at(-1):n.label)+'</h2><div class="path">'+esc(n.id)+'</div><p class="help">'+esc(g.kind==="arch"?(n.description||"Компонент LikeC4"):(groups[n.group]||n.group))+'</p>'+
+ if(!n){E("detail").innerHTML='<h2>Выберите модуль</h2><p class="help">Нажмите на узел графа или строку слева. Здесь появятся подробные пояснения.</p>';return}
+ const ex=D.explanations||{},isCode=g.kind==="code";
+ const inside=g.edges.filter(e=>e.to===n.id),outside=g.edges.filter(e=>e.from===n.id);
+ const src=href(isCode?n.path:n.source);
+ const areaOf={ai:"app.ai",app:"app",core:"app",documents:"app.library",editor:"app.editor",excel:"app.excel",frv:"app.frv",photos:"app.photos",review:"app.review",quality:"app.review",shared:"app",twi:"app.twi"};
+ const area=isCode?archIndex.get(areaOf[n.group]):null;
+ const docExplanation=isCode?area?.explanation:n.explanation;
+ const description=docExplanation||(isCode?"Для отдельного файла нет проверенного текстового описания в прежней карте. Ниже показаны его реальные связи по CodeFlow/AST.":n.description||"Для этого компонента отдельного пояснения не было.");
+ const context=isCode?'<p class="explain-meta">Описание относится к подсистеме «'+esc(area?.label||groups[n.group]||n.group)+'», а не к отдельной функции. Переходы к функциям подтверждаются ссылками в исходниках.</p>':
+  '<p class="explain-meta">'+esc(n.sublabel||"")+" · "+'Сведения из прежней архитектурной карты Stage41.</p>';
+ const title=isCode?n.path.split("/").at(-1):n.label;
+ const refs=isCode?[{path:n.path,line:0}]:((n.sources&&n.sources.length?n.sources:src?[{path:n.source,line:0}]:[]));
+ const taskIds=isCode?(ex.tasksBySource?.[n.path]||[]):(ex.taskAssociations?.[n.id]==="*"?(ex.tasks||[]).map(t=>t.id):(ex.taskAssociations?.[n.id]||[]));
+ E("detail").innerHTML='<h2>'+esc(title)+'</h2><div class="path">'+esc(n.id)+'</div>'+
+ '<div class="subhead">Что делает и для чего нужен</div><div class="story"><p>'+esc(description)+'</p></div>'+context+
  '<div class="kpis"><div class="kpi"><b>'+inside.length+'</b><small>Входящие</small></div><div class="kpi"><b>'+outside.length+'</b><small>Исходящие</small></div></div>'+
  (src?'<a class="source source-open" href="'+esc(src)+'" target="_blank" rel="noopener">Открыть локальный исходник</a>':"")+
- '<div class="subhead">Связи</div>'+edgeList(inside.concat(outside),n.id,g)+
- (g.kind==="arch"?'<div class="subhead">Модель</div><a href="../viewer/diagrams/likec4/model.c4.html" target="_blank">Открыть model.c4</a>':'<p class="help">AST подтверждает синтаксис вызова, но не факт исполнения.</p>');
+ (!isCode?notesForComponent(n):"")+
+ '<div class="subhead">Связи и функции</div>'+edgeList(inside.concat(outside),n.id,g)+
+ aiTaskCards(taskIds)+
+ '<div class="subhead">Проверяемые исходники</div><div class="source-list">'+(sourceLinks(refs)||'<p class="help-extra">Для этого элемента нет опубликованного локального исходника.</p>')+'</div>'+
+ (isCode?'<p class="help-extra">CodeFlow и AST показывают статические связи, не гарантируя исполнения пути.</p>':'<div class="help-extra">Модель архитектуры: <a href="../viewer/diagrams/likec4/model.c4.html" target="_blank">model.c4</a></div>');
  E("detail").querySelectorAll("[data-neighbor]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.neighbor,true)));
 }
 const ns="http://www.w3.org/2000/svg";

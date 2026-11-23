@@ -50,6 +50,10 @@ with sync_playwright() as p:
     assert page.locator('#world .node').count()==73
     assert page.locator('#world .edge').count()>250
     assert page.locator('#detail .source-open[href*="stage41-quality.js.html"]').count()==1
+    assert page.locator('#detail .story').count()==1
+    assert "Что делает и для чего нужен" in page.locator("#detail").inner_text()
+    assert page.locator('#detail details.ai-task').count()==3
+    assert page.locator('#detail details.ai-task[data-task="generate_sop"]').count()==1
     page.screenshot(path=str(OUT/"02-codegraph.png"),full_page=True)
 
     before=page.locator("#world").get_attribute("transform")
@@ -80,11 +84,29 @@ with sync_playwright() as p:
     page.locator('[data-view="ai-details"]').click()
     assert page.locator("#world .node").count()>=13
     assert page.locator('#world .node[data-id="app.ai"]').count()==1
+    page.locator('#world .node[data-id="app.ai"]').click()
+    assert page.locator('#detail details.ai-task').count()==16
+    assert page.locator('#detail .story').count()==1
+    assert "Что уходит в запрос" in page.locator('#detail details.ai-task[data-task="generate_sop"]').inner_text()
+    assert "Как проверяется ответ" in page.locator('#detail details.ai-task[data-task="generate_sop"]').inner_text()
+    assert "Как применяется результат" in page.locator('#detail details.ai-task[data-task="generate_sop"]').inner_text()
+    page.locator('#detail details.ai-task[data-task="generate_sop"] .ai-examples summary').click()
+    assert page.locator('#detail details.ai-task[data-task="generate_sop"] .ai-schema').count()==2
+    with page.expect_popup() as documented_source:
+        page.locator('#detail details.ai-task[data-task="generate_sop"] a.source-ref').first.click()
+    source=documented_source.value
+    source.wait_for_load_state("load")
+    assert source.url.startswith("file://")
+    assert source.locator(".line").count()>30
+    source.close()
     page.screenshot(path=str(OUT/"04-architecture-ai.png"),full_page=True)
     page.locator('[data-view="modules"]').click()
     assert page.locator('#world .node[data-id="app.editor"]').count()==1
     page.locator('#world .node[data-id="app.editor"]').click()
     assert page.locator("#detail .source-open").count()==1
+    assert "Основной документ" in page.locator("#detail .story").inner_text()
+    assert page.locator("#detail .flow-note").count()>3
+    assert page.locator("#detail .source-ref").count()>0
     with page.expect_popup() as c4popup:
         page.locator('#detail .source-open').click()
     c4source=c4popup.value
@@ -93,6 +115,13 @@ with sync_playwright() as p:
     assert c4source.locator(".line").count()>0
     c4source.close()
     page.screenshot(path=str(OUT/"05-architecture-modules.png"),full_page=True)
+    for view in ("landscape","modules","sop-details","ai-details","twi-details",
+                 "frv-details","storage-details","excel-details"):
+        page.locator('[data-view="'+view+'"]').click()
+        assert page.locator("#world .node").count()>0,view
+    page.locator('[data-view="modules"]').click()
+    page.locator('#world .node[data-id="app.editor"]').click()
+    page.screenshot(path=str(OUT/"07-explanations-restored.png"),full_page=True)
 
     page.locator('[data-mode="code"]').click()
     assert page.locator("#world .node").count()==73
@@ -116,5 +145,5 @@ print("PORTABLE_CHROME_PASS="+json.dumps({
     "main":"file://","modules":73,"edges":367,"architecture_views":8,
     "map_tabs":2,"maps":1,"local_source_navigation":True,
     "constructor":"opened","network_requests":len(external),
-    "page_errors":len(errors),"screenshots":6,
+    "page_errors":len(errors),"screenshots":7,
 },ensure_ascii=False))
