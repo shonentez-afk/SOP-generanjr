@@ -54,6 +54,7 @@ def ai_fields(p):
     assert "Stage39.1" in p.locator("#sopVersionLabel").inner_text()
     km=f'[data-ai-km="{id}"][data-ki="0"]'
     reason=f'[data-ai="reason"][data-id="{id}"]'
+    action=f'[data-ai="action"][data-id="{id}"]'
     def ai_click(selector,response):
         p.evaluate("result => {window.stage391AiResult=result}",response)
         p.locator(selector).click()
@@ -61,6 +62,8 @@ def ai_fields(p):
           document.querySelector(selector)&&
           !document.querySelector(selector).disabled&&
           document.querySelector(selector).textContent==='✨'""",arg=selector)
+    ai_click(action,'Установить подшипник с усилием 989 Н')
+    assert p.evaluate("() => state.steps[0].action")=="Установить подшипник"
     ai_click(km,'Проверить зазор 888 мм')
     assert p.evaluate("() => state.steps[0].keyMoments[0]")=="Проверить посадку"
     ai_click(km,'Проверить отсутствие перекоса')
@@ -114,9 +117,16 @@ def ai_fields(p):
                      '<input type="checkbox" checked data-stage27-suggestion="S2">';
       const before=JSON.stringify(state.steps);
       stage27ApplySelected();
-      return {same:before===JSON.stringify(state.steps)};
+      const blocked=before===JSON.stringify(state.steps);
+      // A human-confirmed new numeric fact is allowed, unlike AI invention.
+      state.stage27.questions[0].answer='Технолог подтвердил 25 Н';
+      state.stage27.suggestions[1].newValue='1. Сохранить качество 25 Н\\n2. Исключить загрязнение';
+      state.stage27.suggestionSignature=stage27DocumentSignature();
+      stage27ApplySelected();
+      return {blocked,accepted:state.steps[0].action==='Выполнить монтаж'&&
+        state.steps[0].reason.includes('25 Н')};
     }""")
-    assert bulk["same"],"One invalid reason made a partially-applied bulk update"
+    assert bulk["blocked"] and bulk["accepted"],"Bulk AI fact proposals were unsafe or rejected confirmed numeric facts"
     print("PASS Stage39.1: contextual Key Points, numbered Reason AI guard, source-fact numbers, checklist, review fix, atomic fact proposals",flush=True)
 
 
