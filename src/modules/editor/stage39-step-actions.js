@@ -223,6 +223,8 @@ function stage39DecorateCards(){
     controls.querySelector('[data-stage39="duplicate"]').disabled=locked||stage39Busy;
     // Collapsing is a view-only action, including for published SOPs.
     collapse.disabled=stage39Busy;
+    if(stage39Busy)collapse.setAttribute('aria-disabled','true');
+    else collapse.removeAttribute('aria-disabled');
   });
 }
 function stage39RefreshButtons(){
