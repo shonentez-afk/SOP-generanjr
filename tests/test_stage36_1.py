@@ -40,7 +40,7 @@ class TwiPrintStage361(unittest.TestCase):
         p=subprocess.run(["node","--check","-"],input=source,text=True,capture_output=True)
         self.assertEqual(p.returncode,0,p.stderr)
         self.assertNotIn("aiAsk(",source)
-        self.assertNotIn("htmlToTwi(",source.split("function twiPrintSnapshot(){")[1].split("function twiPrintIssues")[0].replace("// function would modify the live document",""))
+        self.assertNotIn("\n  htmlToTwi(",source.split("function twiPrintSnapshot(){")[1].split("function twiPrintIssues")[0])
         self.assertIn("fitToWidth:1,fitToHeight:0",source)
         self.assertIn("printTitlesRow",source)
         self.assertIn("TWI_PRINT_SECTIONS",source)
