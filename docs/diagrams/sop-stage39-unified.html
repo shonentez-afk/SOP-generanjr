@@ -92,14 +92,14 @@ footer{color:#89a8c0;border-top:1px solid var(--br);padding:16px 4vw 30px;font-s
     <div class="stats"><span class="stat"><b>8</b> представлений LikeC4</span><span class="stat"><b>1</b> автономный HTML приложения</span><span class="stat"><b>2</b> исходника .c4</span></div>
     <p class="muted">Файлы LikeC4 описывают архитектуру как код. Схема в этом HTML — собственный автономный просмотрщик; официальный CLI LikeC4 здесь не запускался. Для сборки полноценного LikeC4-сайта используйте локальный Node.js 20+.</p>
     <div class="cardlist">
-      <div class="card"><h3>01 · Общее устройство</h3><p>Пользователь, браузерная программа, Yandex Cloud и сетевая папка.</p></div>
-      <div class="card"><h3>02 · Подсистемы</h3><p>Границы логических модулей внутри одного HTML, без ошибочного деления на сервисы.</p></div>
-      <div class="card"><h3>03 · СОП</h3><p>Шаги, редактор, проверки, фотографии, XLSX, библиотека, TWI.</p></div>
-      <div class="card"><h3>04 · ИИ</h3><p>Промпты, aiAsk, Yandex Cloud proxy, YandexGPT, валидация и применение.</p></div>
-      <div class="card"><h3>05 · TWI</h3><p>Обучение по четырём этапам, сохранение ручных правок и печать.</p></div>
-      <div class="card"><h3>06 · ФРВ</h3><p>Наблюдения, измерения, ИИ-предложения и передача в новый СОП.</p></div>
-      <div class="card"><h3>07 · Хранение</h3><p>IndexedDB, фотографии, версии, необязательная синхронизация.</p></div>
-      <div class="card"><h3>08 · Excel</h3><p>Корпоративный XLSX, печатный TWI и локальная ExcelJS.</p></div>
+      <div class="card"><h3>01 · Общее устройство</h3><button type="button" class="chipbtn" data-c4view="landscape">Открыть раздел карты</button><p>Пользователь, браузерная программа, Yandex Cloud и сетевая папка.</p></div>
+      <div class="card"><h3>02 · Подсистемы</h3><button type="button" class="chipbtn" data-c4view="modules">Открыть раздел карты</button><p>Границы логических модулей внутри одного HTML, без ошибочного деления на сервисы.</p></div>
+      <div class="card"><h3>03 · СОП</h3><button type="button" class="chipbtn" data-c4view="sop">Открыть раздел карты</button><p>Шаги, редактор, проверки, фотографии, XLSX, библиотека, TWI.</p></div>
+      <div class="card"><h3>04 · ИИ</h3><button type="button" class="chipbtn" data-c4view="ai">Открыть раздел карты</button><p>Промпты, aiAsk, Yandex Cloud proxy, YandexGPT, валидация и применение.</p></div>
+      <div class="card"><h3>05 · TWI</h3><button type="button" class="chipbtn" data-c4view="twi">Открыть раздел карты</button><p>Обучение по четырём этапам, сохранение ручных правок и печать.</p></div>
+      <div class="card"><h3>06 · ФРВ</h3><button type="button" class="chipbtn" data-c4view="frv">Открыть раздел карты</button><p>Наблюдения, измерения, ИИ-предложения и передача в новый СОП.</p></div>
+      <div class="card"><h3>07 · Хранение</h3><button type="button" class="chipbtn" data-c4view="storage">Открыть раздел карты</button><p>IndexedDB, фотографии, версии, необязательная синхронизация.</p></div>
+      <div class="card"><h3>08 · Excel</h3><button type="button" class="chipbtn" data-c4view="excel">Открыть раздел карты</button><p>Корпоративный XLSX, печатный TWI и локальная ExcelJS.</p></div>
     </div>
     <div class="details" id="sources">
       <h3>Исходники и дополнительные инструменты</h3>
@@ -163,6 +163,7 @@ $("search").addEventListener("input",x=>{query=x.target.value.toLowerCase();rend
 $("group").addEventListener("change",x=>{group=x.target.value;renderMenu()});
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
 document.querySelectorAll("[data-focus]").forEach(b=>b.addEventListener("click",()=>pickOverview(b.dataset.focus)));
+document.querySelectorAll("[data-c4view]").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.c4view;if(v==="ai"){setTab("ai");return}if(v==="landscape"){setTab("overview");return}const id={modules:"runtime",sop:"sop",twi:"twi",frv:"frv",storage:"library",excel:"sopXlsx"}[v];if(id){setTab("overview");const f=$("viewer");f.addEventListener("load",()=>pickOverview(id),{once:true})}}));
 const h=location.hash.slice(1);setTab(["overview","ai","dependencies","likec4"].includes(h)?h:"overview");
 }
 init();
