@@ -4,7 +4,9 @@
 **Статус:** обзорный аудит **принятой** пользователем Stage41 в main.  
 **Назначение:** дать проверяемое описание функциональных границ, ключевых пользовательских сценариев, известных рисков и дальнейших проверок. Это **не** сертификационный аудит безопасности, независимое тестирование реального цеха и не полный динамический анализ кода.
 
-[← README](../README.md) · [Скачать Stage41](../releases/stage41-ai-quality-20261123.html) · [Полная архитектурная карта Stage41 (PR #37)](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/docs/archify-stage39-architecture-20261123/docs/diagrams/sop-stage41-unified.html)
+[← README](../README.md) · [**Как проводить аудит L1**](AUDIT_LEVEL1_USER_GUIDE_STAGE41_RU.md) · [Руководство SOP](USER_GUIDE_STAGE41_RU.md) · [Руководство по карте](INTERACTIVE_MAP_USER_GUIDE_STAGE41_RU.md) · [Скачать Stage41](../releases/stage41-ai-quality-20261123.html) · [Полная архитектурная карта Stage41 (PR #37)](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/docs/archify-stage39-architecture-20261123/docs/diagrams/sop-stage41-unified.html)
+
+> **Как пользоваться отчётом:** документ ниже фиксирует результаты L1 и их границы. Для самостоятельного повторения проверки в браузере откройте [пошаговую инструкцию](AUDIT_LEVEL1_USER_GUIDE_STAGE41_RU.md); аудит L1 не является кнопкой приложения.
 
 ## 1. Предмет проверки
 
