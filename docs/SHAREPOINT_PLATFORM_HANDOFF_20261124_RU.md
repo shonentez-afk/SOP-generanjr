@@ -7,6 +7,14 @@
 **Принятая основа программы:** Stage41 в main.  
 **Важно:** внутренние адреса и скриншоты предприятия намеренно не опубликованы в открытом GitHub.
 
+### Последняя актуализация 24.11.2026 — XML метаданные файла успешно прочитаны
+
+Пользователь подтвердил вывод Invoke-WebRequest -UseBasicParsing с Accept application/atom+xml и Select-Xml: HTTP 200, непустые ID и m:etag. XML-подход к чтению ListItemAllFields работает в корпоративном PowerShell. Ранее GET SP.File подтвердил Exists=True и Length=0. Точную причину отсутствия вывода JSON ListItemAllFields не устанавливать без диагностики. Конкретные ID, ETag, URL и имя тестового файла в GitHub не сохранять.
+
+**Текущий шаг:** завершить контролируемый тест только на существующем пустом учебном TXT. Сценарий с ErrorActionPreference=Stop, явным согласием пользователя, проверкой точного имени, ID, исходного ETag и Length=0. Получить ListItemEntityTypeFullName и EntityPropertyName двух Text-полей. Штатный New-TemporaryFile и Set-Content -Encoding ASCII, затем POST с X-HTTP-Method PUT к GetFileByServerRelativeUrl(...)/$value, -InFile и X-RequestDigest. Прочитать размер файла обратно. Снова прочитать XML ListItemAllFields и получить новый ETag после обновления содержимого. Выполнить MERGE только учебного элемента с конкретным ETag, ASCII-значениями номера и редакции, JSON через ConvertTo-Json (без запрещённых методов кодировки). Проверить итоговые поля через XML. При любой ошибке остановиться и не повторять запись вслепую; не создавать второй объект, не менять остальные файлы и настройки. Проверка непустого TXT и метаданных пока не пройдена. Далее — реальная проверка XLSX и версий, полная схема семи хранилищ, отдельный разрешённый клиентский адаптер, проверка аудита L1 и Outlook. Stage41/main, шаблоны XLSX и ИИ-прокси сохранять.
+
+Официальная документация: https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest ; https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-lists-and-list-items-with-rest ; https://learn.microsoft.com/en-us/powershell/module/Microsoft.PowerShell.Utility/Invoke-WebRequest?view=powershell-5.1 .
+
 ### Последняя актуализация 24.11.2026 — прямой GET подтвердил пустой файл
 
 Пользователь выполнил GET RootFolder/ServerRelativeUrl и GetFileByServerRelativeUrl с select Name,Length,Exists. Возвращено точное имя учебного файла, Length=0, Exists=True. Создание файлового объекта через REST подтверждено и визуально, и API. Запись непустого содержимого не подтверждена. После этого пользователь выполнил GET ListItemAllFields, но вывод свойств не показал. ID и ETag пока неизвестны. Предыдущий пустой вывод фильтрованного списка не является доказательством отсутствия файла.
