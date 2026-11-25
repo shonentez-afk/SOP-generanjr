@@ -19,6 +19,54 @@ function stage42Reader(ws){
 function stage42IsHeading(txt){
   return /^(?:Действие(?:я)?|Ключевой момент|КМ|Причина|Почему важно|Визуализация|QR|Время|Длительность)$/iu.test(String(txt||'').trim());
 }
+// Restore the real numbered key points, not arbitrary visual/soft line wraps.
+// Excel often stores one point over several lines inside a merged cell.
+// Input: "1. Inspect cable\nand plug\n2. Inspect body\n3. Test switch"
+// Output: three complete key points, without embedded list numbers.
+function stage42SplitKeyMoments(value){
+  const raw=stage42CellText(value).replace(/\r\n?/gu,'\n')
+    .replace(/\u00a0/gu,' ').replace(/\u200b/gu,'').trim();
+  if(!raw)return [];
+  const clean=text=>String(text||'').replace(/[ \t]*\n[ \t]*/gu,' ')
+    .replace(/[ \t]{2,}/gu,' ').trim();
+  // 1. / 2) are list markers only when followed by whitespace and text.
+  // Decimal values (1.5, 2.0), voltage, and plain wrapped lines must
+  // not create a new point. Works for both separate and inline numbering.
+  const re=/(^|[ \t\n]+)(\d{1,2})[.)][ \t\n]+(?=\S)/gu;
+  const markers=[...raw.matchAll(re)].map(m=>({
+    from:m.index+m[1].length,to:m.index+m[0].length,num:Number(m[2]),
+    lineStart:m.index===0||m[1].includes('\n')
+  }));
+  const first=markers.findIndex(m=>m.num===1&&
+    (m.lineStart||raw.slice(0,m.from).trim().length===0));
+  if(first!==-1){
+    const points=[];
+    let previous=markers[first],start=previous.to;
+    const prelude=clean(raw.slice(0,previous.from));
+    for(let i=first+1;i<markers.length;i++){
+      const marker=markers[i];
+      // Prefer sequential 1,2,3...; later numbers embedded in sentences
+      // are not mistaken for a new point. If a numbered list skips a
+      // number, only an explicit new-line marker is treated as a boundary.
+      if(marker.num!==previous.num+1&&!marker.lineStart)continue;
+      const text=clean(raw.slice(start,marker.from));
+      if(text)points.push(points.length===0&&prelude?prelude+' '+text:text);
+      previous=marker;start=marker.to;
+    }
+    const tail=clean(raw.slice(start));
+    if(tail)points.push(points.length===0&&prelude?prelude+' '+tail:tail);
+    if(points.length)return points;
+  }
+  // Unnumbered bulleted paragraphs are distinct points.
+  const lines=raw.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(lines.length>1&&lines.every(x=>/^(?:[•●▪▫*]|[-–—])\s+\S/u.test(x)))
+    return lines.map(x=>clean(x.replace(/^(?:[•●▪▫*]|[-–—])\s+/u,'')));
+  // Empty paragraphs indicate separation; a single line break alone
+  // usually means word wrapping inside one key point.
+  const paragraphs=raw.split(/\n[ \t]*\n+/u).map(clean).filter(Boolean);
+  if(paragraphs.length>1)return paragraphs;
+  return [clean(raw.replace(/^\s*\d{1,2}[.)]\s+/u,''))].filter(Boolean);
+}
 function stage42CleanAction(txt){return String(txt||'').replace(/^\s*\d{1,3}\s*[.)]\s*/u,'').trim()}
 function stage42ActionCandidate(txt){
   const v=String(txt||'').trim();
@@ -253,7 +301,7 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
     const next=anchors.find(v=>v.row>a.row)?.row||ws.rowCount+1;
     const km=stage42ReadLabeled(rd,ws,a.row,a.col,/^(?:Ключевой момент|КМ)$/iu,1,next);
     const why=stage42ReadLabeled(rd,ws,a.row,a.col,/^(?:Причина|Почему важно)$/iu,2,next);
-    const moments=km.text?km.text.split(/\n+/u).map(x=>x.replace(/^\s*\d+\s*[.)]\s*/u,'').trim()).filter(Boolean):[];
+    const moments=stage42SplitKeyMoments(km.text);
     let durationSeconds=0,timeSource='';
     for(let tc=a.col+1;tc<=Math.min(a.col+4,ws.columnCount||13);tc++){
       if(!master(a.row,tc))continue;
@@ -269,7 +317,8 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
     steps.push({action,keyMoments:moments.length?moments:[''],reason:why.text,
       durationSeconds,successCriteria:'',source,photoIndex:-1,
       frv:{vdc:false,m2:'',m1:'',move:'',comment:''}});
-    if(moments.length>3)warnings.push('В шаге '+steps.length+' более трёх КМ. Разделите их перед загрузкой.');
+    if(moments.length>3)warnings.push('Шаг '+steps.length+': распознано '+moments.length+
+      ' нумерованных КМ. Все пункты сохраняются отдельно; проверьте их и итоговую печатную форму.');
   }
   if(!steps.length)warnings.push('На листе «'+ws.name+'» не удалось найти действия. Выберите другой лист или назначьте ячейки вручную.');
   const details=stage42Metadata(ws,rd);
