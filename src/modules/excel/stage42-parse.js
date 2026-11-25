@@ -368,30 +368,53 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
       const row=Math.floor(tl.row)+1,col=Math.floor(tl.col)+1;
       const blob=new Blob([bytes],{type:'image/'+ext});
       const record={bytes,ext,row,col,url:URL.createObjectURL(blob),
-        source:ws.name+'!'+stage42CellAddress(row,col),assigned:-1};
-      // Preserve accepted C:E/F:I/J:L matching and visualization-row rule.
-      if(vizRows.has(row)){
-        // Accepted corporate templates place "Визуализация" immediately
-        // BEFORE the action it illustrates (e.g. portrait rows 15/16, 19/20).
-        // Preserve this mapping over any proximity to the previous step.
-        // Only use a preceding action when there is no immediately following
-        // action and the visualization is clearly inside the preceding block.
-        const prior=actionRows.filter(a=>a.row<row).pop();
-        const following=actionRows.find(a=>a.row>row);
-        const actionRow=following&&following.row===row+1?following.row:
-          prior&&row>=prior.row+2&&row<=prior.row+4?prior.row:null;
-        const targetCol=col>=3&&col<=5?3:col>=6&&col<=9?6:col>=10&&col<=12?10:0;
-        if(actionRow&&targetCol){
-          const index=steps.findIndex(s=>s.source.action===stage42CellAddress(actionRow,targetCol));
-          if(index!==-1&&!media.some(m=>m.assigned===index)){
-            record.assigned=index;steps[index].photoIndex=media.length;
+        source:ws.name+'!'+stage42CellAddress(row,col),assigned:-1,
+        auxiliary:false};
+      // Image row may be the visualization row (the usual template) or
+      // one row above it (old enterprise templates). Do not confuse the
+      // header logo or safety icons with a photo of a manufacturing step.
+      const next=actionRows.find(a=>a.row>row);
+      const previous=actionRows.filter(a=>a.row<row).pop();
+      const isPreceding=!!(next&&
+        (row===next.row-1||(row===next.row-2&&vizRows.has(next.row-1))));
+      const isFollowing=!!(!isPreceding&&previous&&
+        row>=previous.row+2&&row<=previous.row+4&&vizRows.has(row));
+      const actionRow=isPreceding?next.row:isFollowing?previous.row:null;
+      if(actionRow){
+        const group=anchors.filter(a=>a.row===actionRow).sort((a,b)=>a.col-b.col);
+        const labelCol=actionRows.find(a=>a.row===actionRow)?.labelCol||0;
+        // For portrait layouts, image at column B is usually the ISO
+        // pictogram in the left label column, not the action's picture.
+        if(col>labelCol&&group.length){
+          let chosen=group[0];
+          for(const a of group)if(a.col<=col)chosen=a;
+          const index=steps.findIndex(x=>x.source.action===
+            stage42CellAddress(chosen.row,chosen.col));
+          if(index!==-1){
+            const existing=steps[index].photoIndex;
+            if(existing===-1){
+              record.assigned=index;
+              steps[index].photoIndex=media.length;
+            }else{
+              const earlier=media[existing];
+              // ExcelJS exports photos as background + foreground at the
+              // SAME anchor. The last one is the actual foreground; taking
+              // the first silently loses the user's original image.
+              if(earlier&&earlier.row===row&&earlier.col===col){
+                earlier.assigned=-1;
+                earlier.auxiliary=true;
+                record.assigned=index;
+                steps[index].photoIndex=media.length;
+              }
+              // Distinct overlapping images are left for user review.
+            }
           }
         }
       }
       media.push(record);
     }catch(error){warnings.push('Не удалось распознать отдельное изображение: '+String(error.message||error))}
   }
-  const orphan=media.filter(x=>x.assigned===-1).length;
+  const orphan=media.filter(x=>x.assigned===-1&&!x.auxiliary).length;
   if(orphan)warnings.push('Не назначено изображений: '+orphan+'. Среди них могут быть логотипы и ISO-пиктограммы.');
   stage42ParseFrv(wb,steps,warnings);
   const checklist=stage42ParseChecklist(wb);
