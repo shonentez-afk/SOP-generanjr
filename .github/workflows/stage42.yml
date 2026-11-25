@@ -38,6 +38,8 @@ jobs:
         run: python qa/stage42_import_wizard_browser.py
       - name: Reproduce book/landscape multi-sheet UX and TechnoNICOL styling
         run: python qa/stage42_sheet_selection_ux_browser.py
+      - name: Retain every numbered and wrapped key moment across import, library and XLSX
+        run: python qa/stage42_key_moments_browser.py
       - name: Inherited accepted Stage41 AI, Reason and TWI
         run: |
           python qa/stage41_ai_quality_browser.py
@@ -79,6 +81,8 @@ jobs:
         run: python qa/stage42_import_wizard_browser.py
       - name: Chrome portrait XLSX with multiple SOP sheets, visual and photo QA
         run: python qa/stage42_sheet_selection_ux_browser.py
+      - name: Windows Chrome multi-key-moment XLSX parser, wizard and roundtrip
+        run: python qa/stage42_key_moments_browser.py
       - name: Existing Windows ExcelJS/ISO/photo regression on Stage42
         run: |
           python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage42-import-wizard-browser-candidate.html'; m.main()"
