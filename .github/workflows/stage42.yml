@@ -1,0 +1,129 @@
+name: Stage42 XLSX SOP import wizard regression
+on:
+  push:
+    branches: [feature/stage42-xlsx-import-wizard-20261125]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage42-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux Stage42 wizard, photos and inherited regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      PYTHONUTF8: '1'
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify unchanged accepted Stage41 and build Stage42
+        run: |
+          python tools/build_stage41.py --verify-static --verify-release
+          python tools/build_stage42.py --verify-static
+          python tools/build_stage42.py
+          python tools/build_stage42.py --verify-static --verify-release
+      - name: All modular unit tests including Stage42
+        run: python -m unittest discover -s tests -v
+      - name: Prepare Chrome, XLSX and image inspection
+        run: python -m pip install 'playwright>=1.50,<2' 'openpyxl>=3.1,<4' 'Pillow>=10,<12'
+      - name: Real offline Chrome Stage42 XLSX editor, photo and library
+        run: python qa/stage42_import_wizard_browser.py
+      - name: Inherited accepted Stage41 AI, Reason and TWI
+        run: |
+          python qa/stage41_ai_quality_browser.py
+          python qa/stage41_compat_browser.py
+      - name: Inherited Stage39.1 FRV and corporate XLSX checks
+        run: python qa/stage39_1_ai_reasons_frv_browser.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage42-linux
+          path: |
+            releases/stage42-import-wizard-browser-candidate.html
+            artifacts/stage42/stage42-wizard-preview.png
+          retention-days: 30
+          if-no-files-found: error
+
+  windows:
+    name: Windows Stage42 wizard and ExcelJS/ISO/photo smoke
+    runs-on: windows-latest
+    timeout-minutes: 65
+    env:
+      PYTHONUTF8: '1'
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify Stage41 exact and build Stage42
+        run: |
+          python tools/build_stage41.py --verify-static --verify-release
+          python tools/build_stage42.py --verify-static
+          python tools/build_stage42.py
+          python tools/build_stage42.py --verify-static --verify-release
+      - name: All Stage42 module tests and JS syntax
+        run: python -m unittest discover -s tests -p test_stage42.py -v
+      - name: Chrome and photo tooling
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Real Chrome Stage42 wizard, photos and library
+        run: python qa/stage42_import_wizard_browser.py
+      - name: Existing Windows ExcelJS/ISO/photo regression on Stage42
+        run: |
+          python -c "import importlib.util; s=importlib.util.spec_from_file_location('win','qa/stage26_windows_smoke.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.RELEASE=m.ROOT/'releases/stage42-import-wizard-browser-candidate.html'; m.main()"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage42-windows
+          path: |
+            releases/stage42-import-wizard-browser-candidate.html
+            artifacts/stage42/stage42-wizard-preview.png
+          retention-days: 30
+          if-no-files-found: error
+
+  publish:
+    name: Publish Stage42 candidate only after Linux and Windows PASS
+    needs: [linux,windows]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage42-xlsx-import-wizard-20261125'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: stage42-linux
+          path: artifacts-from-linux
+      - name: Commit tested standalone HTML and preview to Stage42 branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage42-xlsx-import-wizard-20261125
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced: skip publishing a stale candidate."
+            exit 0
+          fi
+          if [ -s artifacts-from-linux/releases/stage42-import-wizard-browser-candidate.html ]; then
+            source_file=artifacts-from-linux/releases/stage42-import-wizard-browser-candidate.html
+          else
+            source_file=artifacts-from-linux/stage42-import-wizard-browser-candidate.html
+          fi
+          test -s "$source_file"
+          mkdir -p releases docs/img
+          cp "$source_file" releases/stage42-import-wizard-browser-candidate.html
+          cp "$source_file" releases/stage42-import-wizard-20261125.html
+          if [ -s artifacts-from-linux/artifacts/stage42/stage42-wizard-preview.png ]; then
+            cp artifacts-from-linux/artifacts/stage42/stage42-wizard-preview.png docs/img/stage42-import-wizard-preview.png
+          fi
+          git add releases/stage42-import-wizard-browser-candidate.html releases/stage42-import-wizard-20261125.html
+          if [ -e docs/img/stage42-import-wizard-preview.png ]; then
+            git add docs/img/stage42-import-wizard-preview.png
+          fi
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage42 verified Chrome Linux/Windows import wizard and image persistence"
+            git push origin HEAD:feature/stage42-xlsx-import-wizard-20261125
+          fi
