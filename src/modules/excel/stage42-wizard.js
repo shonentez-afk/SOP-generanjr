@@ -42,6 +42,7 @@ function stage42RenderSteps(){
   const p=stage42Wizard.proposal;
   const host=stage42El('stage42Steps');
   if(!p){host.innerHTML='';return}
+  stage42El('stage42EmptyGuide').hidden=p.steps.length>0;
   host.innerHTML=p.steps.map((s,i)=>
     '<button type="button" class="stage42-step'+(i===stage42Wizard.selectedStep?' selected':'')+
     '" data-stage42-step="'+i+'"><b>Шаг '+(i+1)+'</b><small>'+
@@ -106,9 +107,17 @@ function stage42RenderWarnings(){
   if(p){
     stage42El('stage42FileInfo').textContent=p.fileName+' · '+p.wb.worksheets.length+
       ' листов · рабочий лист «'+p.sourceSheet+'»';
-    stage42El('stage42Sheet').innerHTML=p.wb.worksheets.map(w=>'<option value="'+stage42Esc(w.name)+'">'+
-      stage42Esc(w.name)+'</option>').join('');
-    stage42El('stage42Sheet').value=stage42Wizard.sheet||p.sourceSheet;
+    stage42El('stage42Sheet').innerHTML=p.wb.worksheets.map(w=>{
+      const info=stage42SheetEvidence(w);
+      return '<option value="'+stage42Esc(w.name)+'">'+stage42Esc(w.name)+
+        ' · '+info.count+' действ.'+'</option>';
+    }).join('');
+    stage42El('stage42Sheet').value=p.sourceSheet;
+    const info=stage42SheetEvidence(p.ws);
+    stage42El('stage42SheetAdvice').textContent=p.steps.length?
+      'Выбран лист «'+p.sourceSheet+'»: найдено '+p.steps.length+
+        ' действий. Проверьте их справа и привязку фотографий.':
+      'На этом листе нет распознанных действий. Выберите другой лист из списка или создайте шаг из выделенной ячейки.';
   }
 }
 function stage42RenderGrid(){
@@ -202,7 +211,8 @@ async function stage42ReadFile(file){
     const fresh=await stage42ParseFile(file);
     stage42ReleaseProposal(stage42Wizard.proposal);
     stage42Wizard.proposal=fresh;
-    stage42Wizard.sheet=fresh.sourceSheet;stage42Wizard.startRow=1;
+    stage42Wizard.sheet=fresh.sourceSheet;
+    stage42Wizard.startRow=Math.max(1,(stage42SheetEvidence(fresh.ws).firstActionRow||1)-3);
     stage42Wizard.cell=null;stage42Wizard.selectedStep=0;
     stage42Wizard.dirty=false;
     stage42RenderReady();
@@ -210,6 +220,47 @@ async function stage42ReadFile(file){
   }catch(error){
     stage42Info('Не удалось прочитать XLSX: '+String(error.message||error),true);
   }finally{stage42Wizard.busy=false}
+}
+function stage42ChooseSopSheet(name){
+  const prior=stage42Wizard.proposal;if(!prior)return;
+  if(name===prior.sourceSheet){stage42Wizard.sheet=name;return}
+  if(stage42Wizard.dirty&&!confirm(
+    'Вы уже исправили распознанную СОП. При выборе другого листа эти изменения будут потеряны. Продолжить?')){
+    stage42El('stage42Sheet').value=prior.sourceSheet;return;
+  }
+  try{
+    const worksheet=prior.wb.getWorksheet(name);
+    if(!worksheet)throw new Error('Лист XLSX не найден');
+    const fresh=stage42ParseSelectedSheet(prior.wb,worksheet,prior.fileName);
+    stage42ReleaseProposal(prior);
+    stage42Wizard.proposal=fresh;
+    stage42Wizard.sheet=fresh.sourceSheet;
+    stage42Wizard.startRow=Math.max(1,(stage42SheetEvidence(worksheet).firstActionRow||1)-3);
+    stage42Wizard.cell=null;stage42Wizard.selectedStep=0;stage42Wizard.dirty=false;
+    stage42El('stage42OmitMedia').checked=false;
+    stage42RenderReady();
+    stage42Info(fresh.steps.length?
+      'Распознано '+fresh.steps.length+' шагов на листе «'+name+'». Проверьте текст и фотографии.':
+      'Лист «'+name+'»: действия пока не распознаны. Выделите ячейку с первым действием и нажмите «Создать шаг из ячейки».');
+  }catch(error){
+    stage42El('stage42Sheet').value=prior.sourceSheet;
+    stage42Info('Не удалось открыть выбранный лист: '+String(error.message||error),true);
+  }
+}
+function stage42ShowStep(index){
+  const p=stage42Wizard.proposal;
+  if(!p||index<0||index>=p.steps.length)return;
+  stage42Wizard.selectedStep=index;
+  const source=p.steps[index].source?.action||'';
+  const match=source.match(/^([A-Z]+)(d+)$/i);
+  if(match){
+    const col=[...match[1].toUpperCase()].reduce((n,ch)=>n*26+ch.charCodeAt(0)-64,0);
+    const row=Number(match[2]);
+    stage42Wizard.cell={sheet:p.sourceSheet,row,col};
+    stage42Wizard.startRow=Math.max(1,row-3);
+  }
+  stage42RenderSteps();stage42RenderStepEditor();
+  stage42RenderGrid();stage42RenderCellInfo();
 }
 async function stage42ConfirmApply(){
   const p=stage42Wizard.proposal;
@@ -249,8 +300,13 @@ function stage42AddFromCell(){
   stage42MarkDirty();stage42RenderSteps();stage42RenderStepEditor();
 }
 function stage42UseCell(field){
-  const s=stage42CurrentStep(),cell=stage42SourceCell();
-  if(!s||!cell||!cell.text){stage42Info('Сначала выберите непустую ячейку и шаг.',true);return}
+  const cell=stage42SourceCell();
+  if(!stage42CurrentStep()&&field==='action'&&cell?.text){stage42AddFromCell();return}
+  const s=stage42CurrentStep();
+  if(!s||!cell||!cell.text){
+    stage42Info('Сначала выберите ячейку с текстом, затем шаг справа. Если шагов ещё нет — нажмите «Создать шаг из ячейки».',true);
+    return;
+  }
   if(field==='action'){s.action=stage42CleanAction(cell.text);s.source.action=cell.source}
   else if(field==='km'){
     const parts=cell.text.split(/\n+/u).map(v=>v.trim()).filter(Boolean);
@@ -424,8 +480,7 @@ function stage42Init(){
   stage42El('stage42Apply').addEventListener('click',stage42ConfirmApply);
   stage42El('stage42OmitMedia').addEventListener('change',stage42MarkDirty);
   stage42El('stage42Sheet').addEventListener('change',event=>{
-    stage42Wizard.sheet=event.target.value;stage42Wizard.startRow=1;
-    stage42Wizard.cell=null;stage42RenderGrid();stage42RenderCellInfo();
+    stage42ChooseSopSheet(event.target.value);
   });
   for(const [id,diff] of [['stage42PrevRows',-24],['stage42NextRows',24]])
     stage42El(id).addEventListener('click',()=>{
@@ -445,8 +500,7 @@ function stage42Init(){
     const target=event.target.closest('[data-stage42-pick-photo]');
     if(target)stage42SetPhoto(Number(target.dataset.stage42PickPhoto));
     const step=event.target.closest('[data-stage42-step]');
-    if(step){stage42Wizard.selectedStep=Number(step.dataset.stage42Step);
-      stage42RenderSteps();stage42RenderStepEditor();}
+    if(step){stage42ShowStep(Number(step.dataset.stage42Step));}
   });
   stage42El('stage42PhotoSelect').addEventListener('change',e=>stage42SetPhoto(Number(e.target.value)));
   stage42El('stage42StepFields').addEventListener('input',e=>{
@@ -466,6 +520,13 @@ function stage42Init(){
     }
   });
   stage42El('stage42FromCell').addEventListener('click',stage42AddFromCell);
+  stage42El('stage42EmptyPick').addEventListener('click',stage42AddFromCell);
+  stage42El('stage42RescanSheet').addEventListener('click',()=>{
+    const name=stage42El('stage42Sheet').value;
+    if(stage42Wizard.proposal?.sourceSheet===name){
+      stage42Info('Лист уже распознан. Чтобы изменить шаг, выберите ячейку и используйте кнопки переноса.',false);
+    }else stage42ChooseSopSheet(name);
+  });
   stage42El('stage42AddBlankStep').addEventListener('click',()=>{
     const p=stage42Wizard.proposal;if(!p)return;
     p.steps.push(stage42MakeStep());stage42Wizard.selectedStep=p.steps.length-1;
