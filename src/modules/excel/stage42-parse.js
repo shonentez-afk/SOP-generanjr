@@ -388,25 +388,42 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
         if(col>labelCol&&group.length){
           let chosen=group[0];
           for(const a of group)if(a.col<=col)chosen=a;
-          const index=steps.findIndex(x=>x.source.action===
+          let index=steps.findIndex(x=>x.source.action===
             stage42CellAddress(chosen.row,chosen.col));
           if(index!==-1){
-            const existing=steps[index].photoIndex;
+            let existing=steps[index].photoIndex;
+            const earlier=existing>=0?media[existing]:null;
+            // Older Excel files sometimes anchor a K-lane picture one
+            // column to the LEFT (J) while the I-lane photo is already
+            // attached at I. Assign this distinct picture to the nearest
+            // still-empty action in that same row. Never redirect the
+            // duplicate background/foreground layers from one anchor.
+            if(existing!==-1&&earlier&&
+              !(earlier.row===row&&earlier.col===col)){
+              const open=group.map(a=>({
+                a,step:steps.findIndex(x=>x.source.action===
+                  stage42CellAddress(a.row,a.col))
+              })).filter(item=>item.step>=0&&
+                steps[item.step].photoIndex===-1&&
+                Math.abs(item.a.col-col)<=2)
+                .sort((a,b)=>Math.abs(a.a.col-col)-Math.abs(b.a.col-col));
+              if(open.length){index=open[0].step;existing=-1}
+            }
             if(existing===-1){
               record.assigned=index;
               steps[index].photoIndex=media.length;
             }else{
-              const earlier=media[existing];
-              // ExcelJS exports photos as background + foreground at the
-              // SAME anchor. The last one is the actual foreground; taking
-              // the first silently loses the user's original image.
-              if(earlier&&earlier.row===row&&earlier.col===col){
-                earlier.assigned=-1;
-                earlier.auxiliary=true;
+              const previous=media[existing];
+              // The constructor's Excel exporter writes blurred background
+              // followed by ORIGINAL foreground at the SAME coordinates.
+              // The last layer must win (unlike the old first-layer match).
+              if(previous&&previous.row===row&&previous.col===col){
+                previous.assigned=-1;
+                previous.auxiliary=true;
                 record.assigned=index;
                 steps[index].photoIndex=media.length;
               }
-              // Distinct overlapping images are left for user review.
+              // Remaining ambiguous pictures are left for manual review.
             }
           }
         }
