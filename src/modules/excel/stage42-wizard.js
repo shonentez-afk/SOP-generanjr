@@ -731,6 +731,18 @@ function stage42EnableFullKeyMomentLists(){
     }
     return step;
   };
+  // Stage38 exports an isolated Excel snapshot and independently caps its
+  // normalized keyMoments at three. Apply the same non-destructive extended
+  // list exception to the export *snapshot*, keeping all existing photo
+  // and FRV handling intact.
+  const acceptedExcelNormalize=normalizeExcelStepKeepingPhoto;
+  normalizeExcelStepKeepingPhoto=function stage42ExcelFullKeyMoments(source){
+    const step=acceptedExcelNormalize(source);
+    if(Array.isArray(source?.keyMoments)&&source.keyMoments.length>3){
+      step.keyMoments=source.keyMoments.map(value=>String(value??''));
+    }
+    return step;
+  };
   const acceptedRender=renderSteps;
   renderSteps=function stage42RenderFullKMs(){
     const result=acceptedRender.apply(this,arguments);
