@@ -2,6 +2,7 @@
 """Stage42 real offline Chrome: correct corporate import, merged cells, photos,
 preview isolation, manual mapping, library and stale-state safety."""
 from pathlib import Path
+from openpyxl import load_workbook
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -195,6 +196,44 @@ def main():
                 action:stored.snapshot.steps[0].action};
             }""")
             assert stored["steps"]==2 and stored["photo"] and stored["id"],stored
+            # Imported IDB photograph must reach the normal corporate XLSX,
+            # not just the on-screen preview and local library.
+            page.evaluate("""() => {
+              state.steps[0].durationSeconds=60;
+              state.steps[1].durationSeconds=45;
+              state.meta.safety='Учебные требования безопасности';
+              state.meta.tools='Учебный инструмент';
+              stateToHtml();
+            }""")
+            with page.expect_download(timeout=90000) as exported:
+                page.locator("#generateBtn").click()
+            out=ART/"stage42-imported-sop-export.xlsx"
+            exported.value.save_as(str(out))
+            excel=load_workbook(out)
+            assert "СОП" in excel.sheetnames,excel.sheetnames
+            assert "ФРВ" in excel.sheetnames,excel.sheetnames
+            assert len(excel["СОП"]._images)>=2,(
+                "Imported photo plus template logo expected",
+                len(excel["СОП"]._images))
+            # Compare matching fields with the unchanged Stage41 parser on
+            # the exact same workbook. Run in a separate browser context.
+            legacy=browser.new_page(viewport={"width":1450,"height":900})
+            legacy.route("http://**",lambda route:route.abort())
+            legacy.route("https://**",lambda route:route.abort())
+            legacy.goto(RELEASE.resolve().as_uri(),wait_until="domcontentloaded",timeout=35000)
+            set_fixture(legacy)
+            baseline=legacy.evaluate("""async () => {
+              const n=await importSopFromXlsx(window.__stage42Fixture);
+              const photo=await idbGetPhoto(state.steps[0].id);
+              return {n,steps:state.steps.map(x=>({
+                action:x.action,km:x.keyMoments[0],reason:x.reason})),
+                hasPhoto:!!photo?.blob,operation:state.meta.operation};
+            }""")
+            legacy.close()
+            assert baseline["n"]==2 and baseline["hasPhoto"],baseline
+            assert baseline["steps"][0]["action"]==final["action"],baseline
+            assert baseline["steps"][0]["km"]==final["km"],baseline
+            assert baseline["operation"]==final["meta"]["operation"],baseline
             # A fresh malformed layout can still be mapped manually without
             # changing the accepted constructor, even when no step was found.
             original=page.evaluate("() => stage42DocumentSignature()")
@@ -231,7 +270,7 @@ def main():
             page.locator("#stage42Cancel").click()
             assert not errors,errors
             print("PASS Stage42 Chrome: merged XLSX, 2-step preview, no mutation before apply, "
-                  "photo persisted in IDB + library, FRV/checklist, editable WHY, manual "
+                  "photo persisted in IDB + library + exported XLSX, legacy parity, FRV/checklist, editable WHY, manual "
                   "unusual XLSX mapping, cancel and stale-state guards",flush=True)
         finally:
             browser.close()
