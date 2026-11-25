@@ -223,7 +223,10 @@ def main():
             page.evaluate("() => {state.meta.operation='Изменено во второй вкладке'}")
             page.once("dialog",lambda d:d.accept())
             page.locator("#stage42Apply").click()
-            assert "изменился после открытия" in page.locator("#stage42Status").inner_text()
+            page.wait_for_function("() => !stage42Wizard.busy",timeout=15000)
+            outcome=page.locator("#stage42Status").inner_text()
+            assert "изменился после открытия" in outcome,{"status":outcome,
+                "proposal":page.evaluate("() => stage42Wizard.proposal?.steps.length")}
             assert page.evaluate("() => state.meta.operation")=="Изменено во второй вкладке"
             page.locator("#stage42Cancel").click()
             assert not errors,errors
