@@ -21,7 +21,7 @@ function stage42CurrentStep(){
 function stage42MarkDirty(){stage42Wizard.dirty=true}
 function stage42UnusedPhotos(){
   const p=stage42Wizard.proposal;
-  return p?p.media.filter((m,i)=>!p.steps.some(s=>s.photoIndex===i)).length:0;
+  return p?p.media.filter((m,i)=>!m.auxiliary&&!p.steps.some(s=>s.photoIndex===i)).length:0;
 }
 function stage42SetPhoto(index){
   const p=stage42Wizard.proposal,s=stage42CurrentStep();if(!p||!s)return;
@@ -108,7 +108,7 @@ function stage42RenderPhotos(){
     const assigned=p.steps.findIndex(s=>s.photoIndex===i);
     return '<div class="stage42-photo"><img alt="Изображение '+(i+1)+'" src="'+
       stage42Esc(m.url)+'"><div>'+stage42Esc(m.source)+'</div><small>'+
-      (assigned>=0?'Шаг '+(assigned+1):'Не назначено · возможный логотип/иконка')+
+      (assigned>=0?'Шаг '+(assigned+1):m.auxiliary?'Служебный фон (дублирующий слой Excel)':'Не назначено · возможный логотип/иконка')+
       '</small><button type="button" data-stage42-pick-photo="'+i+'">К выбранному шагу</button></div>';
   }).join('')||'<p class="stage42-note">В выбранном листе нет встроенных фотографий.</p>';
   const check=stage42El('stage42OmitMedia');
