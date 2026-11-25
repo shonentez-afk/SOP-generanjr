@@ -1,0 +1,80 @@
+name: Stage43 A3 SOP XLSX export formats
+on:
+  push:
+    branches: [feature/stage43-sop-print-formats-20261125]
+  pull_request:
+    branches: [main]
+    paths: ['**/stage43*']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: stage43-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 65
+    env:
+      PYTHONUTF8: '1'
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build and verify accepted Stage42
+        run: |
+          python tools/build_stage43.py --verify-static
+          python tools/build_stage43.py
+          python tools/build_stage43.py --verify-release
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Install Chrome test tooling
+        run: python -m pip install "playwright>=1.50,<2" "openpyxl>=3.1,<4" "Pillow>=10,<12"
+      - name: Export both A3 layouts in actual Chrome
+        run: python qa/stage43_print_formats_browser.py
+      - name: Stage42 wizard, photos, library and long KMs
+        run: |
+          python -c "import sys; from pathlib import Path; sys.path.insert(0,'qa'); import stage42_import_wizard_browser as m; m.RELEASE=Path('releases/stage43-sop-print-formats-20261125.html').resolve(); m.main()"
+          python -c "import sys; from pathlib import Path; sys.path.insert(0,'qa'); import stage42_key_moments_browser as m; m.RELEASE=Path('releases/stage43-sop-print-formats-20261125.html').resolve(); m.main()"
+          python -c "import sys; from pathlib import Path; sys.path.insert(0,'qa'); import stage42_enterprise_real_layout_browser as m; m.RELEASE=Path('releases/stage43-sop-print-formats-20261125.html').resolve(); m.main()"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage43-${{ matrix.os }}
+          path: |
+            releases/stage43-sop-print-formats-20261125.html
+            artifacts/stage43/
+          retention-days: 30
+  publish:
+    needs: regression
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/stage43-sop-print-formats-20261125'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: stage43-ubuntu-latest
+          path: artifacts-from-linux
+      - name: Publish tested candidate only on Stage43 branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin feature/stage43-sop-print-formats-20261125
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "Branch advanced; skip stale build"
+            exit 0
+          fi
+          source_file=artifacts-from-linux/releases/stage43-sop-print-formats-20261125.html
+          test -s "$source_file"
+          cp "$source_file" releases/stage43-sop-print-formats-20261125.html
+          git add releases/stage43-sop-print-formats-20261125.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build: Stage43 verified A3 SOP export formats"
+            git push origin HEAD:feature/stage43-sop-print-formats-20261125
+          fi

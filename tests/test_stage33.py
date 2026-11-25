@@ -121,7 +121,7 @@ d.standardCandidate.steps[0].plannedTimeSec=null;
 assert.equal(scope.frvStudyProposedSteps(d),null);
 console.log('PASS Stage33 local FRV partition, null measurement, median project time and evidence references');
 """
-        result=subprocess.run(["node","-e","const SOURCE="+json.dumps(source)+";\n"+script],
+        result=subprocess.run(["node","-"],input="const SOURCE="+json.dumps(source)+";\n"+script,
                               capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+"\n"+result.stderr)
 

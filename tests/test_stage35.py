@@ -96,7 +96,7 @@ assert.ok(transfer.frvSource.libraryId);
 assert.equal(o.durationSec,12.5);
 console.log('PASS Stage35: stale AI blocked, factual seconds unchanged, independent source library ID');
 """
-        result=subprocess.run(["node","-e","const SOURCE="+json.dumps(src)+";\n"+script],
+        result=subprocess.run(["node","-"],input="const SOURCE="+json.dumps(src)+";\n"+script,
           capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+"\n"+result.stderr)
 
