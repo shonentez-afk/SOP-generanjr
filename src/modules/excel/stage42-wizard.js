@@ -718,4 +718,49 @@ function stage42Init(){
     if(e.key==='Escape'&&!host.hidden){e.preventDefault();stage42Close()}
   });
 }
+// Stage41's accepted editor handles no more than three KM in normalisation.
+// Stage42 imports can contain four, five, or more *real numbered points* in
+// one action. Preserve them through drafts/library/JSON without changing the
+// underlying Stage41 sources; the normal three-KM workflow stays identical.
+function stage42EnableFullKeyMomentLists(){
+  const acceptedNormalize=normalizeStepShape;
+  normalizeStepShape=function stage42NormalizeFullKMs(source){
+    const step=acceptedNormalize(source);
+    if(Array.isArray(source?.keyMoments)&&source.keyMoments.length>3){
+      step.keyMoments=source.keyMoments.map(value=>String(value??''));
+    }
+    return step;
+  };
+  const acceptedRender=renderSteps;
+  renderSteps=function stage42RenderFullKMs(){
+    const result=acceptedRender.apply(this,arguments);
+    const cards=document.querySelectorAll('#stepsContainer .step-card');
+    cards.forEach((card,i)=>{
+      const step=state.steps[i];
+      if(!step||step.keyMoments.length<3||step.keyMoments.length>=60)return;
+      const first=card.querySelector('[data-km="'+step.id+'"]');
+      const area=first?.parentElement?.parentElement;
+      if(!area||area.querySelector('[data-stage42-add-more-km]'))return;
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.dataset.stage42AddMoreKm=String(step.id);
+      btn.className='text-xs text-red-700 mt-1 font-medium';
+      btn.textContent='＋ Добавить КМ';
+      btn.addEventListener('click',event=>{
+        event.preventDefault();
+        if(state.documentManager?.status==='Опубликован'||
+           state.documentManager?.status==='Архив')return;
+        if(step.keyMoments.length>=60)return;
+        step.keyMoments.push('');
+        stateChanged();
+        renderSteps();
+      });
+      area.appendChild(btn);
+    });
+    const label=$('sopVersionLabel');
+    if(label)label.textContent='· Stage42 (импорт XLSX)';
+    return result;
+  };
+}
+stage42EnableFullKeyMomentLists();
 stage42Init();
