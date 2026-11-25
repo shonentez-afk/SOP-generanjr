@@ -218,7 +218,10 @@ def main():
             # were accepted. The original document must remain untouched.
             page.locator("#importSopBtn").click()
             feed_file(page)
+            page.locator('#stage42Grid [data-stage42-cell="D5"]').click()
+            page.locator("#stage42FromCell").click()
             page.evaluate("() => {state.meta.operation='Изменено во второй вкладке'}")
+            page.once("dialog",lambda d:d.accept())
             page.locator("#stage42Apply").click()
             assert "изменился после открытия" in page.locator("#stage42Status").inner_text()
             assert page.evaluate("() => state.meta.operation")=="Изменено во второй вкладке"
