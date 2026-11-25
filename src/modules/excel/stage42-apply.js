@@ -15,7 +15,7 @@ function stage42CheckProposal(proposal){
     if(!String(st.action||'').trim())throw new Error('В шаге '+(i+1)+' отсутствует действие');
     if(String(st.action).length>3000)throw new Error('Слишком длинное действие в шаге '+(i+1));
     const kms=(st.keyMoments||[]).map(x=>String(x).trim()).filter(Boolean);
-    if(kms.length>3)throw new Error('В шаге '+(i+1)+' более трёх КМ; распределите их по шагам');
+    if(kms.length>60)throw new Error('В шаге '+(i+1)+' более 60 КМ. Проверьте исходную ячейку и разделите ошибочно объединённые списки.');
     if(kms.some(x=>x.length>1600))throw new Error('Слишком длинный ключевой момент в шаге '+(i+1));
     if(String(st.reason||'').length>8000)throw new Error('Слишком длинная причина в шаге '+(i+1));
     if(!Number.isFinite(Number(st.durationSeconds))||Number(st.durationSeconds)<0)
@@ -83,7 +83,7 @@ async function stage42ApplyProposal(proposal,signature){
         s=createEmptyStep();
       }
       s.action=String(source.action||'').trim();
-      s.keyMoments=(source.keyMoments||[]).map(x=>String(x).trim()).filter(Boolean).slice(0,3);
+      s.keyMoments=(source.keyMoments||[]).map(x=>String(x).trim()).filter(Boolean);
       if(!s.keyMoments.length)s.keyMoments=[''];
       s.reason=String(source.reason||'');
       s.durationSeconds=Math.round(Number(source.durationSeconds)||0);
