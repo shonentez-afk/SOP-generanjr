@@ -326,8 +326,12 @@ function stage42UseCell(field){
   }
   if(field==='action'){s.action=stage42CleanAction(cell.text);s.source.action=cell.source}
   else if(field==='km'){
-    const parts=cell.text.split(/\n+/u).map(v=>v.trim()).filter(Boolean);
+    const parts=stage42SplitKeyMoments(cell.text);
     const existing=s.keyMoments.filter(x=>String(x).trim());
+    if(existing.length+parts.length>60){
+      stage42Info('В выбранной ячейке слишком много КМ. Проверьте нумерацию исходного Excel.',true);
+      return;
+    }
     s.keyMoments=existing.concat(parts);
     s.source.keyMoments=cell.source;
   }else if(field==='reason'){s.reason=cell.text;s.source.reason=cell.source}
@@ -449,6 +453,13 @@ function stage42Style(){
     '#stage42Wizard .stage42-step small{line-height:1.42}',
     '#stage42Wizard .stage42-empty{border:1px dashed #ee9399;background:#fff9f9;padding:16px;border-radius:12px;margin:10px 0;color:#8f2d35}',
     '#stage42Wizard .stage42-empty p{margin:8px 0 12px;color:#64748b;line-height:1.5}',
+    '#stage42Wizard .stage42-moment-panel{border:1px solid #e2e6ec;background:#fafbfc;border-radius:10px;padding:11px 13px}',
+    '#stage42Wizard .stage42-moment-list{display:grid;gap:10px;margin:9px 0}',
+    '#stage42Wizard .stage42-moment-item{display:grid;grid-template-columns:1fr auto;align-items:start;gap:5px 8px}',
+    '#stage42Wizard .stage42-moment-item label{grid-column:1/-1;font-weight:700;color:#435166}',
+    '#stage42Wizard .stage42-moment-item textarea{width:100%;min-height:62px;resize:vertical;line-height:1.5}',
+    '#stage42Wizard .stage42-moment-item button{width:36px;min-height:36px;color:#b91c1c;border-color:#f1caca}',
+    '#stage42Wizard #stage42AddMoment{font-weight:650;color:#b8000b;border-color:#f2c9ce;background:white}',
     '#stage42Wizard .stage42-fields{gap:12px;margin-top:12px}',
     '#stage42Wizard .stage42-fields label{font-size:12.5px;color:#475569}',
     '#stage42Wizard input:not([type=checkbox]),#stage42Wizard textarea,#stage42Wizard select{border:1px solid #d0d8e3;border-radius:9px;padding:9px 10px;background:#fff;color:#1e293b}',
@@ -615,13 +626,58 @@ function stage42Init(){
   });
   stage42El('stage42PhotoSelect').addEventListener('change',e=>stage42SetPhoto(Number(e.target.value)));
   stage42El('stage42StepFields').addEventListener('input',e=>{
-    const el=e.target.closest('[data-stage42-field]'),s=stage42CurrentStep();
-    if(!el||!s)return;
+    const s=stage42CurrentStep();if(!s)return;
+    const moment=e.target.closest('[data-stage42-moment]');
+    if(moment){
+      const index=Number(moment.dataset.stage42Moment);
+      if(index>=0&&index<s.keyMoments.length){
+        s.keyMoments[index]=moment.value;
+        stage42MarkDirty();stage42RenderSteps();
+      }
+      return;
+    }
+    const el=e.target.closest('[data-stage42-field]');
+    if(!el)return;
     const name=el.dataset.stage42Field;
-    if(name==='keyMoments')s.keyMoments=el.value.split(/\n+/u);
-    else if(name==='durationSeconds')s.durationSeconds=el.value===''?0:Number(el.value);
+    if(name==='durationSeconds')s.durationSeconds=el.value===''?0:Number(el.value);
     else if(['action','reason','successCriteria'].includes(name))s[name]=el.value;
     stage42MarkDirty();stage42RenderSteps();
+  });
+  stage42El('stage42StepFields').addEventListener('paste',e=>{
+    const area=e.target.closest('[data-stage42-moment]'),s=stage42CurrentStep();
+    if(!area||!s)return;
+    const text=e.clipboardData?.getData('text/plain')||'';
+    const parts=stage42SplitKeyMoments(text);
+    if(parts.length<2)return;
+    if(s.keyMoments.length+parts.length-1>60){
+      e.preventDefault();
+      stage42Info('Вставка содержит слишком много КМ; разделите список на части.',true);
+      return;
+    }
+    e.preventDefault();
+    const index=Number(area.dataset.stage42Moment);
+    s.keyMoments.splice(index,1,...parts);
+    stage42MarkDirty();stage42RenderMomentFields(s);stage42RenderSteps();
+    stage42Info('Распознано '+parts.length+' нумерованных КМ. Проверьте каждый пункт.');
+  });
+  stage42El('stage42StepFields').addEventListener('click',e=>{
+    const remove=e.target.closest('[data-stage42-remove-moment]'),s=stage42CurrentStep();
+    if(!remove||!s)return;
+    const index=Number(remove.dataset.stage42RemoveMoment);
+    if(s.keyMoments.length<=1)s.keyMoments=[''];
+    else s.keyMoments.splice(index,1);
+    stage42MarkDirty();stage42RenderMomentFields(s);stage42RenderSteps();
+  });
+  stage42El('stage42AddMoment').addEventListener('click',()=>{
+    const s=stage42CurrentStep();if(!s)return;
+    if(s.keyMoments.length>=60){
+      stage42Info('Для одного действия допускается до 60 КМ. Проверьте исходную ячейку.',true);
+      return;
+    }
+    s.keyMoments.push('');
+    stage42MarkDirty();stage42RenderMomentFields(s);stage42RenderSteps();
+    stage42El('stage42MomentFields').querySelector(
+      '[data-stage42-moment="'+(s.keyMoments.length-1)+'"]')?.focus();
   });
   stage42El('stage42Meta').addEventListener('input',e=>{
     const el=e.target.closest('[data-stage42-meta]');
