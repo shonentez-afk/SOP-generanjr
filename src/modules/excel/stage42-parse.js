@@ -291,14 +291,15 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
         source:ws.name+'!'+stage42CellAddress(row,col),assigned:-1};
       // Preserve accepted C:E/F:I/J:L matching and visualization-row rule.
       if(vizRows.has(row)){
-        // Corporate templates vary: visualization can sit immediately BEFORE
-        // the next action, or AFTER that action's KM and Reason (as in the
-        // portrait/book template). In the second case it belongs to the
-        // PREVIOUS action, not the next one. Never guess outside those patterns.
+        // Accepted corporate templates place "Визуализация" immediately
+        // BEFORE the action it illustrates (e.g. portrait rows 15/16, 19/20).
+        // Preserve this mapping over any proximity to the previous step.
+        // Only use a preceding action when there is no immediately following
+        // action and the visualization is clearly inside the preceding block.
         const prior=actionRows.filter(a=>a.row<row).pop();
         const following=actionRows.find(a=>a.row>row);
-        const actionRow=prior&&row>=prior.row+2&&row<=prior.row+4?
-          prior.row:following&&following.row===row+1?following.row:null;
+        const actionRow=following&&following.row===row+1?following.row:
+          prior&&row>=prior.row+2&&row<=prior.row+4?prior.row:null;
         const targetCol=col>=3&&col<=5?3:col>=6&&col<=9?6:col>=10&&col<=12?10:0;
         if(actionRow&&targetCol){
           const index=steps.findIndex(s=>s.source.action===stage42CellAddress(actionRow,targetCol));
