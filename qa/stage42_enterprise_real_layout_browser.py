@@ -27,7 +27,13 @@ def main():
               const frv=wb.addWorksheet('ФРВ-Эл.бланк-Анализ');
               for(let n=14;n<19;n++)frv.getCell('J'+n).value=(n-13)+'. Учебная строка метода анализа';
               const ws=wb.addWorksheet('СОП_А3_Альб12');
-              ws.getCell('A1').value='Учебный филиал';
+              ws.getCell('C1').value='Учебный филиал';
+              ws.getCell('F1').value='СОП №';
+              ws.getCell('G1').value='00.000';
+              ws.getCell('K1').value='Дата:';
+              ws.getCell('K2').value='00.08.2021г.';
+              ws.getCell('A2').value='Подразделение:';
+              ws.getCell('A3').value='Учебный цех';
               ws.getCell('C3').value='Учебная замена узла';
               for(const [row,nums] of [[10,[1,2,3,4]],[14,[5,6,7,8]]]){
                 ws.getCell('A'+row).value='Действие';
@@ -65,7 +71,7 @@ def main():
               c.getContext('2d').fillRect(2,2,12,12);
               const photo=wb.addImage({base64:c.toDataURL('image/png'),extension:'png'});
               for(const [ri,col] of [
-                [7,1],[8,4],[7,8],[8,10],
+                [7,1],[8,4],[7,8],[8,9],
                 [12,1],[12,4],[12,8],[12,10]
               ])ws.addImage(photo,{tl:{row:ri,col},br:{row:ri+.6,col:col+.8}});
               // Additional header logo & safety mark should stay unassigned.
@@ -91,6 +97,7 @@ def main():
                 unused:p.media.filter(x=>x.assigned===-1&&!x.auxiliary).length,
                 media:p.media.length,
                 defaultAction:p.steps[0].action,
+                meta:p.meta,
                 time:p.steps[0].durationSeconds,
                 exampleCount:stage42SheetEvidence(example).count,
                 warnings:p.warnings};
@@ -99,6 +106,9 @@ def main():
             }""")
             assert result["sheet"]=="СОП_А3_Альб12",result
             assert result["count"]==8,result
+            assert result["meta"]["sopNumber"]=="00.000",result
+            assert result["meta"]["department"]=="Учебный цех",result
+            assert not result["meta"].get("date"),result
             assert result["exampleCount"]==9,result
             assert result["sources"]==[
                 "B10","E10","I10","K10","B14","E14","I14","K14"],result
@@ -111,6 +121,8 @@ def main():
             assert result["media"]==10 and result["unused"]==2,result
             generated=page.evaluate("""async () => {
               const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('СОП');
+              ws.getCell('G2').value='СОП №:';
+              ws.getCell('G3').value='12.034.2026. Версия 1';
               ws.getCell('B15').value='Визуализация';
               ws.getCell('B16').value='Действие';
               ws.getCell('B17').value='Ключевой момент';
@@ -137,6 +149,7 @@ def main():
               const p=await stage42ParseFile(new File([buffer],'constructor-export.xlsx',{
                 type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
               const data={sheet:p.sourceSheet,count:p.steps.length,
+                sopNumber:p.meta.sopNumber,
                 photoIndices:p.steps.map(x=>x.photoIndex),
                 chosenAux:p.steps.map(x=>p.media[x.photoIndex]?.auxiliary),
                 auxiliary:p.media.filter(x=>x.auxiliary).length,
@@ -147,6 +160,7 @@ def main():
               return data;
             }""")
             assert generated["count"]==3,generated
+            assert generated["sopNumber"]=="12.034.2026. Версия 1",generated
             assert generated["photoIndices"]==[1,3,-1],generated
             assert generated["auxiliary"]==2,generated
             assert generated["unassigned"]==2,generated
