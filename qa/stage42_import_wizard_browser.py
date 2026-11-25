@@ -244,6 +244,10 @@ def main():
             page.locator('#stage42Grid [data-stage42-cell="D5"]').click()
             page.locator("#stage42FromCell").click()
             assert page.evaluate("() => stage42Wizard.proposal.steps[0].action")=="Осмотреть новую деталь"
+            page.locator('[data-stage42-step="0"]').click()
+            assert page.evaluate("() => stage42Wizard.cell.row")==5
+            assert page.evaluate("() => stage42Wizard.cell.col")==4
+            assert page.locator('#stage42Grid td.stage42-selected[data-stage42-cell="D5"]').count()==1
             page.locator('#stage42Grid [data-stage42-cell="D6"]').click()
             page.locator('[data-stage42-use="km"]').click()
             page.locator('#stage42Grid [data-stage42-cell="D7"]').click()
