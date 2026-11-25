@@ -35,7 +35,7 @@ function stage42SourceCell(){
   if(!cell||!p)return null;
   const ws=p.wb.getWorksheet(cell.sheet);
   if(!ws)return null;
-  return {text:makeReader(ws).text(cell.row,cell.col),
+  return {text:stage42Reader(ws).text(cell.row,cell.col),
     source:cell.sheet+'!'+stage42CellAddress(cell.row,cell.col)};
 }
 function stage42RenderSteps(){
@@ -129,7 +129,7 @@ function stage42RenderGrid(){
   if(!ws)return;
   const top=Math.max(1,stage42Wizard.startRow),
     last=Math.min(ws.rowCount||1,top+23),
-    right=Math.min(Math.max(ws.columnCount||13,1),18),rd=makeReader(ws);
+    right=Math.min(Math.max(ws.columnCount||13,1),18),rd=stage42Reader(ws);
   stage42El('stage42Rows').textContent='Строки '+top+'–'+last+' из '+ws.rowCount;
   const mergeMap=buildMergeMap(ws);
   const covered=new Set();
