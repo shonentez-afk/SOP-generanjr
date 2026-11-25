@@ -149,10 +149,21 @@ function stage42Metadata(ws,rd){
   }
   const numberRow=findRow(rd,ws,'СОП №');
   if(numberRow)for(let c=1;c<=12;c++){
-    if(!/СОП №/iu.test(rd.text(numberRow,c)))continue;
-    for(let rr=numberRow+1;rr<=Math.min(numberRow+3,ws.rowCount);rr++){
-      const v=rd.text(rr,c);
-      if(v&&!/СОП №|Дата:|УТВЕРЖДАЮ/iu.test(v)){put('sopNumber',v);break}
+    if(!/СОП\s*№/iu.test(rd.text(numberRow,c)))continue;
+    // Old landscape workbooks have "СОП №" in F1 and its value in G1.
+    // Constructor-produced portrait files use G2 -> G3. Never confuse
+    // the next "Время СОП:" row or its formula with the document number.
+    const options=[
+      [numberRow,c+1],[numberRow,c+2],[numberRow+1,c],
+      [numberRow+1,c+1],[numberRow+2,c]
+    ];
+    for(const [rr,cc] of options){
+      if(rr>ws.rowCount||cc>ws.columnCount)continue;
+      const v=rd.text(rr,cc),raw=rd.raw(rr,cc);
+      if(!/\d/u.test(v)||raw instanceof Date||typeof raw==='object'&&
+        raw!==null&&raw.formula!==undefined)continue;
+      if(/СОП\s*№|Время\s+СОП|Дата|УТВЕРЖДАЮ|Ответствен/iu.test(v))continue;
+      put('sopNumber',v);break;
     }
     break;
   }
@@ -164,7 +175,13 @@ function stage42Metadata(ws,rd){
       const iso=raw instanceof Date?
         [raw.getFullYear(),String(raw.getMonth()+1).padStart(2,'0'),String(raw.getDate()).padStart(2,'0')].join('-'):
         toIsoDate(val);
-      if(iso){put('date',iso);break}
+      // "00.08.2021г." is present in one legacy example and is NOT a
+      // valid date. Do not silently convert its invalid day into a date.
+      const parsed=iso?new Date(iso+'T00:00:00Z'):null;
+      if(parsed&&!Number.isNaN(parsed.getTime())&&
+         parsed.toISOString().slice(0,10)===iso){
+        put('date',iso);break;
+      }
     }
     break;
   }
