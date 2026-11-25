@@ -7,7 +7,14 @@ function stage42CellText(value){
   if(Array.isArray(value?.richText))return value.richText.map(x=>x.text||'').join('');
   if(typeof value==='object'&&value.text!==undefined)return String(value.text);
   if(typeof value==='object'&&value.result!==undefined)return stage42CellText(value.result);
+  // ExcelJS may return internal rich/object placeholders for image/unsupported
+  // cells; rendering "[object Object]" is misleading, not cell content.
+  if(typeof value==='object')return '';
   return String(value);
+}
+function stage42Reader(ws){
+  const base=makeReader(ws);
+  return {raw:base.raw,text:(r,c)=>stage42CellText(base.raw(r,c)).trim()};
 }
 function stage42IsHeading(txt){
   return /^(?:Действие(?:я)?|Ключевой момент|КМ|Причина|Почему важно|Визуализация|QR|Время|Длительность)$/iu.test(String(txt||'').trim());
@@ -156,7 +163,7 @@ function stage42ParseChecklist(wb){
 // Check actual SOP content in *every* worksheet. Names alone can identify an
 // empty landscape template while the populated SOP is the portrait sheet.
 function stage42SheetEvidence(ws){
-  const rd=makeReader(ws),mm=buildMergeMap(ws);
+  const rd=stage42Reader(ws),mm=buildMergeMap(ws);
   const isMaster=(r,c)=>!mm[r+':'+c]||mm[r+':'+c]===stage42CellAddress(r,c);
   let labels=0,actions=0,numbered=0,firstActionRow=0;
   const maxRow=Math.min(ws.rowCount||0,2000),maxCol=Math.min(ws.columnCount||13,13);
@@ -210,7 +217,7 @@ async function stage42ParseFile(file){
 }
 function stage42ParseSelectedSheet(wb,ws,fileName){
   if(!ws)throw new Error('Выберите лист, содержащий СОП');
-  const rd=makeReader(ws),mm=buildMergeMap(ws),warnings=[],steps=[];
+  const rd=stage42Reader(ws),mm=buildMergeMap(ws),warnings=[],steps=[];
   const master=(r,c)=>!mm[r+':'+c]||mm[r+':'+c]===stage42CellAddress(r,c);
   const actionRows=[];
   for(let r=1;r<=ws.rowCount;r++)for(let c=1;c<=Math.min(7,ws.columnCount||7);c++){
@@ -284,10 +291,17 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
         source:ws.name+'!'+stage42CellAddress(row,col),assigned:-1};
       // Preserve accepted C:E/F:I/J:L matching and visualization-row rule.
       if(vizRows.has(row)){
-        const nextAction=actionRows.find(a=>a.row>row)?.row;
+        // Corporate templates vary: visualization can sit immediately BEFORE
+        // the next action, or AFTER that action's KM and Reason (as in the
+        // portrait/book template). In the second case it belongs to the
+        // PREVIOUS action, not the next one. Never guess outside those patterns.
+        const prior=actionRows.filter(a=>a.row<row).pop();
+        const following=actionRows.find(a=>a.row>row);
+        const actionRow=prior&&row>=prior.row+2&&row<=prior.row+4?
+          prior.row:following&&following.row===row+1?following.row:null;
         const targetCol=col>=3&&col<=5?3:col>=6&&col<=9?6:col>=10&&col<=12?10:0;
-        if(nextAction&&targetCol){
-          const index=steps.findIndex(s=>s.source.action===stage42CellAddress(nextAction,targetCol));
+        if(actionRow&&targetCol){
+          const index=steps.findIndex(s=>s.source.action===stage42CellAddress(actionRow,targetCol));
           if(index!==-1&&!media.some(m=>m.assigned===index)){
             record.assigned=index;steps[index].photoIndex=media.length;
           }
