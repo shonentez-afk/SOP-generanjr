@@ -1,3 +1,14 @@
+## Текущее состояние 25.11.2026 — Stage43 принята и в main
+
+- **Рабочая версия:** [Stage43](../releases/stage43-sop-print-formats-20261125.html), [PR #41](https://github.com/shonentez-afk/SOP-generanjr/pull/41), merge `d41969272d26ffb7382384365ce7d4d3e7bd7639`. Пользователь подтвердил «работает».
+- **Изменение:** только экспорт XLSX — книжный/альбомный A3, 3/4 действия, фотографии, КМ, причины и время. Предпросмотр не меняется до отдельного запроса. Stage42 импорт и остальная функциональность сохранены.
+- **CI:** [#45565635807](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45565635807) SUCCESS Linux/Windows/Publish; 127/127 unit на каждой ОС и 4 Chrome-сценария. 77 JS-модулей. Физическая печать/точное совпадение заводской шапки отдельно не подтверждены.
+- **Передача:** [START_NEW_CHAT_RU.md](START_NEW_CHAT_RU.md) — основной актуальный источник. Архитектурный PR #37 остаётся отдельно.
+
+Ниже — исторические записи.
+
+---
+
 ## Текущее состояние 19.11.2026 — Stage30 принят и в main
 
 - **Рабочая принятая версия:** [Stage30 — редактор фото](https://github.com/shonentez-afk/SOP-generanjr/pull/25), PR #25 объединён в `main` (commit `a37fb3c25d2066a5908af0c33d5a0efcdb0f2f99`). Файл `releases/stage30-photo-editor-browser-candidate.html` запускается как автономный HTML `file://` в настольных Chrome/Edge. Пользователь проверил редактор в своём браузере и подтвердил: «всё работает».

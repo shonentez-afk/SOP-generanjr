@@ -1,23 +1,24 @@
 # SOP-generanjr — Конструктор СОП, TWI и анализ ФРВ
 
-**Актуальная принятая версия: Stage42 · 25 ноября 2026 года**
+**Актуальная принятая версия: Stage43 · 25 ноября 2026 года**
 
 Приложение для подготовки и проверки **стандартных операционных процедур (СОП)**, создания **TWI Job Instruction**, работы с **ФРВ**, фотографиями и печатными Excel-документами. Предназначено для **ПК** и открывается как **один автономный HTML-файл** в Chrome или Edge. Для основной работы не нужен локальный сервер или установка программы. ИИ-функции требуют доступа к настроенному прокси Yandex Cloud.
 
-[**⬇ Скачать принятую Stage42 (.html)**](releases/stage42-import-wizard-20261125.html) · [Мастер импорта XLSX — руководство Stage42](docs/STAGE42_XLSX_IMPORT_WIZARD_RU.md) · [Полное руководство редактора СОП](docs/USER_GUIDE_STAGE41_RU.md) · [Актуальный статус проекта](docs/START_NEW_CHAT_RU.md)
+[**⬇ Скачать принятую Stage43 (.html)**](releases/stage43-sop-print-formats-20261125.html) · [Экспорт СОП в двух форматах](docs/STAGE43_SOP_PRINT_FORMATS_RU.md) · [Мастер импорта XLSX — руководство Stage42](docs/STAGE42_XLSX_IMPORT_WIZARD_RU.md) · [Полное руководство редактора СОП](docs/USER_GUIDE_STAGE41_RU.md) · [Актуальный статус проекта](docs/START_NEW_CHAT_RU.md)
 
-**Статус версии:** Stage42 проверена пользователем на импорте готовых СОП XLSX и принята 25.11.2026; [PR #40 объединён с main](https://github.com/shonentez-afk/SOP-generanjr/pull/40). [GitHub Actions #45560087668](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45560087668): **Linux / Windows / Publish — SUCCESS**, 124 модульных теста и браузерные регрессии импорта, фотографий, библиотеки, XLSX, TWI и функций Stage41. Принятая Stage41 остаётся доступна как предыдущий стабильный релиз.
+**Статус версии:** Stage43 принята пользователем («работает») 25.11.2026 и объединена в `main` ([PR #41](https://github.com/shonentez-afk/SOP-generanjr/pull/41)). [Linux / Windows / Publish — SUCCESS](https://github.com/shonentez-afk/SOP-generanjr/actions/runs/45565635807), **127/127 модульных тестов на каждой ОС и четыре сценария Chrome на каждой ОС**. Экспорт СОП XLSX: книжный A3 (3 действия) или альбомный A3 (4 действия); предпросмотр остаётся книжным по решению пользователя. Stage42 сохранена как предыдущая принятая версия.
 
-## Руководства пользователя — актуальная Stage42 и унаследованные функции
+## Руководства пользователя — актуальная Stage43 и унаследованные функции
 
 | Документ | Содержание |
 |---|---|
+| **[Два формата экспорта СОП — Stage43](docs/STAGE43_SOP_PRINT_FORMATS_RU.md)** | Книжная и альбомная выгрузка XLSX, без изменения предпросмотра |
 | **[Мастер импорта готовых СОП — Stage42](docs/STAGE42_XLSX_IMPORT_WIZARD_RU.md)** | Пошаговый импорт корпоративских XLSX, предпросмотр ячеек, выбор рабочего листа, сопоставление действий/КМ/причин и фотографий, загрузка в штатный редактор, защита данных и известные ограничения |
 | **[Полное руководство Конструктора СОП (основа Stage41)](docs/USER_GUIDE_STAGE41_RU.md)** | Пошаговая работа с СОП, КМ, причинами, ИИ, проверкой, TWI, ФРВ, фото, библиотекой, версиями и XLSX; настоящие учебные скриншоты Chrome |
 | **[Как пользоваться аудитом первого уровня (L1)](docs/AUDIT_LEVEL1_USER_GUIDE_STAGE41_RU.md)** | Шесть проверяемых функциональных контуров, работа с доказательствами и рисками, контрольные сценарии, форма протокола |
 | **[Руководство по единой интерактивной карте](docs/INTERACTIVE_MAP_USER_GUIDE_STAGE41_RU.md)** | Четыре вкладки, 16 задач ИИ, поиск 73 модулей, фильтры AST, 367 связей, восемь представлений LikeC4 |
 
-**Исходные материалы:** [готовый аудит L1](docs/AUDIT_LEVEL1_STAGE41_RU.md) и [единая карта Stage41 из документационного PR #37](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/docs/archify-stage39-architecture-20261123/docs/diagrams/sop-stage41-unified.html). Карта **не входит в main по решению пользователя**; сам конструктор Stage42 принят.
+**Исходные материалы:** [готовый аудит L1](docs/AUDIT_LEVEL1_STAGE41_RU.md) и [единая карта Stage41 из документационного PR #37](https://github.com/shonentez-afk/SOP-generanjr/raw/refs/heads/docs/archify-stage39-architecture-20261123/docs/diagrams/sop-stage41-unified.html). Карта **не входит в main по решению пользователя**; сам конструктор Stage43 принят.
 
 ![Карта возможностей SOP-generanjr Stage41](docs/img/stage41-overview.svg)
 
