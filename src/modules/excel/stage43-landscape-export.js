@@ -193,3 +193,16 @@ async function stage43WriteLandscape(wb,ws,data,M,status){
   return photoCount;
 }
 stage43InitExportFormat();
+
+// Display the actual release identity after the Stage42 runtime has loaded.
+function stage43SetReleaseLabel(){
+  const label=$('sopVersionLabel');
+  if(label)label.textContent='· Stage43 (форматы экспорта XLSX)';
+}
+function stage43InitReleaseLabel(){
+  const renderAccepted=renderSteps;
+  renderSteps=function(){const result=renderAccepted.apply(this,arguments);stage43SetReleaseLabel();return result};
+  stage43SetReleaseLabel();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stage43InitReleaseLabel,{once:true});
+else queueMicrotask(stage43InitReleaseLabel);

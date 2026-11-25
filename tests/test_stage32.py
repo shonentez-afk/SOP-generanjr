@@ -93,7 +93,7 @@ assert.throws(()=>range(ws,3,5,0),err=>err?.name==='RangeError');
 console.log('PASS Stage32.2: conservative Excel column widths, native image aspect and picture containment');
 """
         script="const EXPORTER="+json.dumps(src)+";\n"+js
-        cmd=subprocess.run(["node","-e",script],text=True,capture_output=True)
+        cmd=subprocess.run(["node","-"],input=script,text=True,capture_output=True)
         self.assertEqual(cmd.returncode,0,cmd.stderr+"\n"+cmd.stdout)
         check=subprocess.run(["node","--check","-"],input=src,text=True,capture_output=True)
         self.assertEqual(check.returncode,0,check.stderr)

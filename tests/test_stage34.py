@@ -114,7 +114,7 @@ assert.equal(scope.computeFrv(steps).errors.length,1);
   console.log('PASS Stage34.1: safe SOP export, step6 mismatch, cancelled validation, measured FRV separation');
 })().catch(e=>{console.error(e);process.exitCode=1});
 """
-        result=subprocess.run(["node","-e","const SOURCE="+json.dumps(source)+";\n"+script],
+        result=subprocess.run(["node","-"],input="const SOURCE="+json.dumps(source)+";\n"+script,
           capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+"\n"+result.stderr)
 
@@ -166,7 +166,7 @@ const copied=d.cycles[0].observations.map((o,i)=>({
 assert(copied.every(x=>x.durationSec===null));
 console.log('PASS Stage34 deterministic Pareto, missing time, repeated measurements and verified before-after');
 """
-        run=subprocess.run(["node","-e","const SOURCE="+json.dumps(source)+";\n"+script],
+        run=subprocess.run(["node","-"],input="const SOURCE="+json.dumps(source)+";\n"+script,
           capture_output=True,text=True)
         self.assertEqual(run.returncode,0,run.stdout+"\n"+run.stderr)
 
