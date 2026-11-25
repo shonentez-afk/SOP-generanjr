@@ -65,7 +65,7 @@ def main():
               c.getContext('2d').fillRect(2,2,12,12);
               const photo=wb.addImage({base64:c.toDataURL('image/png'),extension:'png'});
               for(const [ri,col] of [
-                [8,1],[8,4],[8,8],[8,10],
+                [7,1],[8,4],[7,8],[8,10],
                 [12,1],[12,4],[12,8],[12,10]
               ])ws.addImage(photo,{tl:{row:ri,col},br:{row:ri+.6,col:col+.8}});
               // Additional header logo & safety mark should stay unassigned.
