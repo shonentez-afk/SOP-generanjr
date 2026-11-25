@@ -11159,8 +11159,17 @@ function stage42SplitKeyMoments(value){
   // 1. / 2) are list markers only when followed by whitespace and text.
   // Decimal values (1.5, 2.0), voltage, and plain wrapped lines must
   // not create a new point. Works for both separate and inline numbering.
-  const re=/(^|[ \t\n]+)(\d{1,2})[.)][ \t\n]+(?=\S)/gu;
-  const markers=[...raw.matchAll(re)].map(m=>({
+  // Real corporate SOPs also contain "1.Предупредить", "2 Достать",
+  // "3 стоять" and markers separated by multiple spaces on the same line.
+  // Inline "2. Второй" is valid; bare inline "2 секунды" is not.
+  const re=/(^|[ \t\n]+)(\d{1,2})([.)])?([ \t]*)(?=[\p{L}«“"])/gu;
+  const markers=[...raw.matchAll(re)].filter(m=>{
+    const prefix=m[1],number=Number(m[2]),hasPunct=!!m[3];
+    if(number>60)return false;
+    const start=m.index===0||prefix.includes('\n');
+    const wideSpaces=prefix.length>=2;
+    return (hasPunct||((start||wideSpaces)&&m[4].length>0));
+  }).map(m=>({
     from:m.index+m[1].length,to:m.index+m[0].length,num:Number(m[2]),
     lineStart:m.index===0||m[1].includes('\n')
   }));
@@ -11198,7 +11207,25 @@ function stage42CleanAction(txt){return String(txt||'').replace(/^\s*\d{1,3}\s*[
 function stage42ActionCandidate(txt){
   const v=String(txt||'').trim();
   return v.length>=8&&!stage42IsHeading(v)&&!/^[-+.\d/\s:]+$/u.test(v)
-    &&!/^(\d{1,3}:\d{2}|СОП №|Дата:|УТВЕРЖДАЮ)/iu.test(v);
+    &&!/^(\d{1,3}:\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|СОП №|Дата:|УТВЕРЖДАЮ|Фото\s*\/\s*схема)/iu.test(v);
+}
+function stage42ActionCell(rd,r,c){
+  const raw=rd.raw(r,c),text=rd.text(r,c);
+  // An ExcelJS Date representing a time-formatted cell must never be
+  // mistaken for a manufacturing action ("30.12.1899").
+  return !(raw instanceof Date)&&typeof raw!=='number'&&
+    stage42ActionCandidate(text);
+}
+function stage42ActionColumns(ws,labelCol){
+  // Columns are corporate layout positions, not hardcoded row numbers.
+  if(labelCol===1&&ws.columnCount>=11)return [2,5,9,11];
+  if(labelCol===2&&ws.columnCount>=10)return [3,6,10];
+  return null; // Other templates fall back to cell-content detection.
+}
+function stage42ActionColAnchors(rd,ws,row,labelCol,master){
+  const candidates=stage42ActionColumns(ws,labelCol)||
+    Array.from({length:Math.max(0,Math.min(ws.columnCount,13)-labelCol)},(_,i)=>i+labelCol+1);
+  return candidates.filter(c=>master(row,c)&&stage42ActionCell(rd,row,c));
 }
 function stage42ColumnName(n){
   let result='';
@@ -11249,10 +11276,21 @@ function stage42Metadata(ws,rd){
   }
   const numberRow=findRow(rd,ws,'СОП №');
   if(numberRow)for(let c=1;c<=12;c++){
-    if(!/СОП №/iu.test(rd.text(numberRow,c)))continue;
-    for(let rr=numberRow+1;rr<=Math.min(numberRow+3,ws.rowCount);rr++){
-      const v=rd.text(rr,c);
-      if(v&&!/СОП №|Дата:|УТВЕРЖДАЮ/iu.test(v)){put('sopNumber',v);break}
+    if(!/СОП\s*№/iu.test(rd.text(numberRow,c)))continue;
+    // Old landscape workbooks have "СОП №" in F1 and its value in G1.
+    // Constructor-produced portrait files use G2 -> G3. Never confuse
+    // the next "Время СОП:" row or its formula with the document number.
+    const options=[
+      [numberRow,c+1],[numberRow,c+2],[numberRow+1,c],
+      [numberRow+1,c+1],[numberRow+2,c]
+    ];
+    for(const [rr,cc] of options){
+      if(rr>ws.rowCount||cc>ws.columnCount)continue;
+      const v=rd.text(rr,cc),raw=rd.raw(rr,cc);
+      if(!/\d/u.test(v)||raw instanceof Date||typeof raw==='object'&&
+        raw!==null&&raw.formula!==undefined)continue;
+      if(/СОП\s*№|Время\s+СОП|Дата|УТВЕРЖДАЮ|Ответствен/iu.test(v))continue;
+      put('sopNumber',v);break;
     }
     break;
   }
@@ -11264,7 +11302,13 @@ function stage42Metadata(ws,rd){
       const iso=raw instanceof Date?
         [raw.getFullYear(),String(raw.getMonth()+1).padStart(2,'0'),String(raw.getDate()).padStart(2,'0')].join('-'):
         toIsoDate(val);
-      if(iso){put('date',iso);break}
+      // "00.08.2021г." is present in one legacy example and is NOT a
+      // valid date. Do not silently convert its invalid day into a date.
+      const parsed=iso?new Date(iso+'T00:00:00Z'):null;
+      if(parsed&&!Number.isNaN(parsed.getTime())&&
+         parsed.toISOString().slice(0,10)===iso){
+        put('date',iso);break;
+      }
     }
     break;
   }
@@ -11346,11 +11390,9 @@ function stage42SheetEvidence(ws){
     for(let c=1;c<=Math.min(7,maxCol);c++){
       if(!isMaster(r,c)||!/^Действие(?:я)?$/iu.test(rd.text(r,c)))continue;
       labels++;
-      for(let col=c+1;col<=maxCol;col++){
-        if(isMaster(r,col)&&stage42ActionCandidate(rd.text(r,col))){
-          actions++;
-          if(!firstActionRow)firstActionRow=r;
-        }
+      for(const col of stage42ActionColAnchors(rd,ws,r,c,isMaster)){
+        actions++;
+        if(!firstActionRow)firstActionRow=r;
       }
       break;
     }
@@ -11375,10 +11417,19 @@ function stage42BestSheet(wb){
   const rated=wb.worksheets.map((ws,index)=>({
     ws,index,...stage42SheetEvidence(ws)
   }));
-  rated.sort((a,b)=>
-    b.count-a.count || b.labels-a.labels ||
-    Number(/СОП|SOP/iu.test(b.ws.name))-Number(/СОП|SOP/iu.test(a.ws.name)) ||
-    a.index-b.index);
+  const primaryName=name=>/^(?:СОП|SOP)(?:$|_)/iu.test(name)&&
+    !/Пример|example|шаблон|template/iu.test(name);
+  rated.sort((a,b)=>{
+    // A populated working SOP must beat the "Пример" worksheet even
+    // when that training sheet contains more actions (9 vs 8 in real
+    // uploaded enterprise workbooks). Never choose an empty working tab.
+    const ap=Number(a.count>0&&a.labels>0&&primaryName(a.ws.name));
+    const bp=Number(b.count>0&&b.labels>0&&primaryName(b.ws.name));
+    return bp-ap ||
+      b.count-a.count || b.labels-a.labels ||
+      Number(/СОП|SOP/iu.test(b.ws.name))-Number(/СОП|SOP/iu.test(a.ws.name)) ||
+      a.index-b.index;
+  });
   return rated[0]?.ws||wb.worksheets[0];
 }
 async function stage42ParseFile(file){
@@ -11401,10 +11452,7 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
     }
   }
   const anchors=[];
-  for(const ar of actionRows)for(let c=ar.labelCol+1;c<=Math.min(ws.columnCount,13);c++){
-    if(!master(ar.row,c))continue;
-    const value=rd.text(ar.row,c);
-    if(!stage42ActionCandidate(value))continue;
+  for(const ar of actionRows)for(const c of stage42ActionColAnchors(rd,ws,ar.row,ar.labelCol,master)){
     if(anchors.some(a=>a.row===ar.row&&a.col===c))continue;
     anchors.push({row:ar.row,col:c,labelCol:ar.labelCol});
   }
@@ -11464,30 +11512,70 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
       const row=Math.floor(tl.row)+1,col=Math.floor(tl.col)+1;
       const blob=new Blob([bytes],{type:'image/'+ext});
       const record={bytes,ext,row,col,url:URL.createObjectURL(blob),
-        source:ws.name+'!'+stage42CellAddress(row,col),assigned:-1};
-      // Preserve accepted C:E/F:I/J:L matching and visualization-row rule.
-      if(vizRows.has(row)){
-        // Accepted corporate templates place "Визуализация" immediately
-        // BEFORE the action it illustrates (e.g. portrait rows 15/16, 19/20).
-        // Preserve this mapping over any proximity to the previous step.
-        // Only use a preceding action when there is no immediately following
-        // action and the visualization is clearly inside the preceding block.
-        const prior=actionRows.filter(a=>a.row<row).pop();
-        const following=actionRows.find(a=>a.row>row);
-        const actionRow=following&&following.row===row+1?following.row:
-          prior&&row>=prior.row+2&&row<=prior.row+4?prior.row:null;
-        const targetCol=col>=3&&col<=5?3:col>=6&&col<=9?6:col>=10&&col<=12?10:0;
-        if(actionRow&&targetCol){
-          const index=steps.findIndex(s=>s.source.action===stage42CellAddress(actionRow,targetCol));
-          if(index!==-1&&!media.some(m=>m.assigned===index)){
-            record.assigned=index;steps[index].photoIndex=media.length;
+        source:ws.name+'!'+stage42CellAddress(row,col),assigned:-1,
+        auxiliary:false};
+      // Image row may be the visualization row (the usual template) or
+      // one row above it (old enterprise templates). Do not confuse the
+      // header logo or safety icons with a photo of a manufacturing step.
+      const next=actionRows.find(a=>a.row>row);
+      const previous=actionRows.filter(a=>a.row<row).pop();
+      const isPreceding=!!(next&&
+        (row===next.row-1||(row===next.row-2&&vizRows.has(next.row-1))));
+      const isFollowing=!!(!isPreceding&&previous&&
+        row>=previous.row+2&&row<=previous.row+4&&vizRows.has(row));
+      const actionRow=isPreceding?next.row:isFollowing?previous.row:null;
+      if(actionRow){
+        const group=anchors.filter(a=>a.row===actionRow).sort((a,b)=>a.col-b.col);
+        const labelCol=actionRows.find(a=>a.row===actionRow)?.labelCol||0;
+        // For portrait layouts, image at column B is usually the ISO
+        // pictogram in the left label column, not the action's picture.
+        if(col>labelCol&&group.length){
+          let chosen=group[0];
+          for(const a of group)if(a.col<=col)chosen=a;
+          let index=steps.findIndex(x=>x.source.action===
+            stage42CellAddress(chosen.row,chosen.col));
+          if(index!==-1){
+            let existing=steps[index].photoIndex;
+            const earlier=existing>=0?media[existing]:null;
+            // Older Excel files sometimes anchor a K-lane picture one
+            // column to the LEFT (J) while the I-lane photo is already
+            // attached at I. Assign this distinct picture to the nearest
+            // still-empty action in that same row. Never redirect the
+            // duplicate background/foreground layers from one anchor.
+            if(existing!==-1&&earlier&&
+              !(earlier.row===row&&earlier.col===col)){
+              const open=group.map(a=>({
+                a,step:steps.findIndex(x=>x.source.action===
+                  stage42CellAddress(a.row,a.col))
+              })).filter(item=>item.step>=0&&
+                steps[item.step].photoIndex===-1&&
+                Math.abs(item.a.col-col)<=2)
+                .sort((a,b)=>Math.abs(a.a.col-col)-Math.abs(b.a.col-col));
+              if(open.length){index=open[0].step;existing=-1}
+            }
+            if(existing===-1){
+              record.assigned=index;
+              steps[index].photoIndex=media.length;
+            }else{
+              const previous=media[existing];
+              // The constructor's Excel exporter writes blurred background
+              // followed by ORIGINAL foreground at the SAME coordinates.
+              // The last layer must win (unlike the old first-layer match).
+              if(previous&&previous.row===row&&previous.col===col){
+                previous.assigned=-1;
+                previous.auxiliary=true;
+                record.assigned=index;
+                steps[index].photoIndex=media.length;
+              }
+              // Remaining ambiguous pictures are left for manual review.
+            }
           }
         }
       }
       media.push(record);
     }catch(error){warnings.push('Не удалось распознать отдельное изображение: '+String(error.message||error))}
   }
-  const orphan=media.filter(x=>x.assigned===-1).length;
+  const orphan=media.filter(x=>x.assigned===-1&&!x.auxiliary).length;
   if(orphan)warnings.push('Не назначено изображений: '+orphan+'. Среди них могут быть логотипы и ISO-пиктограммы.');
   stage42ParseFrv(wb,steps,warnings);
   const checklist=stage42ParseChecklist(wb);
@@ -11676,7 +11764,7 @@ function stage42CurrentStep(){
 function stage42MarkDirty(){stage42Wizard.dirty=true}
 function stage42UnusedPhotos(){
   const p=stage42Wizard.proposal;
-  return p?p.media.filter((m,i)=>!p.steps.some(s=>s.photoIndex===i)).length:0;
+  return p?p.media.filter((m,i)=>!m.auxiliary&&!p.steps.some(s=>s.photoIndex===i)).length:0;
 }
 function stage42SetPhoto(index){
   const p=stage42Wizard.proposal,s=stage42CurrentStep();if(!p||!s)return;
@@ -11763,7 +11851,7 @@ function stage42RenderPhotos(){
     const assigned=p.steps.findIndex(s=>s.photoIndex===i);
     return '<div class="stage42-photo"><img alt="Изображение '+(i+1)+'" src="'+
       stage42Esc(m.url)+'"><div>'+stage42Esc(m.source)+'</div><small>'+
-      (assigned>=0?'Шаг '+(assigned+1):'Не назначено · возможный логотип/иконка')+
+      (assigned>=0?'Шаг '+(assigned+1):m.auxiliary?'Служебный фон (дублирующий слой Excel)':'Не назначено · возможный логотип/иконка')+
       '</small><button type="button" data-stage42-pick-photo="'+i+'">К выбранному шагу</button></div>';
   }).join('')||'<p class="stage42-note">В выбранном листе нет встроенных фотографий.</p>';
   const check=stage42El('stage42OmitMedia');
