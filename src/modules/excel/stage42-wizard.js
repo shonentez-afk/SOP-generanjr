@@ -256,7 +256,7 @@ function stage42ShowStep(index){
   if(!p||index<0||index>=p.steps.length)return;
   stage42Wizard.selectedStep=index;
   const source=p.steps[index].source?.action||'';
-  const match=source.match(/^([A-Z]+)(\d+)$/i);
+  const match=source.match(/^(?:.*!)?([A-Z]+)(\d+)$/i);
   if(match){
     const col=[...match[1].toUpperCase()].reduce((n,ch)=>n*26+ch.charCodeAt(0)-64,0);
     const row=Number(match[2]);
