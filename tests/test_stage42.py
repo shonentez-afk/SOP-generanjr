@@ -67,6 +67,7 @@ class Stage42Contracts(unittest.TestCase):
         self.assertIn("data-stage42-moment",wizard)
         self.assertIn("stage42EnableFullKeyMomentLists",wizard)
         self.assertIn("normalizeStepShape=function stage42NormalizeFullKMs",wizard)
+        self.assertIn("normalizeExcelStepKeepingPhoto=function stage42ExcelFullKeyMoments",wizard)
         self.assertIn("stage42SplitKeyMoments(cell.text)",wizard)
         self.assertNotIn("filter(Boolean).slice(0,3)",apply)
         self.assertNotIn("kms.length>3",apply)
