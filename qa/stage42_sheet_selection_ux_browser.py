@@ -39,6 +39,7 @@ def main():
               filled.getCell('B18').value='Причина';
               filled.getCell('C18').value='Чтобы заявка была связана с оборудованием';
               filled.getCell('F18').value='Для передачи точного описания';
+              filled.getCell('B15').value='Визуализация';
               filled.getCell('B19').value='Визуализация';
               filled.getCell('B20').value='Действие';
               filled.getCell('C20').value='3. Проверить карточку заявки';
@@ -50,7 +51,7 @@ def main():
               filled.getCell('C22').value='Чтобы избежать ошибки';
               filled.getCell('F22').value='Для корректной передачи заявки';
               const photo=wb.addImage({base64:'data:image/png;base64,'+b64,extension:'png'});
-              filled.addImage(photo,{tl:{col:2,row:18},br:{col:4,row:18.8}});
+              filled.addImage(photo,{tl:{col:2,row:14},br:{col:4,row:14.8}});
               filled.addImage(photo,{tl:{col:5,row:18},br:{col:7,row:18.8}});
               filled.addImage(photo,{tl:{col:0,row:1},br:{col:1,row:2}});
               wb.addWorksheet('ФРВ');
@@ -85,7 +86,7 @@ def main():
             assert found["sheet"]=="СОП_А3_КнижЭ",found
             assert found["count"]==4,found
             assert found["sources"]==["C16","F16","C20","F20"],found
-            assert found["photos"][:2]==[0,1],found
+            assert found["photos"]==[0,-1,-1,1],found
             assert found["media"]==3 and found["unused"]==1,found
             assert 1<found["firstRow"]<=16,found
             assert found["header"]=="rgb(255, 255, 255)",found
@@ -118,7 +119,7 @@ def main():
             page.locator("#stage42Cancel").click()
             assert not errors,errors
             print("PASS Stage42 UX: automatic populated-sheet choice; portrait action rows, "
-                  "four steps, post-action image mapping, red TN design, reparse on "
+                  "four steps, pre-action corporate image mapping, red TN design, reparse on "
                   "sheet switch, guided zero-step state, source jump, edit guard")
         finally:
             browser.close()
