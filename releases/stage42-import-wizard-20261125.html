@@ -11146,6 +11146,54 @@ function stage42Reader(ws){
 function stage42IsHeading(txt){
   return /^(?:Действие(?:я)?|Ключевой момент|КМ|Причина|Почему важно|Визуализация|QR|Время|Длительность)$/iu.test(String(txt||'').trim());
 }
+// Restore the real numbered key points, not arbitrary visual/soft line wraps.
+// Excel often stores one point over several lines inside a merged cell.
+// Input: "1. Inspect cable\nand plug\n2. Inspect body\n3. Test switch"
+// Output: three complete key points, without embedded list numbers.
+function stage42SplitKeyMoments(value){
+  const raw=stage42CellText(value).replace(/\r\n?/gu,'\n')
+    .replace(/\u00a0/gu,' ').replace(/\u200b/gu,'').trim();
+  if(!raw)return [];
+  const clean=text=>String(text||'').replace(/[ \t]*\n[ \t]*/gu,' ')
+    .replace(/[ \t]{2,}/gu,' ').trim();
+  // 1. / 2) are list markers only when followed by whitespace and text.
+  // Decimal values (1.5, 2.0), voltage, and plain wrapped lines must
+  // not create a new point. Works for both separate and inline numbering.
+  const re=/(^|[ \t\n]+)(\d{1,2})[.)][ \t\n]+(?=\S)/gu;
+  const markers=[...raw.matchAll(re)].map(m=>({
+    from:m.index+m[1].length,to:m.index+m[0].length,num:Number(m[2]),
+    lineStart:m.index===0||m[1].includes('\n')
+  }));
+  const first=markers.findIndex(m=>m.num===1&&
+    (m.lineStart||raw.slice(0,m.from).trim().length===0));
+  if(first!==-1){
+    const points=[];
+    let previous=markers[first],start=previous.to;
+    const prelude=clean(raw.slice(0,previous.from));
+    for(let i=first+1;i<markers.length;i++){
+      const marker=markers[i];
+      // Prefer sequential 1,2,3...; later numbers embedded in sentences
+      // are not mistaken for a new point. If a numbered list skips a
+      // number, only an explicit new-line marker is treated as a boundary.
+      if(marker.num!==previous.num+1&&!marker.lineStart)continue;
+      const text=clean(raw.slice(start,marker.from));
+      if(text)points.push(points.length===0&&prelude?prelude+' '+text:text);
+      previous=marker;start=marker.to;
+    }
+    const tail=clean(raw.slice(start));
+    if(tail)points.push(points.length===0&&prelude?prelude+' '+tail:tail);
+    if(points.length)return points;
+  }
+  // Unnumbered bulleted paragraphs are distinct points.
+  const lines=raw.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(lines.length>1&&lines.every(x=>/^(?:[•●▪▫*]|[-–—])\s+\S/u.test(x)))
+    return lines.map(x=>clean(x.replace(/^(?:[•●▪▫*]|[-–—])\s+/u,'')));
+  // Empty paragraphs indicate separation; a single line break alone
+  // usually means word wrapping inside one key point.
+  const paragraphs=raw.split(/\n[ \t]*\n+/u).map(clean).filter(Boolean);
+  if(paragraphs.length>1)return paragraphs;
+  return [clean(raw.replace(/^\s*\d{1,2}[.)]\s+/u,''))].filter(Boolean);
+}
 function stage42CleanAction(txt){return String(txt||'').replace(/^\s*\d{1,3}\s*[.)]\s*/u,'').trim()}
 function stage42ActionCandidate(txt){
   const v=String(txt||'').trim();
@@ -11380,7 +11428,7 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
     const next=anchors.find(v=>v.row>a.row)?.row||ws.rowCount+1;
     const km=stage42ReadLabeled(rd,ws,a.row,a.col,/^(?:Ключевой момент|КМ)$/iu,1,next);
     const why=stage42ReadLabeled(rd,ws,a.row,a.col,/^(?:Причина|Почему важно)$/iu,2,next);
-    const moments=km.text?km.text.split(/\n+/u).map(x=>x.replace(/^\s*\d+\s*[.)]\s*/u,'').trim()).filter(Boolean):[];
+    const moments=stage42SplitKeyMoments(km.text);
     let durationSeconds=0,timeSource='';
     for(let tc=a.col+1;tc<=Math.min(a.col+4,ws.columnCount||13);tc++){
       if(!master(a.row,tc))continue;
@@ -11396,7 +11444,8 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
     steps.push({action,keyMoments:moments.length?moments:[''],reason:why.text,
       durationSeconds,successCriteria:'',source,photoIndex:-1,
       frv:{vdc:false,m2:'',m1:'',move:'',comment:''}});
-    if(moments.length>3)warnings.push('В шаге '+steps.length+' более трёх КМ. Разделите их перед загрузкой.');
+    if(moments.length>3)warnings.push('Шаг '+steps.length+': распознано '+moments.length+
+      ' нумерованных КМ. Все пункты сохраняются отдельно; проверьте их и итоговую печатную форму.');
   }
   if(!steps.length)warnings.push('На листе «'+ws.name+'» не удалось найти действия. Выберите другой лист или назначьте ячейки вручную.');
   const details=stage42Metadata(ws,rd);
@@ -11470,7 +11519,7 @@ function stage42CheckProposal(proposal){
     if(!String(st.action||'').trim())throw new Error('В шаге '+(i+1)+' отсутствует действие');
     if(String(st.action).length>3000)throw new Error('Слишком длинное действие в шаге '+(i+1));
     const kms=(st.keyMoments||[]).map(x=>String(x).trim()).filter(Boolean);
-    if(kms.length>3)throw new Error('В шаге '+(i+1)+' более трёх КМ; распределите их по шагам');
+    if(kms.length>60)throw new Error('В шаге '+(i+1)+' более 60 КМ. Проверьте исходную ячейку и разделите ошибочно объединённые списки.');
     if(kms.some(x=>x.length>1600))throw new Error('Слишком длинный ключевой момент в шаге '+(i+1));
     if(String(st.reason||'').length>8000)throw new Error('Слишком длинная причина в шаге '+(i+1));
     if(!Number.isFinite(Number(st.durationSeconds))||Number(st.durationSeconds)<0)
@@ -11538,7 +11587,7 @@ async function stage42ApplyProposal(proposal,signature){
         s=createEmptyStep();
       }
       s.action=String(source.action||'').trim();
-      s.keyMoments=(source.keyMoments||[]).map(x=>String(x).trim()).filter(Boolean).slice(0,3);
+      s.keyMoments=(source.keyMoments||[]).map(x=>String(x).trim()).filter(Boolean);
       if(!s.keyMoments.length)s.keyMoments=[''];
       s.reason=String(source.reason||'');
       s.durationSeconds=Math.round(Number(source.durationSeconds)||0);
@@ -11660,19 +11709,32 @@ function stage42RenderSteps(){
     '<p class="stage42-note">Шаги не распознаны. Выберите ячейку и создайте шаг вручную.</p>';
   stage42El('stage42Count').textContent=p.steps.length+' шагов';
 }
+function stage42RenderMomentFields(s){
+  const host=stage42El('stage42MomentFields');if(!host)return;
+  host.innerHTML=(s.keyMoments||['']).map((value,i)=>
+    '<div class="stage42-moment-item"><label for="stage42Moment'+i+'">'+(i+1)+'. Ключевой момент</label>'+
+    '<textarea id="stage42Moment'+i+'" rows="2" data-stage42-moment="'+i+
+    '" placeholder="Точный текст '+(i+1)+'-го КМ из исходного XLSX">'+
+    stage42Esc(value)+'</textarea>'+
+    '<button type="button" title="Удалить этот КМ" aria-label="Удалить КМ '+(i+1)+
+    '" data-stage42-remove-moment="'+i+'">✕</button></div>').join('');
+  const count=stage42El('stage42MomentCount');
+  if(count)count.textContent=(s.keyMoments||[]).filter(x=>String(x).trim()).length+' КМ';
+}
 function stage42RenderStepEditor(){
   const p=stage42Wizard.proposal,s=stage42CurrentStep();
   const form=stage42El('stage42StepFields');
   if(!s){form.hidden=true;return}
   form.hidden=false;
   for(const [field,value] of Object.entries({
-    action:s.action,keyMoments:(s.keyMoments||[]).join('\n'),
+    action:s.action,
     reason:s.reason,successCriteria:s.successCriteria,
     durationSeconds:s.durationSeconds
   })){
     const input=form.querySelector('[data-stage42-field="'+field+'"]');
     if(input)input.value=String(value??'');
   }
+  stage42RenderMomentFields(s);
   const photo=form.querySelector('#stage42PhotoSelect');
   photo.innerHTML='<option value="-1">Нет фотографии</option>'+
     p.media.map((m,i)=>'<option value="'+i+'">'+stage42Esc(m.source)+
@@ -11919,8 +11981,12 @@ function stage42UseCell(field){
   }
   if(field==='action'){s.action=stage42CleanAction(cell.text);s.source.action=cell.source}
   else if(field==='km'){
-    const parts=cell.text.split(/\n+/u).map(v=>v.trim()).filter(Boolean);
+    const parts=stage42SplitKeyMoments(cell.text);
     const existing=s.keyMoments.filter(x=>String(x).trim());
+    if(existing.length+parts.length>60){
+      stage42Info('В выбранной ячейке слишком много КМ. Проверьте нумерацию исходного Excel.',true);
+      return;
+    }
     s.keyMoments=existing.concat(parts);
     s.source.keyMoments=cell.source;
   }else if(field==='reason'){s.reason=cell.text;s.source.reason=cell.source}
@@ -12042,6 +12108,13 @@ function stage42Style(){
     '#stage42Wizard .stage42-step small{line-height:1.42}',
     '#stage42Wizard .stage42-empty{border:1px dashed #ee9399;background:#fff9f9;padding:16px;border-radius:12px;margin:10px 0;color:#8f2d35}',
     '#stage42Wizard .stage42-empty p{margin:8px 0 12px;color:#64748b;line-height:1.5}',
+    '#stage42Wizard .stage42-moment-panel{border:1px solid #e2e6ec;background:#fafbfc;border-radius:10px;padding:11px 13px}',
+    '#stage42Wizard .stage42-moment-list{display:grid;gap:10px;margin:9px 0}',
+    '#stage42Wizard .stage42-moment-item{display:grid;grid-template-columns:1fr auto;align-items:start;gap:5px 8px}',
+    '#stage42Wizard .stage42-moment-item label{grid-column:1/-1;font-weight:700;color:#435166}',
+    '#stage42Wizard .stage42-moment-item textarea{width:100%;min-height:62px;resize:vertical;line-height:1.5}',
+    '#stage42Wizard .stage42-moment-item button{width:36px;min-height:36px;color:#b91c1c;border-color:#f1caca}',
+    '#stage42Wizard #stage42AddMoment{font-weight:650;color:#b8000b;border-color:#f2c9ce;background:white}',
     '#stage42Wizard .stage42-fields{gap:12px;margin-top:12px}',
     '#stage42Wizard .stage42-fields label{font-size:12.5px;color:#475569}',
     '#stage42Wizard input:not([type=checkbox]),#stage42Wizard textarea,#stage42Wizard select{border:1px solid #d0d8e3;border-radius:9px;padding:9px 10px;background:#fff;color:#1e293b}',
@@ -12138,8 +12211,14 @@ function stage42Init(){
     '<button type="button" id="stage42StepRemove" class="stage42-danger">Удалить шаг</button></div>',
     '<div id="stage42StepFields" class="stage42-fields">',
     '<label class="stage42-wide">Действие<textarea data-stage42-field="action"></textarea></label>',
-    '<label class="stage42-wide">Ключевые моменты (каждый с новой строки, максимум 3)',
-    '<textarea rows="3" data-stage42-field="keyMoments"></textarea></label>',
+    '<div class="stage42-wide stage42-moment-panel">',
+    '<div class="stage42-topline"><label>Ключевые моменты — каждый отдельным пунктом</label>',
+    '<span id="stage42MomentCount" class="stage42-note"></span></div>',
+    '<p class="stage42-help">Нумерация 1., 2., 3. из Excel разделяется автоматически.',
+    ' Перенос длинной строки внутри пункта не создаёт новый КМ.</p>',
+    '<div id="stage42MomentFields" class="stage42-moment-list"></div>',
+    '<button type="button" id="stage42AddMoment">＋ Добавить ключевой момент</button>',
+    '</div>',
     '<label class="stage42-wide">Причина — одно поле, допускается нумерация',
     '<textarea rows="3" data-stage42-field="reason"></textarea></label>',
     '<label class="stage42-wide">Критерий результата<textarea data-stage42-field="successCriteria"></textarea></label>',
@@ -12202,13 +12281,58 @@ function stage42Init(){
   });
   stage42El('stage42PhotoSelect').addEventListener('change',e=>stage42SetPhoto(Number(e.target.value)));
   stage42El('stage42StepFields').addEventListener('input',e=>{
-    const el=e.target.closest('[data-stage42-field]'),s=stage42CurrentStep();
-    if(!el||!s)return;
+    const s=stage42CurrentStep();if(!s)return;
+    const moment=e.target.closest('[data-stage42-moment]');
+    if(moment){
+      const index=Number(moment.dataset.stage42Moment);
+      if(index>=0&&index<s.keyMoments.length){
+        s.keyMoments[index]=moment.value;
+        stage42MarkDirty();stage42RenderSteps();
+      }
+      return;
+    }
+    const el=e.target.closest('[data-stage42-field]');
+    if(!el)return;
     const name=el.dataset.stage42Field;
-    if(name==='keyMoments')s.keyMoments=el.value.split(/\n+/u);
-    else if(name==='durationSeconds')s.durationSeconds=el.value===''?0:Number(el.value);
+    if(name==='durationSeconds')s.durationSeconds=el.value===''?0:Number(el.value);
     else if(['action','reason','successCriteria'].includes(name))s[name]=el.value;
     stage42MarkDirty();stage42RenderSteps();
+  });
+  stage42El('stage42StepFields').addEventListener('paste',e=>{
+    const area=e.target.closest('[data-stage42-moment]'),s=stage42CurrentStep();
+    if(!area||!s)return;
+    const text=e.clipboardData?.getData('text/plain')||'';
+    const parts=stage42SplitKeyMoments(text);
+    if(parts.length<2)return;
+    if(s.keyMoments.length+parts.length-1>60){
+      e.preventDefault();
+      stage42Info('Вставка содержит слишком много КМ; разделите список на части.',true);
+      return;
+    }
+    e.preventDefault();
+    const index=Number(area.dataset.stage42Moment);
+    s.keyMoments.splice(index,1,...parts);
+    stage42MarkDirty();stage42RenderMomentFields(s);stage42RenderSteps();
+    stage42Info('Распознано '+parts.length+' нумерованных КМ. Проверьте каждый пункт.');
+  });
+  stage42El('stage42StepFields').addEventListener('click',e=>{
+    const remove=e.target.closest('[data-stage42-remove-moment]'),s=stage42CurrentStep();
+    if(!remove||!s)return;
+    const index=Number(remove.dataset.stage42RemoveMoment);
+    if(s.keyMoments.length<=1)s.keyMoments=[''];
+    else s.keyMoments.splice(index,1);
+    stage42MarkDirty();stage42RenderMomentFields(s);stage42RenderSteps();
+  });
+  stage42El('stage42AddMoment').addEventListener('click',()=>{
+    const s=stage42CurrentStep();if(!s)return;
+    if(s.keyMoments.length>=60){
+      stage42Info('Для одного действия допускается до 60 КМ. Проверьте исходную ячейку.',true);
+      return;
+    }
+    s.keyMoments.push('');
+    stage42MarkDirty();stage42RenderMomentFields(s);stage42RenderSteps();
+    stage42El('stage42MomentFields').querySelector(
+      '[data-stage42-moment="'+(s.keyMoments.length-1)+'"]')?.focus();
   });
   stage42El('stage42Meta').addEventListener('input',e=>{
     const el=e.target.closest('[data-stage42-meta]');
@@ -12249,6 +12373,63 @@ function stage42Init(){
     if(e.key==='Escape'&&!host.hidden){e.preventDefault();stage42Close()}
   });
 }
+// Stage41's accepted editor handles no more than three KM in normalisation.
+// Stage42 imports can contain four, five, or more *real numbered points* in
+// one action. Preserve them through drafts/library/JSON without changing the
+// underlying Stage41 sources; the normal three-KM workflow stays identical.
+function stage42EnableFullKeyMomentLists(){
+  const acceptedNormalize=normalizeStepShape;
+  normalizeStepShape=function stage42NormalizeFullKMs(source){
+    const step=acceptedNormalize(source);
+    if(Array.isArray(source?.keyMoments)&&source.keyMoments.length>3){
+      step.keyMoments=source.keyMoments.map(value=>String(value??''));
+    }
+    return step;
+  };
+  // Stage38 exports an isolated Excel snapshot and independently caps its
+  // normalized keyMoments at three. Apply the same non-destructive extended
+  // list exception to the export *snapshot*, keeping all existing photo
+  // and FRV handling intact.
+  const acceptedExcelNormalize=normalizeExcelStepKeepingPhoto;
+  normalizeExcelStepKeepingPhoto=function stage42ExcelFullKeyMoments(source){
+    const step=acceptedExcelNormalize(source);
+    if(Array.isArray(source?.keyMoments)&&source.keyMoments.length>3){
+      step.keyMoments=source.keyMoments.map(value=>String(value??''));
+    }
+    return step;
+  };
+  const acceptedRender=renderSteps;
+  renderSteps=function stage42RenderFullKMs(){
+    const result=acceptedRender.apply(this,arguments);
+    const cards=document.querySelectorAll('#stepsContainer .step-card');
+    cards.forEach((card,i)=>{
+      const step=state.steps[i];
+      if(!step||step.keyMoments.length<3||step.keyMoments.length>=60)return;
+      const first=card.querySelector('[data-km="'+step.id+'"]');
+      const area=first?.parentElement?.parentElement;
+      if(!area||area.querySelector('[data-stage42-add-more-km]'))return;
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.dataset.stage42AddMoreKm=String(step.id);
+      btn.className='text-xs text-red-700 mt-1 font-medium';
+      btn.textContent='＋ Добавить КМ';
+      btn.addEventListener('click',event=>{
+        event.preventDefault();
+        if(state.documentManager?.status==='Опубликован'||
+           state.documentManager?.status==='Архив')return;
+        if(step.keyMoments.length>=60)return;
+        step.keyMoments.push('');
+        stateChanged();
+        renderSteps();
+      });
+      area.appendChild(btn);
+    });
+    const label=$('sopVersionLabel');
+    if(label)label.textContent='· Stage42 (импорт XLSX)';
+    return result;
+  };
+}
+stage42EnableFullKeyMomentLists();
 stage42Init();
 // Stage28: preserve accepted native four-button SOP toolbar; unify mentor result source.
 // Existing buttons, tab navigation, screenshots/Excel and runtime are untouched.
