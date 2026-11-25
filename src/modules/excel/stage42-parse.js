@@ -153,6 +153,52 @@ function stage42ParseChecklist(wb){
   }
   return changes;
 }
+// Check actual SOP content in *every* worksheet. Names alone can identify an
+// empty landscape template while the populated SOP is the portrait sheet.
+function stage42SheetEvidence(ws){
+  const rd=makeReader(ws),mm=buildMergeMap(ws);
+  const isMaster=(r,c)=>!mm[r+':'+c]||mm[r+':'+c]===stage42CellAddress(r,c);
+  let labels=0,actions=0,numbered=0,firstActionRow=0;
+  const maxRow=Math.min(ws.rowCount||0,2000),maxCol=Math.min(ws.columnCount||13,13);
+  for(let r=1;r<=maxRow;r++){
+    for(let c=1;c<=Math.min(7,maxCol);c++){
+      if(!isMaster(r,c)||!/^Действие(?:я)?$/iu.test(rd.text(r,c)))continue;
+      labels++;
+      for(let col=c+1;col<=maxCol;col++){
+        if(isMaster(r,col)&&stage42ActionCandidate(rd.text(r,col))){
+          actions++;
+          if(!firstActionRow)firstActionRow=r;
+        }
+      }
+      break;
+    }
+  }
+  if(!actions){
+    for(let r=1;r<=maxRow;r++){
+      for(let c=1;c<=maxCol;c++){
+        if(!isMaster(r,c))continue;
+        const t=rd.text(r,c);
+        if(/^\d{1,3}\s*[.)]\s*[\p{L}]/u.test(t)&&stage42ActionCandidate(t)){
+          numbered++;
+          if(!firstActionRow)firstActionRow=r;
+          break;
+        }
+      }
+    }
+  }
+  return {sheet:ws.name,actions,labels,numbered,count:actions||numbered,
+    firstActionRow};
+}
+function stage42BestSheet(wb){
+  const rated=wb.worksheets.map((ws,index)=>({
+    ws,index,...stage42SheetEvidence(ws)
+  }));
+  rated.sort((a,b)=>
+    b.count-a.count || b.labels-a.labels ||
+    Number(/СОП|SOP/iu.test(b.ws.name))-Number(/СОП|SOP/iu.test(a.ws.name)) ||
+    a.index-b.index);
+  return rated[0]?.ws||wb.worksheets[0];
+}
 async function stage42ParseFile(file){
   if(!file||!/\.xlsx$/iu.test(file.name||''))throw new Error('Выберите файл .xlsx');
   if(file.size>80*1024*1024)throw new Error('Файл более 80 МБ; разбейте импорт на меньшие файлы');
@@ -160,16 +206,10 @@ async function stage42ParseFile(file){
   const wb=new ExcelJS.Workbook();
   await wb.xlsx.load(await file.arrayBuffer());
   if(!wb.worksheets.length)throw new Error('Книга Excel не содержит листов');
-  const isSop=ws=>/^(СОП|SOP|СОП_А3)$/iu.test(ws.name);
-  const hasSop=ws=>/СОП|SOP/iu.test(ws.name);
-  const hasActions=ws=>{
-    const rd=makeReader(ws);
-    for(let r=1;r<=Math.min(ws.rowCount,160);r++)for(let c=1;c<=Math.min(ws.columnCount,7);c++)
-      if(/^Действие(?:я)?$/iu.test(rd.text(r,c)))return true;
-    return false;
-  };
-  const ws=wb.worksheets.find(isSop)||wb.worksheets.find(hasSop)||
-    wb.worksheets.find(hasActions)||wb.worksheets[0];
+  return stage42ParseSelectedSheet(wb,stage42BestSheet(wb),file.name);
+}
+function stage42ParseSelectedSheet(wb,ws,fileName){
+  if(!ws)throw new Error('Выберите лист, содержащий СОП');
   const rd=makeReader(ws),mm=buildMergeMap(ws),warnings=[],steps=[];
   const master=(r,c)=>!mm[r+':'+c]||mm[r+':'+c]===stage42CellAddress(r,c);
   const actionRows=[];
@@ -224,7 +264,7 @@ async function stage42ParseFile(file){
       frv:{vdc:false,m2:'',m1:'',move:'',comment:''}});
     if(moments.length>3)warnings.push('В шаге '+steps.length+' более трёх КМ. Разделите их перед загрузкой.');
   }
-  if(!steps.length)warnings.push('Не удалось автоматически найти действия. Назначьте текст ячеек вручную.');
+  if(!steps.length)warnings.push('На листе «'+ws.name+'» не удалось найти действия. Выберите другой лист или назначьте ячейки вручную.');
   const details=stage42Metadata(ws,rd);
   const media=[];
   const vizRows=new Set();
@@ -260,7 +300,7 @@ async function stage42ParseFile(file){
   if(orphan)warnings.push('Не назначено изображений: '+orphan+'. Среди них могут быть логотипы и ISO-пиктограммы.');
   stage42ParseFrv(wb,steps,warnings);
   const checklist=stage42ParseChecklist(wb);
-  return {fileName:file.name,wb,ws,steps,meta:details.meta,
+  return {fileName,wb,ws,steps,meta:details.meta,
     agreed:details.agreed,responsibles:details.responsibles,checklist,
     media,warnings,sourceSheet:ws.name,readOnly:true};
 }
