@@ -54,19 +54,32 @@ function stage42RenderSteps(){
     '<p class="stage42-note">Шаги не распознаны. Выберите ячейку и создайте шаг вручную.</p>';
   stage42El('stage42Count').textContent=p.steps.length+' шагов';
 }
+function stage42RenderMomentFields(s){
+  const host=stage42El('stage42MomentFields');if(!host)return;
+  host.innerHTML=(s.keyMoments||['']).map((value,i)=>
+    '<div class="stage42-moment-item"><label for="stage42Moment'+i+'">'+(i+1)+'. Ключевой момент</label>'+
+    '<textarea id="stage42Moment'+i+'" rows="2" data-stage42-moment="'+i+
+    '" placeholder="Точный текст '+(i+1)+'-го КМ из исходного XLSX">'+
+    stage42Esc(value)+'</textarea>'+
+    '<button type="button" title="Удалить этот КМ" aria-label="Удалить КМ '+(i+1)+
+    '" data-stage42-remove-moment="'+i+'">✕</button></div>').join('');
+  const count=stage42El('stage42MomentCount');
+  if(count)count.textContent=(s.keyMoments||[]).filter(x=>String(x).trim()).length+' КМ';
+}
 function stage42RenderStepEditor(){
   const p=stage42Wizard.proposal,s=stage42CurrentStep();
   const form=stage42El('stage42StepFields');
   if(!s){form.hidden=true;return}
   form.hidden=false;
   for(const [field,value] of Object.entries({
-    action:s.action,keyMoments:(s.keyMoments||[]).join('\n'),
+    action:s.action,
     reason:s.reason,successCriteria:s.successCriteria,
     durationSeconds:s.durationSeconds
   })){
     const input=form.querySelector('[data-stage42-field="'+field+'"]');
     if(input)input.value=String(value??'');
   }
+  stage42RenderMomentFields(s);
   const photo=form.querySelector('#stage42PhotoSelect');
   photo.innerHTML='<option value="-1">Нет фотографии</option>'+
     p.media.map((m,i)=>'<option value="'+i+'">'+stage42Esc(m.source)+
@@ -532,8 +545,14 @@ function stage42Init(){
     '<button type="button" id="stage42StepRemove" class="stage42-danger">Удалить шаг</button></div>',
     '<div id="stage42StepFields" class="stage42-fields">',
     '<label class="stage42-wide">Действие<textarea data-stage42-field="action"></textarea></label>',
-    '<label class="stage42-wide">Ключевые моменты (каждый с новой строки, максимум 3)',
-    '<textarea rows="3" data-stage42-field="keyMoments"></textarea></label>',
+    '<div class="stage42-wide stage42-moment-panel">',
+    '<div class="stage42-topline"><label>Ключевые моменты — каждый отдельным пунктом</label>',
+    '<span id="stage42MomentCount" class="stage42-note"></span></div>',
+    '<p class="stage42-help">Нумерация 1., 2., 3. из Excel разделяется автоматически.',
+    ' Перенос длинной строки внутри пункта не создаёт новый КМ.</p>',
+    '<div id="stage42MomentFields" class="stage42-moment-list"></div>',
+    '<button type="button" id="stage42AddMoment">＋ Добавить ключевой момент</button>',
+    '</div>',
     '<label class="stage42-wide">Причина — одно поле, допускается нумерация',
     '<textarea rows="3" data-stage42-field="reason"></textarea></label>',
     '<label class="stage42-wide">Критерий результата<textarea data-stage42-field="successCriteria"></textarea></label>',
