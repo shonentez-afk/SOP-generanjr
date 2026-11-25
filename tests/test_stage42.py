@@ -56,6 +56,21 @@ class Stage42Contracts(unittest.TestCase):
         self.assertNotIn("aiAsk(",code)
         self.assertNotIn("AI_PROXY_BASE",code)
 
+    def test_all_numbered_key_moments_are_preserved_in_stage42(self):
+        parser=build_stage42.read("src/modules/excel/stage42-parse.js")
+        wizard=build_stage42.read("src/modules/excel/stage42-wizard.js")
+        apply=build_stage42.read("src/modules/excel/stage42-apply.js")
+        self.assertIn("function stage42SplitKeyMoments",parser)
+        self.assertIn("const moments=stage42SplitKeyMoments(km.text)",parser)
+        self.assertNotIn("km.text.split(/\\n+/u)",parser)
+        self.assertIn("stage42RenderMomentFields",wizard)
+        self.assertIn("data-stage42-moment",wizard)
+        self.assertIn("stage42EnableFullKeyMomentLists",wizard)
+        self.assertIn("normalizeStepShape=function stage42NormalizeFullKMs",wizard)
+        self.assertIn("stage42SplitKeyMoments(cell.text)",wizard)
+        self.assertNotIn("filter(Boolean).slice(0,3)",apply)
+        self.assertNotIn("kms.length>3",apply)
+
     def test_sheet_choice_and_main_app_visual_language(self):
         parser=build_stage42.read("src/modules/excel/stage42-parse.js")
         wizard=build_stage42.read("src/modules/excel/stage42-wizard.js")
