@@ -32,8 +32,17 @@ function stage42SplitKeyMoments(value){
   // 1. / 2) are list markers only when followed by whitespace and text.
   // Decimal values (1.5, 2.0), voltage, and plain wrapped lines must
   // not create a new point. Works for both separate and inline numbering.
-  const re=/(^|[ \t\n]+)(\d{1,2})[.)][ \t\n]+(?=\S)/gu;
-  const markers=[...raw.matchAll(re)].map(m=>({
+  // Real corporate SOPs also contain "1.Предупредить", "2 Достать",
+  // "3 стоять" and markers separated by multiple spaces on the same line.
+  // Inline "2. Второй" is valid; bare inline "2 секунды" is not.
+  const re=/(^|[ \t\n]+)(\d{1,2})([.)])?([ \t]*)(?=[\p{L}«“"])/gu;
+  const markers=[...raw.matchAll(re)].filter(m=>{
+    const prefix=m[1],number=Number(m[2]),hasPunct=!!m[3];
+    if(number>60)return false;
+    const start=m.index===0||prefix.includes('\n');
+    const wideSpaces=prefix.length>=2;
+    return (hasPunct||((start||wideSpaces)&&m[4].length>0));
+  }).map(m=>({
     from:m.index+m[1].length,to:m.index+m[0].length,num:Number(m[2]),
     lineStart:m.index===0||m[1].includes('\n')
   }));
@@ -71,7 +80,25 @@ function stage42CleanAction(txt){return String(txt||'').replace(/^\s*\d{1,3}\s*[
 function stage42ActionCandidate(txt){
   const v=String(txt||'').trim();
   return v.length>=8&&!stage42IsHeading(v)&&!/^[-+.\d/\s:]+$/u.test(v)
-    &&!/^(\d{1,3}:\d{2}|СОП №|Дата:|УТВЕРЖДАЮ)/iu.test(v);
+    &&!/^(\d{1,3}:\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|СОП №|Дата:|УТВЕРЖДАЮ|Фото\s*\/\s*схема)/iu.test(v);
+}
+function stage42ActionCell(rd,r,c){
+  const raw=rd.raw(r,c),text=rd.text(r,c);
+  // An ExcelJS Date representing a time-formatted cell must never be
+  // mistaken for a manufacturing action ("30.12.1899").
+  return !(raw instanceof Date)&&typeof raw!=='number'&&
+    stage42ActionCandidate(text);
+}
+function stage42ActionColumns(ws,labelCol){
+  // Columns are corporate layout positions, not hardcoded row numbers.
+  if(labelCol===1&&ws.columnCount>=11)return [2,5,9,11];
+  if(labelCol===2&&ws.columnCount>=10)return [3,6,10];
+  return null; // Other templates fall back to cell-content detection.
+}
+function stage42ActionColAnchors(rd,ws,row,labelCol,master){
+  const candidates=stage42ActionColumns(ws,labelCol)||
+    Array.from({length:Math.max(0,Math.min(ws.columnCount,13)-labelCol)},(_,i)=>i+labelCol+1);
+  return candidates.filter(c=>master(row,c)&&stage42ActionCell(rd,row,c));
 }
 function stage42ColumnName(n){
   let result='';
@@ -219,11 +246,9 @@ function stage42SheetEvidence(ws){
     for(let c=1;c<=Math.min(7,maxCol);c++){
       if(!isMaster(r,c)||!/^Действие(?:я)?$/iu.test(rd.text(r,c)))continue;
       labels++;
-      for(let col=c+1;col<=maxCol;col++){
-        if(isMaster(r,col)&&stage42ActionCandidate(rd.text(r,col))){
-          actions++;
-          if(!firstActionRow)firstActionRow=r;
-        }
+      for(const col of stage42ActionColAnchors(rd,ws,r,c,isMaster)){
+        actions++;
+        if(!firstActionRow)firstActionRow=r;
       }
       break;
     }
@@ -248,10 +273,19 @@ function stage42BestSheet(wb){
   const rated=wb.worksheets.map((ws,index)=>({
     ws,index,...stage42SheetEvidence(ws)
   }));
-  rated.sort((a,b)=>
-    b.count-a.count || b.labels-a.labels ||
-    Number(/СОП|SOP/iu.test(b.ws.name))-Number(/СОП|SOP/iu.test(a.ws.name)) ||
-    a.index-b.index);
+  const primaryName=name=>/^(?:СОП|SOP)(?:$|_)/iu.test(name)&&
+    !/Пример|example|шаблон|template/iu.test(name);
+  rated.sort((a,b)=>{
+    // A populated working SOP must beat the "Пример" worksheet even
+    // when that training sheet contains more actions (9 vs 8 in real
+    // uploaded enterprise workbooks). Never choose an empty working tab.
+    const ap=Number(a.count>0&&a.labels>0&&primaryName(a.ws.name));
+    const bp=Number(b.count>0&&b.labels>0&&primaryName(b.ws.name));
+    return bp-ap ||
+      b.count-a.count || b.labels-a.labels ||
+      Number(/СОП|SOP/iu.test(b.ws.name))-Number(/СОП|SOP/iu.test(a.ws.name)) ||
+      a.index-b.index;
+  });
   return rated[0]?.ws||wb.worksheets[0];
 }
 async function stage42ParseFile(file){
@@ -274,10 +308,7 @@ function stage42ParseSelectedSheet(wb,ws,fileName){
     }
   }
   const anchors=[];
-  for(const ar of actionRows)for(let c=ar.labelCol+1;c<=Math.min(ws.columnCount,13);c++){
-    if(!master(ar.row,c))continue;
-    const value=rd.text(ar.row,c);
-    if(!stage42ActionCandidate(value))continue;
+  for(const ar of actionRows)for(const c of stage42ActionColAnchors(rd,ws,ar.row,ar.labelCol,master)){
     if(anchors.some(a=>a.row===ar.row&&a.col===c))continue;
     anchors.push({row:ar.row,col:c,labelCol:ar.labelCol});
   }
