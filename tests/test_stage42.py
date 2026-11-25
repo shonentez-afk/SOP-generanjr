@@ -56,5 +56,21 @@ class Stage42Contracts(unittest.TestCase):
         self.assertNotIn("aiAsk(",code)
         self.assertNotIn("AI_PROXY_BASE",code)
 
+    def test_sheet_choice_and_main_app_visual_language(self):
+        parser=build_stage42.read("src/modules/excel/stage42-parse.js")
+        wizard=build_stage42.read("src/modules/excel/stage42-wizard.js")
+        for name in ("stage42SheetEvidence","stage42BestSheet",
+                     "stage42ParseSelectedSheet","stage42Reader"):
+            self.assertIn(name,parser)
+        for name in ("stage42ChooseSopSheet","stage42ShowStep",
+                     "stage42EmptyGuide","stage42SheetAdvice","stage42EmptyPick",
+                     "stage42RescanSheet","stage42-needs-mapping"):
+            self.assertIn(name,wizard)
+        for token in ("--tn-red","--tn-ink","--tn-bg","Inter,system-ui",
+                      "Загрузить в Конструктор СОП","source.match"):
+            self.assertIn(token,wizard)
+        self.assertIn("stage42Apply').disabled=!p.steps.length",wizard)
+        self.assertIn("stage42Reader(ws).text(cell.row,cell.col)",wizard)
+
 if __name__=="__main__":
     unittest.main()
