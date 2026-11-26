@@ -1,0 +1,140 @@
+// SOP-generanjr Stage39 architecture. Source snapshot: main@4cf1a467e912984cb98d6dc969ab10eb685f458b
+// Documentation only. Components below are logical boundaries inside ONE browser runtime.
+specification {
+  element person {
+    style {
+      shape person
+      color green
+    }
+  }
+  element system {
+    style {
+      shape browser
+      color blue
+    }
+  }
+  element module
+  element storage {
+    style {
+      shape storage
+      color amber
+    }
+  }
+  element cloud {
+    style {
+      color green
+    }
+  }
+  element external
+}
+
+model {
+  worker = person 'Сотрудник на ПК'
+
+  app = system 'SOP-generanjr Stage39' {
+    description '67 исходных JavaScript модулей, объединяемых в один автономный HTML для Chrome или Edge через file://.'
+    link https://github.com/shonentez-afk/SOP-generanjr/blob/4cf1a467e912984cb98d6dc969ab10eb685f458b/src/app/stage39-parts.json 'Manifest Stage39'
+
+    editor = module 'Редактор СОП' {
+      description 'Шаги, ключевые моменты, единое поле причин, управление шагами и ручная корректировка.'
+      link https://github.com/shonentez-afk/SOP-generanjr/blob/4cf1a467e912984cb98d6dc969ab10eb685f458b/src/modules/editor/stage38-steps.js 'Source'
+    }
+
+    review = module 'Контроль СОП' {
+      description 'Локальные проверки плюс единый запрос review. Замечания сохраняются с учётом изменений документа.'
+      link https://github.com/shonentez-afk/SOP-generanjr/blob/4cf1a467e912984cb98d6dc969ab10eb685f458b/src/modules/ai/stage28-review-task.js 'Source'
+    }
+
+    ai = module 'ИИ-подсистема' {
+      description 'Разные типы запросов с общим транспортом aiAsk. JSON и текст валидируются перед применением с оговорёнными ограничениями.'
+      generator = module 'Генерация СОП'
+      field = module 'Редактирование полей'
+      reviewtask = module 'ИИ-проверка'
+      mentoring = module 'Уточнения и наставник'
+      analog = module 'Создание по аналогу'
+      twitask = module 'Генерация TWI'
+      frvtask = module 'ИИ-анализ ФРВ'
+      transport = module 'Транспорт aiAsk'
+      response = module 'Валидация JSON'
+      guard = module 'Проверка актуальности'
+    }
+
+    frv = module 'ФРВ и Анализ ФРВ' {
+      study = module 'Наблюдения и реальные замеры'
+      suggestion = module 'Классификация и предложения'
+      transfer = module 'Передача в новый СОП'
+    }
+
+    twi = module 'TWI Job Instruction' {
+      generator = module 'План четырёх этапов'
+      print = module 'Экспорт печатного XLSX'
+    }
+
+    photos = module 'Фотографии и разметка' {
+      description 'Загрузка оригиналов и локальный графический редактор с Undo и Redo.'
+    }
+
+    library = module 'Библиотека СОП' {
+      description 'Черновики, публикация, версии, архив, обмен с папкой при разрешении пользователя.'
+    }
+
+    excel = module 'Корпоративный XLSX СОП' {
+      description 'Экспорт 3 листов с фото, форматированием и причинами в одной ячейке.'
+    }
+
+    assets = module 'Встроенные ресурсы' {
+      description 'ExcelJS 4.4 и локальные пиктограммы ISO 7010.'
+    }
+
+    storage = storage 'Локальная IndexedDB' {
+      docs = module 'Документы и версии'
+      media = module 'Фото и Blob'
+    }
+  }
+
+  proxy = cloud 'Yandex Cloud Function' {
+    description 'HTTPS POST: выбор модели, max_tokens, ограничения, обработка HTTP и возврат choices[0].message.content.'
+    link https://github.com/shonentez-afk/SOP-generanjr/blob/4cf1a467e912984cb98d6dc969ab10eb685f458b/proxy/index.py 'Source'
+  }
+
+  yandex = external 'YandexGPT API'
+  network = external 'Опциональная сетевая папка'
+
+  worker -> app 'Открывает автономный HTML'
+  app.editor -> app.ai.generator 'Запускает генерацию'
+  app.editor -> app.ai.field 'Улучшает отдельные поля'
+  app.editor -> app.review 'Передаёт СОП на проверку'
+  app.editor -> app.twi.generator 'Формирует TWI из СОП'
+  app.editor -> app.excel 'Экспортирует корпоративный XLSX'
+  app.editor -> app.photos 'Добавляет фотографии'
+  app.editor -> app.library 'Сохраняет документ'
+  app.frv.transfer -> app.editor 'Создаёт отдельный проект после подтверждения'
+  app.frv.study -> app.frv.suggestion 'Реальные наблюдения для анализа'
+  app.frv.suggestion -> app.ai.frvtask 'Предлагает категории и улучшения'
+  app.twi.generator -> app.ai.twitask 'Запрашивает учебный план'
+  app.twi.generator -> app.twi.print 'Экспортирует TWI'
+  app.review -> app.ai.reviewtask 'Запускает единый review'
+  app.review -> app.ai.mentoring 'Задаёт вопросы и объясняет'
+  app.ai.analog -> app.ai.generator 'Использует генератор структуры СОП'
+  app.ai.generator -> app.ai.transport 'JSON-задача'
+  app.ai.field -> app.ai.transport 'Текстовое поле'
+  app.ai.reviewtask -> app.ai.transport 'JSON-замечания'
+  app.ai.mentoring -> app.ai.transport 'Вопросы и предложения'
+  app.ai.analog -> app.ai.transport 'JSON с выбранным аналогом'
+  app.ai.twitask -> app.ai.transport 'JSON четырёх этапов JI'
+  app.ai.frvtask -> app.ai.transport 'JSON ФРВ'
+  app.ai.transport -> proxy 'HTTPS POST'
+  proxy -> yandex 'Completion API'
+  app.ai.transport -> app.ai.response 'Получает content'
+  app.ai.response -> app.ai.guard 'Проверенный формат'
+  app.ai.guard -> app.editor 'Только актуальный результат'
+  app.ai.guard -> app.review 'Отображает замечания'
+  app.ai.guard -> app.twi.generator 'План и сравнение правок'
+  app.ai.guard -> app.frv.suggestion 'Рекомендации без подмены замеров'
+  app.library -> app.storage.docs 'Сохраняет документы'
+  app.photos -> app.storage.media 'Сохраняет Blob'
+  app.library -> network 'Синхронизирует при разрешении'
+  app.photos -> app.excel 'Передаёт фотографии'
+  app.assets -> app.excel 'ExcelJS и ISO 7010'
+  app.assets -> app.twi.print 'ExcelJS'
+}

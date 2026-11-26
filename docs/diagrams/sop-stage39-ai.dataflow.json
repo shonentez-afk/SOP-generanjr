@@ -1,0 +1,464 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "SOP-generanjr Stage39 — поток запросов к ИИ",
+    "subtitle": "Запрос → aiAsk → Yandex Cloud Function → YandexGPT → проверка ответа → подтверждение",
+    "output": "docs/diagrams/sop-stage39-ai-archify.html",
+    "locale": "ru",
+    "quality_profile": "showcase",
+    "feedback_links": false,
+    "visual_preset": "signal-flow",
+    "repository": {
+      "url": "https://github.com/shonentez-afk/SOP-generanjr.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "4cf1a467e912984cb98d6dc969ab10eb685f458b"
+    }
+  },
+  "stages": [
+    {
+      "label": "Действия пользователя"
+    },
+    {
+      "label": "Формирование задачи"
+    },
+    {
+      "label": "Транспорт и прокси"
+    },
+    {
+      "label": "Модель"
+    },
+    {
+      "label": "Проверка и применение"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "sop_ui",
+      "type": "frontend",
+      "stage": 0,
+      "row": 0,
+      "label": "СОП / редактор",
+      "sublabel": "генерация · поля · аналог",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage29-generate-sop.js",
+          "line": 1,
+          "end_line": 33
+        }
+      ]
+    },
+    {
+      "id": "qa_ui",
+      "type": "frontend",
+      "stage": 0,
+      "row": 1,
+      "label": "Проверка и наставник",
+      "sublabel": "проверка · вопросы · спор",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage28-review-task.js",
+          "line": 58,
+          "end_line": 104
+        }
+      ]
+    },
+    {
+      "id": "twi_ui",
+      "type": "frontend",
+      "stage": 0,
+      "row": 2,
+      "label": "TWI из СОП",
+      "sublabel": "4 этапа JI",
+      "sources": [
+        {
+          "path": "src/modules/twi/stage29-from-sop.js",
+          "line": 40,
+          "end_line": 61
+        }
+      ]
+    },
+    {
+      "id": "frv_ui",
+      "type": "frontend",
+      "stage": 0,
+      "row": 3,
+      "label": "Анализ ФРВ",
+      "sublabel": "черновик · анализ · категории",
+      "sources": [
+        {
+          "path": "src/modules/frv/stage35-study-ai.js",
+          "line": 123,
+          "end_line": 155
+        }
+      ]
+    },
+    {
+      "id": "sop_tasks",
+      "type": "backend",
+      "stage": 1,
+      "row": 0,
+      "label": "SOP tasks",
+      "sublabel": "generate_sop · edit_* · analog",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage29-generate-sop.js",
+          "line": 17,
+          "end_line": 24
+        },
+        {
+          "path": "src/modules/ai/stage22-field-editor.js",
+          "line": 14,
+          "end_line": 15
+        },
+        {
+          "path": "src/modules/ai/stage27-analogs-history.js",
+          "line": 96,
+          "end_line": 103
+        }
+      ]
+    },
+    {
+      "id": "qa_tasks",
+      "type": "backend",
+      "stage": 1,
+      "row": 1,
+      "label": "Review tasks",
+      "sublabel": "review · questions · proposals",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage28-review-task.js",
+          "line": 97,
+          "end_line": 105
+        },
+        {
+          "path": "src/modules/ai/stage27-intelligence.js",
+          "line": 67,
+          "end_line": 90
+        }
+      ]
+    },
+    {
+      "id": "twi_tasks",
+      "type": "backend",
+      "stage": 1,
+      "row": 2,
+      "label": "TWI task",
+      "sublabel": "twi_generate · JSON (15 полей)",
+      "sources": [
+        {
+          "path": "src/modules/twi/stage29-from-sop.js",
+          "line": 53,
+          "end_line": 59
+        }
+      ]
+    },
+    {
+      "id": "frv_tasks",
+      "type": "backend",
+      "stage": 1,
+      "row": 3,
+      "label": "FRV tasks",
+      "sublabel": "build · row · analyze · classify",
+      "sources": [
+        {
+          "path": "src/modules/frv/stage35-study-ai.js",
+          "line": 45,
+          "end_line": 64
+        },
+        {
+          "path": "src/modules/frv/stage35-study-ai.js",
+          "line": 189,
+          "end_line": 214
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "type": "frontend",
+      "stage": 2,
+      "row": 1,
+      "label": "aiAsk()",
+      "sublabel": "POST · model · temperature · task",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage26-transport.js",
+          "line": 36,
+          "end_line": 65
+        }
+      ]
+    },
+    {
+      "id": "proxy",
+      "type": "cloud",
+      "stage": 2,
+      "row": 3,
+      "label": "Yandex Cloud Function",
+      "sublabel": "проверка · modelUri · HTTP",
+      "sources": [
+        {
+          "path": "proxy/index.py",
+          "line": 145,
+          "end_line": 205
+        }
+      ]
+    },
+    {
+      "id": "model",
+      "type": "external",
+      "stage": 3,
+      "row": 2,
+      "label": "YandexGPT",
+      "sublabel": "completion · текст модели",
+      "sources": [
+        {
+          "path": "proxy/index.py",
+          "line": 16,
+          "end_line": 27
+        }
+      ]
+    },
+    {
+      "id": "envelope",
+      "type": "frontend",
+      "stage": 4,
+      "row": 0,
+      "label": "Разбор ответа proxy",
+      "sublabel": "choices[0].message.content",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage26-transport.js",
+          "line": 71,
+          "end_line": 88
+        }
+      ]
+    },
+    {
+      "id": "validation",
+      "type": "security",
+      "stage": 4,
+      "row": 1,
+      "label": "Проверка формата",
+      "sublabel": "JSON / схема / нормализация",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage24-task-response.js",
+          "line": 14,
+          "end_line": 22
+        },
+        {
+          "path": "src/modules/ai/stage23-protocol.js",
+          "line": 22,
+          "end_line": 60
+        }
+      ]
+    },
+    {
+      "id": "guard",
+      "type": "security",
+      "stage": 4,
+      "row": 2,
+      "label": "Контроль актуальности",
+      "sublabel": "не применять устаревшие ответы",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage22-context-guard.js",
+          "line": 42,
+          "end_line": 66
+        }
+      ]
+    },
+    {
+      "id": "commit",
+      "type": "frontend",
+      "stage": 4,
+      "row": 3,
+      "label": "Применение результата",
+      "sublabel": "сравнение / подтверждение / сохранение",
+      "sources": [
+        {
+          "path": "src/modules/ai/stage29-generate-sop.js",
+          "line": 25,
+          "end_line": 73
+        },
+        {
+          "path": "src/modules/twi/stage29-from-sop.js",
+          "line": 60,
+          "end_line": 85
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "f_sop_ui_sop_tasks",
+      "from": "sop_ui",
+      "to": "sop_tasks",
+      "label": "описание / текущие шаги",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f_qa_ui_qa_tasks",
+      "from": "qa_ui",
+      "to": "qa_tasks",
+      "label": "СОП и проверяемые поля",
+      "variant": "default"
+    },
+    {
+      "id": "f_twi_ui_twi_tasks",
+      "from": "twi_ui",
+      "to": "twi_tasks",
+      "label": "снимок СОП",
+      "variant": "default"
+    },
+    {
+      "id": "f_frv_ui_frv_tasks",
+      "from": "frv_ui",
+      "to": "frv_tasks",
+      "label": "наблюдения и замеры",
+      "variant": "default"
+    },
+    {
+      "id": "f_sop_tasks_transport",
+      "from": "sop_tasks",
+      "to": "transport",
+      "label": "task + system/user",
+      "variant": "default"
+    },
+    {
+      "id": "f_qa_tasks_transport",
+      "from": "qa_tasks",
+      "to": "transport",
+      "label": "task + system/user",
+      "variant": "default"
+    },
+    {
+      "id": "f_twi_tasks_transport",
+      "from": "twi_tasks",
+      "to": "transport",
+      "label": "task + system/user",
+      "variant": "default"
+    },
+    {
+      "id": "f_frv_tasks_transport",
+      "from": "frv_tasks",
+      "to": "transport",
+      "label": "task + system/user",
+      "variant": "default"
+    },
+    {
+      "id": "f_transport_proxy",
+      "from": "transport",
+      "to": "proxy",
+      "label": "POST JSON через HTTPS",
+      "variant": "security"
+    },
+    {
+      "id": "f_proxy_model",
+      "from": "proxy",
+      "to": "model",
+      "label": "completion API",
+      "variant": "security"
+    },
+    {
+      "id": "f_model_proxy",
+      "from": "model",
+      "to": "proxy",
+      "label": "текст AI",
+      "variant": "dashed"
+    },
+    {
+      "id": "f_proxy_envelope",
+      "from": "proxy",
+      "to": "envelope",
+      "label": "JSON choices[]",
+      "variant": "dashed"
+    },
+    {
+      "id": "f_envelope_validation",
+      "from": "envelope",
+      "to": "validation",
+      "label": "извлечь content",
+      "variant": "default"
+    },
+    {
+      "id": "f_validation_guard",
+      "from": "validation",
+      "to": "guard",
+      "label": "только валидный ответ",
+      "variant": "security"
+    },
+    {
+      "id": "f_guard_commit",
+      "from": "guard",
+      "to": "commit",
+      "label": "актуальный запрос",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f_commit_sop_ui",
+      "from": "commit",
+      "to": "sop_ui",
+      "label": "шаги / предложения",
+      "variant": "dashed"
+    },
+    {
+      "id": "f_commit_qa_ui",
+      "from": "commit",
+      "to": "qa_ui",
+      "label": "замечания",
+      "variant": "dashed"
+    },
+    {
+      "id": "f_commit_twi_ui",
+      "from": "commit",
+      "to": "twi_ui",
+      "label": "план обучения",
+      "variant": "dashed"
+    },
+    {
+      "id": "f_commit_frv_ui",
+      "from": "commit",
+      "to": "frv_ui",
+      "label": "предложения, не RAW",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Разные задачи, общий транспорт",
+      "items": [
+        "Каждая кнопка формирует собственный system prompt и user-контекст",
+        "aiAsk упаковывает model, messages, temperature, max_tokens и task"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Реальная сетевая граница",
+      "items": [
+        "Браузер отправляет POST в Yandex Cloud Function, а не непосредственно в YandexGPT",
+        "Cloud Function выбирает модель согласно переменным окружения и возвращает choices[0].message.content"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Не все ответы одинаковы",
+      "items": [
+        "generate_sop и review ожидают структурированный JSON",
+        "edit_* и photo_hint — короткий текст; TWI — 4 секции / 15 полей",
+        "FRV — отдельные JSON-форматы для черновика, классификации и анализа"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Защитные условия",
+      "items": [
+        "JSON/структура и ограничения задачи проверяются до применения",
+        "Устаревший ответ отбрасывается, подтверждения сохраняют ручные изменения",
+        "RAW/фактическое время ФРВ не меняется ответом ИИ"
+      ]
+    }
+  ]
+}

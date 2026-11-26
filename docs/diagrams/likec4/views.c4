@@ -1,0 +1,92 @@
+// LikeC4 multi-level views of one offline Stage39 browser application.
+// Static analysis of 67 active modules is available separately in stage39-verified-callgraph.json.
+views {
+
+  view landscape {
+    title '01 · Общее устройство конструктора'
+    description 'Пользователь, автономное приложение, внешняя ИИ-модель и опциональная сетевая папка.'
+    include *
+  }
+
+  view modules of app {
+    title '02 · Подсистемы внутри автономного HTML'
+    description 'Логические блоки приложения. Не микросервисы: код выполняется в одном JavaScript runtime.'
+    include
+      *,
+      worker,
+      proxy,
+      yandex,
+      network
+  }
+
+  view sop-details of app.editor {
+    title '03 · Жизненный цикл СОП'
+    description 'Составление, проверка, фото, Excel, библиотека и создание TWI по существующему СОП.'
+    include
+      *,
+      app.review,
+      app.photos,
+      app.excel,
+      app.ai.generator,
+      app.ai.field,
+      app.twi,
+      app.library,
+      app.frv.transfer
+  }
+
+  view ai-details of app.ai {
+    title '04 · Запросы и ответы ИИ'
+    description 'Транспорт aiAsk, внешний Yandex Cloud proxy, YandexGPT, JSON валидация и guard актуальности.'
+    include
+      *,
+      app.editor,
+      app.review,
+      app.twi.generator,
+      app.frv.suggestion,
+      proxy,
+      yandex
+  }
+
+  view twi-details of app.twi {
+    title '05 · TWI Job Instruction'
+    description 'Создание плана обучения из СОП, защита ручных правок и печатный XLSX.'
+    include
+      *,
+      app.editor,
+      app.ai.twitask,
+      app.ai.guard,
+      app.assets
+  }
+
+  view frv-details of app.frv {
+    title '06 · Исследование ФРВ'
+    description 'Замеры отдельно от ИИ-предложений; новый СОП только после предпросмотра и backup.'
+    include
+      *,
+      app.editor,
+      app.ai.frvtask,
+      app.ai.guard
+  }
+
+  view storage-details of app.storage {
+    title '07 · Документы, фото и синхронизация'
+    description 'Локальная IndexedDB и опциональный обмен файлами через выбранную сетевую папку.'
+    include
+      *,
+      app.library,
+      app.photos,
+      network
+  }
+
+  view excel-details of app.excel {
+    title '08 · Excel и локальные ресурсы'
+    description 'Корпоративский XLSX, фото и локальный ExcelJS; TWI XLSX формируется отдельно.'
+    include
+      *,
+      app.editor,
+      app.photos,
+      app.assets,
+      app.twi.print
+  }
+
+}
